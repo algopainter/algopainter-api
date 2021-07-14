@@ -1,0 +1,37 @@
+{
+  "name": "@algopainter/algopainter-api",
+  "version": "1.0.0",
+  "description": "AlgoPainter API",
+  "main": "app.ts",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "netlify": "netlify dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/algopainter/algopainter-api"
+  },
+  "keywords": [],
+  "author": "AlgoPainter Developers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/algopainter/algopainter-api/issues"
+  },
+  "homepage": "https://github.com/algopainter/algopainter-api#readme",
+  "dependencies": {
+    "@netlify/functions": "^0.7.2",
+    "dotenv": "^10.0.0",
+    "mongo-querystring": "^4.1.1",
+    "mongoose": "^5.13.2"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^15.14.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "eslint": "^7.30.0",
+    "netlify-cli": "^4.3.0",
+    "typedoc": "^0.21.4",
+    "typescript": "^4.3.5"
+  }
+}

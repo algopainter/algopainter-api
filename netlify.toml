@@ -1,0 +1,7 @@
+[functions]
+  directory = "src/netlify"
+
+[[redirects]]
+  from = '/'
+  to = '/.netlify/functions/index'
+  status = 200
