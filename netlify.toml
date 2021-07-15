@@ -2,6 +2,17 @@
   directory = "src/netlify"
 
 [[redirects]]
+  from = '/api/auction/get'
+  to = '/.netlify/functions/auctions-get'
+  query = { id = ":id" }
+  status = 200
+
+[[redirects]]
+  from = '/api/auction/*'
+  to = '/.netlify/functions/auctions-:splat'
+  status = 200
+
+[[redirects]]
   from = '/'
   to = '/.netlify/functions/index'
   status = 200
