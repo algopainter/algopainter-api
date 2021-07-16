@@ -11,7 +11,7 @@ export default abstract class BaseService<T> {
   abstract pagedAsync(filter: IFilter | null, order: IOrderBy | null, page: number | null, perPage: number | null)
     : Promise<Result<Paged<T>>>;
   
-  abstract getAsync(filter: IFilter | null)
+  abstract getAsync(id: string)
     : Promise<Result<T>>;
   
   abstract createAsync(createdItem: T)

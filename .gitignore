@@ -1,5 +1,6 @@
 #netlify
 .netlify
+bin
 
 # Logs
 logs

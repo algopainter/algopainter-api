@@ -36,11 +36,10 @@ export default class AuctionService extends BaseService<IAuction> {
    * @param filter Filter for data
    * @returns Promise<Result<IAuction>>
    */
-  async getAsync(filter: IFilter): Promise<Result<IAuction>> {
+  async getAsync(id: string): Promise<Result<IAuction>> {
     try {
       await this._connect();
-      console.log(filter);
-      const data = await AuctionContext.findById(filter['id'])
+      const data = await AuctionContext.findById(id);
       return Result.success<IAuction>(null, data);
     } catch(ex) {
       return Result.fail<IAuction>(ex.toString(), null);
@@ -57,7 +56,7 @@ export default class AuctionService extends BaseService<IAuction> {
    * @param perPage Number of items per page
    * @returns Promise<Result<Paged<IAuction>>>
    */
-  async pagedAsync(filter: IFilter, order: IOrderBy | null, page: number | null, perPage: number | null): Promise<Result<Paged<IAuction>>> {
+  async pagedAsync(filter: IFilter, order: IOrderBy | null, page: number, perPage: number): Promise<Result<Paged<IAuction>>> {
     try {
       await this._connect();
       const qs = new MongoQS();
