@@ -3,7 +3,7 @@ import { AuctionContext, IAuction } from "../domain/auction";
 import BaseService, { IFilter, IOrderBy } from "./base-service";
 import Paged from "../shared/paged";
 import { connect, disconnect, Mongoose } from 'mongoose';
-import { Settings } from "../shared/settings";
+import Settings from "../shared/settings";
 import MongoQS from 'mongo-querystring'
 /**
  * Auction service class
@@ -15,7 +15,7 @@ export default class AuctionService extends BaseService<IAuction> {
    * Connects to database
    */
   private async _connect() : Promise<Mongoose> {
-    return await connect(Settings['mongoURL'], {
+    return await connect(Settings.mongoURL(), {
       useNewUrlParser: true, 
       useUnifiedTopology: true
     });
