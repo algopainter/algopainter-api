@@ -27,8 +27,22 @@ export default class AuctionService extends BaseService<IAuction> {
    * @param order Order of data
    * @returns Promise<Result<IAuction[]>>
    */
-  listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IAuction[]>> {
-    throw new Error("Method not implemented.");
+  async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IAuction[]>> {
+    try {
+      await this._connect();
+      const qs = new MongoQS();
+      const query = Object.keys(filter).length ? qs.parse(filter) : null;
+      
+      const data = await AuctionContext
+        .find(query)
+        .sort(Object.keys(order).length ? order : { createdAt : -1 });
+      
+      return Result.success<IAuction[]>(null, data);
+    } catch(ex) {
+      return Result.fail<IAuction[]>(ex.toString(), null);
+    } finally {
+      await disconnect();
+    }
   }
 
   /**
@@ -61,7 +75,6 @@ export default class AuctionService extends BaseService<IAuction> {
       await this._connect();
       const qs = new MongoQS();
       const query = Object.keys(filter).length ? qs.parse(filter) : null;
-      console.log(query);
       const count = await AuctionContext.find(query).countDocuments();
       
       const data = await AuctionContext

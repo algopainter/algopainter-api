@@ -6,12 +6,16 @@ abstract class BaseController {
   abstract get path(): string;
   abstract intializeRoutes(router: Router): void;
 
-  handleResult<T>(actionResult: Result<T>, res: Response<unknown, Record<string, unknown>>): void {
+  handleResult(actionResult: Result<unknown> | null, res: Response<unknown, Record<string, unknown>>): void {
     try {
-      if (actionResult.success) {
-        res.status(200).send(actionResult.data || actionResult.message)
+      if(actionResult == null) {
+        res.status(204).send();
       } else {
-        res.status(400).send(actionResult.data || actionResult.message)
+        if (actionResult.success) {
+          res.status(200).send(actionResult.data || actionResult.message)
+        } else {
+          res.status(400).send(actionResult.data || actionResult.message)
+        }
       }
     } catch (ex) {
       console.log(ex);
