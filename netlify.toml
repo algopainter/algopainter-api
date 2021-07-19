@@ -1,7 +1,6 @@
-[functions]
-  directory = "src/netlify"
+[build]
+  command = "npm install && npm run build-netlify"
+  functions = "bin/netlify"
 
-[[redirects]]
-  from = '/'
-  to = '/.netlify/functions/index'
-  status = 200
+[functions]
+  directory = "bin/netlify"
