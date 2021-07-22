@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import bodyParser from 'body-parser';
 import { BaseController } from './controllers/base-controller'
 import AuctionController from './controllers/auction-controller'
+import cors from 'cors';
 
 class Application {
   public app: express.Application;
@@ -19,6 +20,7 @@ class Application {
  
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
+    this.app.use(cors());
     this.app.use('/api', this.router); // Netlify redirects
     this.app.use('/.netlify/functions/server', this.router); // Netlify redirects
   }
