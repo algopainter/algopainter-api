@@ -1,20 +1,21 @@
 import { model, Schema, Model, Document } from 'mongoose';
-export interface UserDocument extends Document {
-  account: string;
+
+
+
+export interface CollectionDocument extends Document {
   createdAt: Date;
   updatedAt: Date;
-  avatar: string;
   name: string;
-  role: "creator" | "bidder" | "owner"
+  items: 
 }
 
-export interface IUser {
-  account: UserDocument['account'];
-  createdAt: UserDocument['createdAt'];
-  updatedAt: UserDocument['updatedAt'];
-  avatar: UserDocument['avatar'];
-  name: UserDocument['name'];
-  role: UserDocument['role']
+export interface ICollection {
+  account: CollectionDocument['account'];
+  createdAt: CollectionDocument['createdAt'];
+  updatedAt: CollectionDocument['updatedAt'];
+  avatar: CollectionDocument['avatar'];
+  name: CollectionDocument['name'];
+  role: CollectionDocument['role']
 }
 
 export const UserSchema: Schema = new Schema({
@@ -26,4 +27,4 @@ export const UserSchema: Schema = new Schema({
   role: { type: Date, required: true },
 });
 
-export const AttendanceContext: Model<UserDocument> = model('users', UserSchema);
+export const AttendanceContext: Model<UserDocument> = model('collections', UserSchema);
