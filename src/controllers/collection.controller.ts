@@ -29,7 +29,7 @@ class CollectionController extends BaseController {
             params.filter, 
             params.order, 
             params.paging.page, 
-            params.paging.page
+            params.paging.perPage
           );
         }
         this.handleResult(result, res);

@@ -22,14 +22,14 @@ class AuctionController extends BaseController {
       try {
         const params = this.requestParams(req);
         let result : Result<Paged<IAuction>> | Result<IAuction[]> | null = null;
-        if(params.paging.page === -1 || params.paging.page === -1) {
+        if(params.paging.page === -1 || params.paging.perPage === -1) {
           result = await this.service.listAsync(params.filter, params.order);
         } else {
           result = await this.service.pagedAsync(
             params.filter, 
             params.order, 
             params.paging.page, 
-            params.paging.page
+            params.paging.perPage
           );
         }
         this.handleResult(result, res);
