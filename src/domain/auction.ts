@@ -1,33 +1,54 @@
 import { model, Schema, Model, Document } from 'mongoose';
-import { IUser, UserSchema } from './user';
+import { IUser } from './user';
+
+export interface IAuctionUser extends IUser {
+  _id: string;
+}
 
 export interface IBid {
   amount: number;
   tokenSymbol: string;
   type: "bid" | "minimum" | "lowest" | "highest";
   createdAt: Date;
-  bidder?: IUser | null;
+  bidder?: IAuctionUser | null;
 }
 
 export interface IAuctionItem {
+  _id: string;
+  likes: number;
   title: string;
   previewImageUrl: string;
   tags: string[]
 }
 
-export class AuctionDocument extends Document {
-  likes: number;
+export interface IAuctionRoyality {
+  value: number;
+  type: 'creator' | 'investor'
+}
+
+export interface IAuctionFees {
+  bidBack: number;
+  royalities: IAuctionRoyality[];
+  service: number;
+}
+
+export interface AuctionDocument extends Document {
   item: IAuctionItem;
   createdAt: Date;
   updatedAt: Date;
+  startDt: Date;
+  expirationDt: Date;
+  fee: IAuctionFees;
   isHot: boolean;
-  users: IUser[];
+  users: IAuctionUser[];
   bids: IBid[];
   categories: string[];
 }
 
 export interface IAuction {
-  likes: AuctionDocument['likes'];
+  startDt: AuctionDocument['startDt'];
+  expirationDt: AuctionDocument['expirationDt'];
+  fee: AuctionDocument['fee'];
   item: AuctionDocument['item'];
   createdAt: AuctionDocument['createdAt'];
   updatedAt: AuctionDocument['updatedAt'];
@@ -38,8 +59,10 @@ export interface IAuction {
 }
 
 export const AuctionSchema: Schema = new Schema({
-  likes: { type: Number, required: true },
   item: { type: Object, required: true },
+  fee: { type: Object, required: true },
+  startDt: { type: Date, required: true },
+  expirationDt: { type: Date, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
   isHot: { type: Boolean, required: true },
