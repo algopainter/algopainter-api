@@ -3,8 +3,8 @@ import { ICollection } from "./domain/collection";
 import { IImage } from "./domain/image";
 import { IUser } from "./domain/user";
 
-const auctionData = (imageID: string) : IAuction => { return {
-  isHot: false,
+const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
+  isHot: isHot,
   fee: {
     bidBack: 10,
     royalities: [
@@ -25,18 +25,62 @@ const auctionData = (imageID: string) : IAuction => { return {
     title: 'Amazing Galaxy',
     tags: ['Galaxy', 'Art', 'Creation']
   },
+  minimumBid: {
+    amount: 600,
+    createdAt: new Date(),
+    tokenSymbol: 'ALGOP',
+  },
+  lowestBid: {
+    amount: 100,
+    createdAt: new Date(),
+    tokenSymbol: 'USD',
+    bidder: {
+      account: '0x0FR71571GTAHJU',
+      avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
+      createdAt: new Date(),
+      name: 'Gleisson',
+      role: 'creator',
+      updatedAt: new Date(),
+      _id: "60b6c7adf1cd1b3be43aa60e",
+      networks: [
+        {
+          name: '@algopainter',
+          type: 'instagram',
+          url: 'https://instagram.com/algopainter'
+        }
+      ],
+      type: 'developer',
+      bio: 'Director of Criptonomia'
+    }
+  },
+  highestBid: {
+    amount: 900,
+    createdAt: new Date(),
+    tokenSymbol: 'ETH',
+    bidder: {
+      account: '0x0FR71571GTAHJU',
+      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
+      createdAt: new Date(),
+      name: 'Lincoln',
+      role: 'owner',
+      updatedAt: new Date(),
+      _id: "60b6c7adf1cd1b3be43aa60e",
+      networks: [
+        {
+          name: '@algopainter',
+          type: 'instagram',
+          url: 'https://instagram.com/algopainter'
+        }
+      ],
+      type: 'developer',
+      bio: 'Product Manager of Criptonomia'
+    }
+  },
   bids: [
     {
-      amount: 600,
-      createdAt: new Date(),
-      tokenSymbol: 'ALGOP',
-      type: 'minimum',
-    },
-    {
-      amount: 900,
+      amount: 100,
       createdAt: new Date(),
       tokenSymbol: 'USD',
-      type: 'lowest',
       bidder: {
         account: '0x0FR71571GTAHJU',
         avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
@@ -57,10 +101,9 @@ const auctionData = (imageID: string) : IAuction => { return {
       }
     },
     {
-      amount: 400,
+      amount: 900,
       createdAt: new Date(),
       tokenSymbol: 'ETH',
-      type: 'highest',
       bidder: {
         account: '0x0FR71571GTAHJU',
         avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
@@ -121,9 +164,9 @@ const auctionData = (imageID: string) : IAuction => { return {
   ]
 }};
 
-const collectionData = (imageID: string) : ICollection => { return {
-  title: 'Gwei ' + Math.floor(Math.random() * 101),
-  description: 'A gwei collection ' + Math.floor(Math.random() * 101),
+const collectionData = (prefix:string, imageID: string) : ICollection => { return {
+  title: prefix + ' ' + Math.floor(Math.random() * 101),
+  description: 'A ' + prefix + ' collection ' + Math.floor(Math.random() * 101),
   owner: {
     account: '0x0FR71571GTAHJU',
     avatar: 'https://randomuser.me/api/portraits/men/.jpg',
@@ -210,9 +253,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -291,9 +334,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -372,9 +415,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -453,9 +496,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -534,9 +577,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -615,9 +658,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -696,9 +739,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -777,9 +820,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -858,9 +901,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -939,9 +982,9 @@ const collectionData = (imageID: string) : ICollection => { return {
             }
           ]
         },
-        image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-        previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-        rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+        image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+        previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+        rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
         parameters:{
           text:"Bull market",
           inspiration:"3",
@@ -1022,9 +1065,9 @@ const imagesData = () : IImage => { return {
         }
       ]
     },
-    image:"QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
-    previewImage:"QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
-    rawImage:"Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
+    image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
+    previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
+    rawImage:"https://gateway.pinata.cloud/ipfs/Qmcz2eofzgahazVGuDwJXmpuFVdawVQKKuEV2a8vcYmZ33",
     parameters:{
       text:"Bull market",
       inspiration:"3",

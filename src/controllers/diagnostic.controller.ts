@@ -46,21 +46,29 @@ class DiagnosticController extends BaseController {
           </html>`)
     });
 
-    router.get(`${this.path}/seed/:amount`, async (req, res) => {
-      const auctionService = new AuctionService();
-      const userService = new UserService();
-      const collectionService = new CollectionService();
-      const imageService = new ImageService();
+    router.get(`${this.path}/seed/:secret`, async (req, res) => {
+      if (req.params.secret === 'AlgoPainter') {
+        const auctionService = new AuctionService();
+        const userService = new UserService();
+        const collectionService = new CollectionService();
+        const imageService = new ImageService();
 
-      userService.createAsync(usersData());
+        //userService.createAsync(usersData());
+        const imageCreated: any = await imageService.createAsync(imagesData());
 
-      for (let index = 0; index < parseInt(req.params.amount); index++) {
-        const imageCreated:any = await imageService.createAsync(imagesData());
-        await auctionService.createAsync(auctionData(imageCreated.data['_id']));
-        await collectionService.createAsync(collectionData(imageCreated.data['_id']));
+        for (let index = 0; index < 30; index++) {
+          await auctionService.createAsync(auctionData(imageCreated.data['_id'], index % 2 == 0));
+          await this.sleep(1000);
+        }
+
+        await collectionService.createAsync(collectionData('Gwei', imageCreated.data['_id']));
+        await collectionService.createAsync(collectionData('Expressions', imageCreated.data['_id']));
+        await collectionService.createAsync(collectionData('Monero', imageCreated.data['_id']));
+
+        res.status(200).send('Data created!');
+      } else {
+        res.status(404).send();
       }
-
-      res.status(200).send('Data created!');
     });
   }
 }
