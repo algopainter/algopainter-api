@@ -1,5 +1,5 @@
 import { IAuction } from "./domain/auction";
-import { ICollection } from "./domain/Collection";
+import { ICollection } from "./domain/collection";
 import { IImage } from "./domain/image";
 import { IUser } from "./domain/user";
 

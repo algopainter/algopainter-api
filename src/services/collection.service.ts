@@ -1,5 +1,5 @@
 import Result from "../shared/result";
-import { CollectionContext, ICollection } from "../domain/Collection";
+import { CollectionContext, ICollection } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
 import { disconnect } from 'mongoose';

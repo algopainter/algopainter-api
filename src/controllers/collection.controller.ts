@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ICollection } from "../domain/Collection";
+import { ICollection } from "../domain/collection";
 import CollectionService from "../services/collection.service";
 import Paged from "../shared/paged";
 import Result from "../shared/result";
