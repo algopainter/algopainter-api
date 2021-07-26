@@ -1,25 +1,13 @@
 import Result from "../shared/result";
 import { AuctionContext, IAuction } from "../domain/auction";
-import BaseService, { IFilter, IOrderBy } from "./base-service";
+import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
-import { connect, disconnect, Mongoose } from 'mongoose';
-import Settings from "../shared/settings";
-import MongoQS from 'mongo-querystring'
+import { disconnect } from 'mongoose';
 /**
  * Auction service class
- * @class AuctionService @extends BaseService<IAuction>
+ * @class AuctionService @extends BaseCRUDService<IAuction>
  */
-export default class AuctionService extends BaseService<IAuction> {
-
-  /**
-   * Connects to database
-   */
-  private async _connect() : Promise<Mongoose> {
-    return await connect(Settings.mongoURL(), {
-      useNewUrlParser: true, 
-      useUnifiedTopology: true
-    });
-  }
+export default class AuctionService extends BaseCRUDService<IAuction> {
 
   /**
    * List auctions data paged
@@ -30,12 +18,10 @@ export default class AuctionService extends BaseService<IAuction> {
   async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IAuction[]>> {
     try {
       await this._connect();
-      const qs = new MongoQS();
-      const query = Object.keys(filter).length ? qs.parse(filter) : null;
       
       const data = await AuctionContext
-        .find(query)
-        .sort(Object.keys(order).length ? order : { createdAt : -1 });
+        .find(this.translateToMongoQuery(filter))
+        .sort(this.translateToMongoOrder(order));
       
       return Result.success<IAuction[]>(null, data);
     } catch(ex) {
@@ -73,14 +59,13 @@ export default class AuctionService extends BaseService<IAuction> {
   async pagedAsync(filter: IFilter, order: IOrderBy | null, page: number, perPage: number): Promise<Result<Paged<IAuction>>> {
     try {
       await this._connect();
-      const qs = new MongoQS();
-      const query = Object.keys(filter).length ? qs.parse(filter) : null;
+      const query = this.translateToMongoQuery(filter);
       const count = await AuctionContext.find(query).countDocuments();
       
       const data = await AuctionContext
         .find(query)
+        .sort(this.translateToMongoOrder(order))
         .skip((page - 1) * (perPage))
-        .sort(Object.keys(order).length ? order : { createdAt : -1 })
         .limit(perPage);
       
       return Result.success<Paged<IAuction>>(null, {

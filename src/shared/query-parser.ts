@@ -1,4 +1,4 @@
-import { IFilter, IOrderBy } from "../services/base-service";
+import { IFilter, IOrderBy } from "../services/base.service";
 
 export default class QueryParser {
   static parseByPrefix(prefix: string, object: unknown) : IFilter | IOrderBy {

@@ -1,8 +1,8 @@
 import { model, Schema, Model, Document } from 'mongoose';
-import { IUser, UserSchema } from './user';
+import { IUser } from './user';
 
 export interface IAuctionUser extends IUser {
-  id: string;
+  _id: string;
 }
 
 export interface IBid {
@@ -14,7 +14,8 @@ export interface IBid {
 }
 
 export interface IAuctionItem {
-  id: string;
+  _id: string;
+  likes: number;
   title: string;
   previewImageUrl: string;
   tags: string[]
@@ -32,7 +33,6 @@ export interface IAuctionFees {
 }
 
 export interface AuctionDocument extends Document {
-  likes: number;
   item: IAuctionItem;
   createdAt: Date;
   updatedAt: Date;
@@ -46,7 +46,6 @@ export interface AuctionDocument extends Document {
 }
 
 export interface IAuction {
-  likes: AuctionDocument['likes'];
   startDt: AuctionDocument['startDt'];
   expirationDt: AuctionDocument['expirationDt'];
   fee: AuctionDocument['fee'];
@@ -60,7 +59,6 @@ export interface IAuction {
 }
 
 export const AuctionSchema: Schema = new Schema({
-  likes: { type: Number, required: true },
   item: { type: Object, required: true },
   fee: { type: Object, required: true },
   startDt: { type: Date, required: true },

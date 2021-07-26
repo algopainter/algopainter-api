@@ -1,30 +1,33 @@
 import { model, Schema, Model, Document } from 'mongoose';
+import { IImage } from './image';
+import { IUser } from './user';
 
+export interface ICollectionImage extends IImage {
+  _id: string;
+}
 
-
+export interface ICollectionOwner extends IUser {
+  _id: string;
+}
 export interface CollectionDocument extends Document {
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  items: 
+  title: string;
+  description: string;
+  images: ICollectionImage[];
+  owner: ICollectionOwner;
 }
 
 export interface ICollection {
-  account: CollectionDocument['account'];
-  createdAt: CollectionDocument['createdAt'];
-  updatedAt: CollectionDocument['updatedAt'];
-  avatar: CollectionDocument['avatar'];
-  name: CollectionDocument['name'];
-  role: CollectionDocument['role']
+  title: CollectionDocument['title'];
+  description: CollectionDocument['description'];
+  images: CollectionDocument['images'];
+  owner: CollectionDocument['owner'];
 }
 
-export const UserSchema: Schema = new Schema({
-  account: { type: String, required: true, index: true },
-  createdAt: { type: Date, required: true },
-  updatedAt: { type: Date, required: false },
-  avatar: { type: Date, required: true },
-  name: { type: Date, required: true },
-  role: { type: Date, required: true },
+export const CollectionSchema: Schema = new Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  images: { type: [Object], required: true },
+  owner: { type: Object, required: true }
 });
 
-export const AttendanceContext: Model<UserDocument> = model('collections', UserSchema);
+export const CollectionContext: Model<CollectionDocument> = model('collections', CollectionSchema);
