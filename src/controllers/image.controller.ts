@@ -46,6 +46,14 @@ class ImageController extends BaseController {
         this.handleResult(error, res);
       }
     });
+
+    router.post(`${this.path}/:id/like`, async (req, res) => {
+      res.status(200).send(req.body);
+    });
+
+    router.delete(`${this.path}/:id/dislike`, async (req, res) => {
+      res.status(200).send(req.body);
+    });
   }
 }
 
