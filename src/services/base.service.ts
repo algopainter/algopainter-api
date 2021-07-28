@@ -46,13 +46,10 @@ export abstract class BaseService {
     const web3 = new Web3();
     const signedHash = web3.eth.accounts.hashMessage(JSON.stringify(sign.data));
     const desiredSignedHash = web3.eth.accounts.hashMessage(JSON.stringify(desired));
-    console.log(signedHash);
-    console.log(desiredSignedHash);
     const signer = web3.eth.accounts.recover(signedHash, sign.signature, true);
-    const signerLocal = web3.eth.accounts.recover(desiredSignedHash, sign.signature, true);
-    console.log(signer);
-    console.log(signerLocal);
-    return signer == sign.account && signerLocal == sign.account;
+    const signerLocal = web3.eth.accounts.recover(desiredSignedHash, sign.signature);
+    return signer.toLowerCase() == sign.account.toLowerCase() && 
+           signerLocal.toLowerCase() == sign.account.toLowerCase();
   }
 }
 

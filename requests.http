@@ -1,12 +1,25 @@
 POST http://localhost:8888/api/images/60cbcbeceddab1956ce0685f/like HTTP/1.1
 content-type: application/json
 
-{ 
-    "data": { 
+{
+    "data":{
         "imageId":"60cbcbeceddab1956ce0685f",
-        "salt":"knhvri6wUD5T3mj0sqZsv"
+        "salt":"BQWg0PmJ5fspMzKm8Yp-C"
     },
-    "salt":"knhvri6wUD5T3mj0sqZsv",
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
     "account":"0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd",
-    "signature":"0x58e8521a5aa9ea5f8536e13e6e298701cba57fe37409b6b865e5af5207ea05734522f2b15054ec19ab8861caa80f6c96f9aa32c8f5be8e46156a9f77628016081b"
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
+}
+
+PUT http://localhost:8888/api/users/0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "imageId":"60cbcbeceddab1956ce0685f",
+        "salt":"BQWg0PmJ5fspMzKm8Yp-C"
+    },
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
+    "account":"0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd",
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
 }
