@@ -47,20 +47,20 @@ export default abstract class BaseController {
         if (actionResult.success) {
           res.status(actionResult.type || 200)
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(actionResult.data || actionResult.message)
+             .send(JSON.stringify(actionResult.data || actionResult.message))
         } else {
           res.status(actionResult.type || 400)
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(actionResult.data || actionResult.message)
+             .send(JSON.stringify(actionResult.data || actionResult.message))
         }
       }
     } catch (ex) {
-      console.log(ex);
       this.handleException(ex, res);
     }
   }
 
   handleException(ex: Error | Exception, res: Response<unknown, Record<string, unknown>>): void {
+    console.error(ex);
     if (ex instanceof Exception) {
       res.status(400).send(ex.formattedMessage);
     } else {

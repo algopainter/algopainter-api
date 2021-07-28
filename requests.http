@@ -1,0 +1,52 @@
+POST http://localhost:8888/api/images/60ff01dbb358d2e0dc4a9104/like HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "imageId":"60ff01dbb358d2e0dc4a9104",
+        "salt":"BQWg0PmJ5fspMzKm8Yp-C"
+    },
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
+    "account":"0xFb749154cd0ED3Eb456a5924247F9e21cfac0316",
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
+}
+
+###
+
+DELETE http://localhost:8888/api/images/60ff01dbb358d2e0dc4a9104/dislike HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "imageId":"60ff01dbb358d2e0dc4a9104",
+        "salt":"BQWg0PmJ5fspMzKm8Yp-C"
+    },
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
+    "account":"0xFb749154cd0ED3Eb456a5924247F9e21cfac0316",
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
+}
+
+###
+
+PUT http://localhost:8888/api/users/0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "name": "Rodrigo",
+        "email": "email",
+        "customProfile": "customProfile",
+        "img": "image",
+        "webSite" : "website",
+        "bio": "bio, test, good",
+        "facebook": "rodrigo",
+        "instagram": "rodrigo",
+        "twitter": "rodrigo",
+        "telegram": "rodrigo",
+        "gmail": "rodrigo",
+        "salt": "BQWg0PmJ5fspMzKm8Yp-C"
+    },
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
+    "account":"0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd",
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
+}

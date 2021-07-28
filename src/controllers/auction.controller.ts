@@ -34,7 +34,7 @@ class AuctionController extends BaseController {
         }
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
 
@@ -43,7 +43,7 @@ class AuctionController extends BaseController {
         const result = await this.service.getAsync(req.params.id);
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
   }
