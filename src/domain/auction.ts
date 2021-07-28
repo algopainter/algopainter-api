@@ -1,4 +1,4 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { model, Schema, Model, Document, ObjectId } from 'mongoose';
 import { IUser } from './user';
 
 export interface IAuctionUser extends IUser {
@@ -63,8 +63,15 @@ export interface IAuction {
   categories: AuctionDocument['categories'];
 }
 
+const itemSchema: Schema = new Schema({
+  likes: { type: Number, required: true },
+  title: { type: String, required: true },
+  previewImageUrl: { type: String, required: true },
+  tags: { type: [String], required: true },
+});
+
 export const AuctionSchema: Schema = new Schema({
-  item: { type: Object, required: true },
+  item: { type: itemSchema, required: true },
   fee: { type: Object, required: true },
   startDt: { type: Date, required: true },
   expirationDt: { type: Date, required: true },

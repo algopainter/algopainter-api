@@ -47,7 +47,7 @@ export abstract class BaseService {
     const signedHash = web3.eth.accounts.hashMessage(JSON.stringify(sign.data));
     const desiredSignedHash = web3.eth.accounts.hashMessage(JSON.stringify(desired));
     const signer = web3.eth.accounts.recover(signedHash, sign.signature, true);
-    const signerLocal = web3.eth.accounts.recover(desiredSignedHash, sign.signature);
+    const signerLocal = web3.eth.accounts.recover(desiredSignedHash, sign.signature, true);
     return signer.toLowerCase() == sign.account.toLowerCase() && 
            signerLocal.toLowerCase() == sign.account.toLowerCase();
   }

@@ -52,7 +52,6 @@ class ImageController extends BaseController {
         const result = await this.service.likeAsync(req.params.id, req.body);
         this.handleResult(result, res);
       } catch (error) {
-        console.log(error);
         this.handleException(error, res);
       }
     });

@@ -55,14 +55,13 @@ export default abstract class BaseController {
         }
       }
     } catch (ex) {
-      console.log(ex);
       this.handleException(ex, res);
     }
   }
 
   handleException(ex: Error | Exception, res: Response<unknown, Record<string, unknown>>): void {
+    console.error(ex);
     if (ex instanceof Exception) {
-      console.log(ex);
       res.status(400).send(ex.formattedMessage);
     } else {
       res.status(500).send(ex.toString());
