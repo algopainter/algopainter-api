@@ -3,6 +3,8 @@ import Result from "../shared/result";
 import MongoQS from 'mongo-querystring'
 import { connect, Mongoose } from "mongoose";
 import Settings from "../shared/settings";
+import ISignBase from "../requests/sign.base";
+import Web3 from 'web3';
 
 export abstract class BaseService {
   /**
@@ -35,6 +37,22 @@ export abstract class BaseService {
     if (order)
       return Object.keys(order).length ? order : { createdAt: -1 };
     return { createdAt: -1 };
+  }
+
+  /**
+   * Validates the signature
+   */
+  validateSignature<T>(sign: ISignBase<T>, desired: T) : boolean {
+    const web3 = new Web3();
+    const signedHash = web3.eth.accounts.hashMessage(JSON.stringify(sign.data));
+    const desiredSignedHash = web3.eth.accounts.hashMessage(JSON.stringify(desired));
+    console.log(signedHash);
+    console.log(desiredSignedHash);
+    const signer = web3.eth.accounts.recover(signedHash, sign.signature, true);
+    const signerLocal = web3.eth.accounts.recover(desiredSignedHash, sign.signature, true);
+    console.log(signer);
+    console.log(signerLocal);
+    return signer == sign.account && signerLocal == sign.account;
   }
 }
 

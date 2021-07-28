@@ -3,6 +3,9 @@ import { ImageContext, IImage } from "../domain/image";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
 import { disconnect } from 'mongoose';
+import { ILikeRequest, ILikeSignData } from '../requests/like.request';
+import Exception from "../shared/exception";
+import { AuctionContext } from "../domain/auction";
 
 /**
  * Image service class
@@ -77,6 +80,35 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
   updateAsync(updatedItem: IImage): Promise<Result<IImage>> {
     throw new Error("Method not implemented.");
+  }
+
+  async likeAsync(id: string, request: ILikeRequest) : Promise<Result<IImage>> {
+    try {
+      if(!this.validateSignature<ILikeSignData>(request, { imageId: id, salt: request.salt }))
+        throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+      await this._connect();
+      const updated = await ImageContext.findOneAndUpdate({ _id: id }, { $inc : { 'likes' : 1 } });
+      console.log(updated)
+      await AuctionContext.updateMany({ 'item.id' : id }, { $inc : { 'item.likes' : 1 } });
+      return Result.success<IImage>(null, updated);
+    } catch(ex) {
+      return Result.fail<IImage>(ex.toString(), null);
+    } finally {
+      await disconnect();
+    }
+  }
+
+  async dislikeAsync(id: string, request: ILikeRequest) : Promise<Result<IImage>> {
+    try {
+      if(!this.validateSignature<ILikeSignData>(request, { imageId: id, salt: request.salt }))
+        throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+      await this._connect();
+      const updated = await ImageContext.findOneAndUpdate({ _id: id }, {$inc : { 'likes' : -1 }});
+      await AuctionContext.updateMany({ 'item.id' : id }, { $inc : { 'item.likes' : -1 } });
+      return Result.success<IImage>(null, updated);
+    } finally {
+      await disconnect();
+    }
   }
 
 }

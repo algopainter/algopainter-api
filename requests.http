@@ -1,0 +1,12 @@
+POST http://localhost:8888/api/images/60cbcbeceddab1956ce0685f/like HTTP/1.1
+content-type: application/json
+
+{ 
+    "data": { 
+        "imageId":"60cbcbeceddab1956ce0685f",
+        "salt":"knhvri6wUD5T3mj0sqZsv"
+    },
+    "salt":"knhvri6wUD5T3mj0sqZsv",
+    "account":"0x38ad0ab1dd2b9a64dd6d75fb6d84a14893366dcd",
+    "signature":"0x58e8521a5aa9ea5f8536e13e6e298701cba57fe37409b6b865e5af5207ea05734522f2b15054ec19ab8861caa80f6c96f9aa32c8f5be8e46156a9f77628016081b"
+}

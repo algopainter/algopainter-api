@@ -34,7 +34,7 @@ class ImageController extends BaseController {
         }
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
 
@@ -43,7 +43,26 @@ class ImageController extends BaseController {
         const result = await this.service.getAsync(req.params.id);
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
+      }
+    });
+
+    router.post(`${this.path}/:id/like`, async (req, res) => {
+      try {
+        const result = await this.service.likeAsync(req.params.id, req.body);
+        this.handleResult(result, res);
+      } catch (error) {
+        console.log(error);
+        this.handleException(error, res);
+      }
+    });
+
+    router.delete(`${this.path}/:id/dislike`, async (req, res) => {
+      try {
+        const result = await this.service.dislikeAsync(req.params.id, req.body);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
       }
     });
   }

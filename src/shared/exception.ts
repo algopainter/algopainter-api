@@ -7,9 +7,9 @@ export default class Exception {
   code: number;
   status: string;
   message: string;
-  metadata: string;
+  metadata: string | null;
 
-  constructor(code: number, status: string, message: string, metadata: string) {
+  constructor(code: number, status: string, message: string, metadata: string | null) {
     this.code = code;
     this.status = status;
     this.message = message;

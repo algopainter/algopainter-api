@@ -47,11 +47,11 @@ export default abstract class BaseController {
         if (actionResult.success) {
           res.status(actionResult.type || 200)
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(actionResult.data || actionResult.message)
+             .send(JSON.stringify(actionResult.data || actionResult.message))
         } else {
           res.status(actionResult.type || 400)
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(actionResult.data || actionResult.message)
+             .send(JSON.stringify(actionResult.data || actionResult.message))
         }
       }
     } catch (ex) {
@@ -62,6 +62,7 @@ export default abstract class BaseController {
 
   handleException(ex: Error | Exception, res: Response<unknown, Record<string, unknown>>): void {
     if (ex instanceof Exception) {
+      console.log(ex);
       res.status(400).send(ex.formattedMessage);
     } else {
       res.status(500).send(ex.toString());
