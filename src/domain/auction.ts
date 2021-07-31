@@ -1,4 +1,4 @@
-import { model, Schema, Model, Document, ObjectId } from 'mongoose';
+import { model, Schema, Model, Document } from 'mongoose';
 import { IUser } from './user';
 
 export interface IAuctionUser extends IUser {
@@ -17,17 +17,19 @@ export interface IAuctionItem {
   likes: number;
   title: string;
   previewImageUrl: string;
-  tags: string[]
+  collectionName: string;
+  tags: string[],
+  likers?: string[] | null
 }
 
-export interface IAuctionRoyality {
+export interface IAuctionRoyalty {
   value: number;
   type: 'creator' | 'investor'
 }
 
 export interface IAuctionFees {
   bidBack: number;
-  royalities: IAuctionRoyality[];
+  royalties: IAuctionRoyalty[];
   service: number;
 }
 
@@ -68,6 +70,8 @@ const itemSchema: Schema = new Schema({
   title: { type: String, required: true },
   previewImageUrl: { type: String, required: true },
   tags: { type: [String], required: true },
+  likers: { type: [String], required: false },
+  collectionName: { type: String, required: false },
 });
 
 export const AuctionSchema: Schema = new Schema({

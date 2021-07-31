@@ -6,15 +6,15 @@ export interface UserDocument extends Document {
   avatar?: string;
   name: string;
   bio?: string;
-  networks: INetwork[];
   type: 'algop' | 'developer' | 'user'
-  role: "creator" | "bidder" | "owner" | 'developer' | 'investor';
-}
-
-export interface INetwork {
-  type: string | 'instagram' | 'facebook' | 'github' | 'twitter' | 'telegram' | 'website';
-  name: string;
-  url: string; 
+  role?: "creator" | "bidder" | "owner" | 'developer' | 'investor' | null;
+  customProfile?: string;
+  webSite? : string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  twitter?: string | null;
+  telegram?: string | null;
+  gmail?: string | null;
 }
 
 export interface IUser {
@@ -22,11 +22,17 @@ export interface IUser {
   createdAt: UserDocument['createdAt'];
   updatedAt: UserDocument['updatedAt'];
   avatar?: UserDocument['avatar'];
-  networks: UserDocument['networks'];
   bio?: UserDocument['bio'];
   name: UserDocument['name'];
   type: UserDocument['type'];
-  role: UserDocument['role'];
+  role?: UserDocument['role'];
+  customProfile?: UserDocument['customProfile'];
+  webSite?: UserDocument['webSite'];
+  facebook?: UserDocument['facebook'];
+  instagram?: UserDocument['instagram'];
+  twitter?: UserDocument['twitter'];
+  telegram?: UserDocument['telegram'];
+  gmail?: UserDocument['gmail'];
 }
 
 export const UserSchema: Schema = new Schema({
@@ -35,10 +41,16 @@ export const UserSchema: Schema = new Schema({
   updatedAt: { type: Date, required: false },
   avatar: { type: String, required: true },
   bio: { type: String, required: false },
-  networks: { type: [Object], required: true },
   name: { type: String, required: true },
   type: { type: String, required: true },
-  role: { type: String, required: true },
+  role: { type: String, required: false },
+  customProfile: { type: String, required: false },
+  webSite: { type: String, required: false },
+  facebook: { type: String, required: false },
+  instagram: { type: String, required: false },
+  twitter: { type: String, required: false },
+  telegram: { type: String, required: false },
+  gmail: { type: String, required: false }
 });
 
 export const UserContext: Model<UserDocument> = model('users', UserSchema);

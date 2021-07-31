@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { UserDocument } from "src/domain/user";
+import { IUserUpdateRequest } from "src/requests/user.update.request";
 import UserService from "../services/user.service";
 import BaseController from "./base.controller"
 
@@ -20,20 +22,17 @@ class UserController extends BaseController {
         const result = await this.service.getAsync(req.params.account);
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
 
-    router.post(`${this.path}`, async (req, res) => {
-      res.status(200).send(req.body);
-    });
-
     router.put(`${this.path}/:account`, async (req, res) => {
-      res.status(200).send(req.body);
-    });
-
-    router.delete(`${this.path}/:account`, async (req, res) => {
-      res.status(200).send(req.body);
+      try {
+        const result = await this.service.updateUser(req.params.account, req.body as IUserUpdateRequest);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
     });
   }
 }

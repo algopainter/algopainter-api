@@ -19,27 +19,33 @@ export interface ImageDocument extends Document {
   title: string;
   likes: number;
   description: string;
+  collectionName: string;
   tags: string[];
   nft: IImageNFTInfo;
   users: IImageAuthority[];
+  likers?: string[] | null;
 }
 
 export interface IImage {
   title: ImageDocument['title'];
   likes: ImageDocument['likes'];
+  collectionName: ImageDocument['collectionName'];
   description: ImageDocument['description'];
   tags: ImageDocument['tags'];
   nft: ImageDocument['nft'];
   users: ImageDocument['users'];
+  likers?: ImageDocument['likers'];
 }
 
 export const ImageSchema: Schema = new Schema({
   title: { type: String, required: true },
   likes: { type: Number, required: true },
   description: { type: String, required: true },
+  collectionName: { type: String, required: true },
   tags: { type: [String], required: true },
   nft: { type: Object, required: true },
   users: { type: [Object], required: true },
+  likers: { type: [String], required: false },
 });
 
 export const ImageContext: Model<ImageDocument> = model('images', ImageSchema);

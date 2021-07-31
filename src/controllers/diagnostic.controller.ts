@@ -3,10 +3,9 @@ import express, { Router } from "express";
 import BaseController from "./base.controller"
 import { routesExtractor } from '../shared/routes'
 import AuctionService from "../services/auction.service";
-import UserService from "../services/user.service";
 import CollectionService from "../services/collection.service";
 import ImageService from "../services/image.service";
-import { auctionData, collectionData, imagesData, usersData } from '../reference'
+import { auctionData, collectionData, imagesData } from '../reference'
 
 class DiagnosticController extends BaseController {
   private app: express.Application;
@@ -49,20 +48,24 @@ class DiagnosticController extends BaseController {
     router.get(`${this.path}/seed/:secret`, async (req, res) => {
       if (req.params.secret === 'AlgoPainter') {
         const auctionService = new AuctionService();
-        const userService = new UserService();
         const collectionService = new CollectionService();
         const imageService = new ImageService();
 
-        //userService.createAsync(usersData());
-        const imageCreated: any = await imageService.createAsync(imagesData());
+        let imageCreated: any = await imageService.createAsync(imagesData("Gwei"));
 
-        for (let index = 0; index < 30; index++) {
-          await auctionService.createAsync(auctionData(imageCreated.data['_id'], index % 2 == 0));
+        for (let index = 0; index < 20; index++) {
+          await auctionService.createAsync(auctionData(imageCreated.data['_id'], index % 2 == 0, "Gwei"));
           await this.sleep(1000);
         }
 
         await collectionService.createAsync(collectionData('Gwei', imageCreated.data['_id']));
+        await this.sleep(1000);
+
+        imageCreated = await imageService.createAsync(imagesData("Expressions"));
         await collectionService.createAsync(collectionData('Expressions', imageCreated.data['_id']));
+        await this.sleep(1000);
+        
+        imageCreated = await imageService.createAsync(imagesData("Monero"));
         await collectionService.createAsync(collectionData('Monero', imageCreated.data['_id']));
 
         res.status(200).send('Data created!');

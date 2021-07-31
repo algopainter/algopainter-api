@@ -11,7 +11,7 @@ import { disconnect } from 'mongoose';
 export default class NFTService extends BaseCRUDService<INFT> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<INFT[]>> {
     try {
-      await this._connect();
+      await this.connect();
       
       const data = await NFTContext
         .find(this.translateToMongoQuery(filter))
@@ -27,7 +27,7 @@ export default class NFTService extends BaseCRUDService<INFT> {
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<INFT>>> {
     try {
-      await this._connect();
+      await this.connect();
       const query = this.translateToMongoQuery(filter);
       const count = await NFTContext.find(query).countDocuments();
       
@@ -53,7 +53,7 @@ export default class NFTService extends BaseCRUDService<INFT> {
 
   async getAsync(id: string): Promise<Result<INFT>> {
     try {
-      await this._connect();
+      await this.connect();
       const data = await NFTContext.findById(id);
       return Result.success<INFT>(null, data);
     } catch(ex) {
@@ -65,7 +65,7 @@ export default class NFTService extends BaseCRUDService<INFT> {
 
   async createAsync(createdItem: INFT): Promise<Result<INFT>> {
     try {
-      await this._connect();
+      await this.connect();
       const input = await NFTContext.create(createdItem);
       return Result.success<INFT>(null, input);
     } catch(ex) {
@@ -74,7 +74,7 @@ export default class NFTService extends BaseCRUDService<INFT> {
       await disconnect();
     }
   }
-  updateAsync(updatedItem: INFT): Promise<Result<INFT>> {
+  updateAsync(id: string, updatedItem: INFT): Promise<Result<INFT>> {
     throw new Error("Method not implemented.");
   }
 

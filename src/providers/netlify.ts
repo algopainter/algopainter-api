@@ -29,7 +29,6 @@ export default class Netlify {
   static createHandler<TResult>(action: Action<TResult>): Handler {
     return async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
       try {
-        console.log(event)
         const actionResult = await action(event.body, event.queryStringParameters);
         if (actionResult.success) {
           return {

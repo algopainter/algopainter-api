@@ -9,6 +9,8 @@ import NFTController from './controllers/nft.controller'
 import ReportController from './controllers/report.controller'
 import UserController from './controllers/user.controller'
 import cors from 'cors';
+import SignService from './services/sign.service';
+import { disconnect } from 'mongoose';
 
 class Application {
   public app: express.Application;
@@ -26,6 +28,18 @@ class Application {
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
     this.app.use(cors());
+    this.app.use(async (req, res, next) => { 
+      const signService = new SignService();
+      await signService.connect();
+      const result = await signService.validatePreRequest(req.body);
+      await disconnect();
+      if(result === null || result === true)
+        next();
+      else
+        res.status(409)
+        .set('X-Powered-By', 'AlgoPainter')
+        .send('Unable to continue with the Request, the data may have conflicts.');
+    })
     this.app.use('/api', this.router); // Netlify redirects
     this.app.use('/', (req, res) => res.status(200).send('AlgoPainter - API'));
   }

@@ -16,19 +16,14 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<IAuction[]>>
    */
   async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IAuction[]>> {
-    try {
-      await this._connect();
-      
-      const data = await AuctionContext
-        .find(this.translateToMongoQuery(filter))
-        .sort(this.translateToMongoOrder(order));
-      
-      return Result.success<IAuction[]>(null, data);
-    } catch(ex) {
-      return Result.fail<IAuction[]>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+
+    const data = await AuctionContext
+      .find(this.translateToMongoQuery(filter))
+      .sort(this.translateToMongoOrder(order));
+
+    await disconnect();
+    return Result.success<IAuction[]>(null, data);
   }
 
   /**
@@ -37,15 +32,10 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<IAuction>>
    */
   async getAsync(id: string): Promise<Result<IAuction>> {
-    try {
-      await this._connect();
-      const data = await AuctionContext.findById(id);
-      return Result.success<IAuction>(null, data);
-    } catch(ex) {
-      return Result.fail<IAuction>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const data = await AuctionContext.findById(id);
+    await disconnect();
+    return Result.success<IAuction>(null, data);
   }
 
   /**
@@ -57,29 +47,24 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<Paged<IAuction>>>
    */
   async pagedAsync(filter: IFilter, order: IOrderBy | null, page: number, perPage: number): Promise<Result<Paged<IAuction>>> {
-    try {
-      await this._connect();
-      const query = this.translateToMongoQuery(filter);
-      const count = await AuctionContext.find(query).countDocuments();
-      
-      const data = await AuctionContext
-        .find(query)
-        .sort(this.translateToMongoOrder(order))
-        .skip((page - 1) * (perPage))
-        .limit(perPage);
-      
-      return Result.success<Paged<IAuction>>(null, {
-        count,
-        currPage: page,
-        pages: Math.round(count / perPage),
-        perPage,
-        data
-      });
-    } catch(ex) {
-      return Result.fail<Paged<IAuction>>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const query = this.translateToMongoQuery(filter);
+    const count = await AuctionContext.find(query).countDocuments();
+
+    const data = await AuctionContext
+      .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    await disconnect();
+    return Result.success<Paged<IAuction>>(null, {
+      count,
+      currPage: page,
+      pages: Math.round(count / perPage),
+      perPage,
+      data
+    });
   }
 
   /**
@@ -87,22 +72,17 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @param createdItem Auction data to be created
    */
   async createAsync(createdItem: IAuction): Promise<Result<IAuction>> {
-    try {
-      await this._connect();
-      const input = await AuctionContext.create(createdItem);
-      return Result.success<IAuction>(null, input);
-    } catch(ex) {
-      return Result.fail<IAuction>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const input = await AuctionContext.create(createdItem);
+    await disconnect();
+    return Result.success<IAuction>(null, input);
   }
 
   /**
    * Updated an Auction
    * @param updatedItem Auction data with updated values
    */
-  updateAsync(updatedItem: IAuction): Promise<Result<IAuction>> {
+  updateAsync(id: string, updatedItem: IAuction): Promise<Result<IAuction>> {
     throw new Error("Method not implemented." + updatedItem);
   }
 }

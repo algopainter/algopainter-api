@@ -9,7 +9,7 @@
     "start-netlify": "netlify dev",
     "netlify": "netlify-lambda build src/netlify && netlify dev",
     "build": "tsc --build",
-    "start": "node bin/api"
+    "start": "tsc --build && node bin/api/server.js"
   },
   "repository": {
     "type": "git",
