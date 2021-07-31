@@ -1,28 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const defaultOptions = {
   prefix: '',
   spacer: 7,
 };
 
-function getPathFromRegex(regexp) {
+function getPathFromRegex(regexp: any) {
   return regexp.toString().replace('/^', '').replace('?(?=\\/|$)/i', '').replace(/\\\//g, '/');
 }
 
-function combineStacks(acc, stack) {
+function combineStacks(acc: any, stack: any) {
   if (stack.handle.stack) {
     const routerPath = getPathFromRegex(stack.regexp);
-    return [...acc, ...stack.handle.stack.map((stack) => ({ routerPath, ...stack }))];
+    return [...acc, ...stack.handle.stack.map((stack: any) => ({ routerPath, ...stack }))];
   }
   return [...acc, stack];
 }
 
-function getStacks(app) {
+function getStacks(app: any) {
   // Express 3
   if (app.routes) {
     // convert to express 4
     return Object.keys(app.routes)
-      .reduce((acc, method) => [...acc, ...app.routes[method]], [])
-      .map((route) => ({ route: { stack: [route] } }));
+      .reduce((acc: any, method: any) => [...acc, ...app.routes[method]], [])
+      .map((route: any) => ({ route: { stack: [route] } }));
   }
 
   // Express 4
@@ -51,7 +52,7 @@ export const routesExtractor = (app: any, opts: any | null = null) => {
   if (stacks) {
     for (const stack of stacks) {
       if (stack.route) {
-        const routeLogged = {};
+        const routeLogged: any = {};
         for (const route of stack.route.stack) {
           const method = route.method ? route.method.toUpperCase() : null;
           if (!routeLogged[method] && method) {
@@ -65,5 +66,17 @@ export const routesExtractor = (app: any, opts: any | null = null) => {
     }
   }
 
-  return routes;
+  const result = [];
+  const map = new Map();
+  for (const item of routes) {
+    if (!map.has(item.path)) {
+      map.set(item.path, true);
+      result.push({
+        method: item.method,
+        path: item.path
+      });
+    }
+  }
+
+  return result;
 };

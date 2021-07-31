@@ -1,10 +1,8 @@
-import ISignBase from "./sign.base";
+import { ISign } from "../domain/sign";
 
-export interface ILikeRequest extends ISignBase<ILikeSignData> {
-    
-}
+export type ILikeRequest = ISign<ILikeSignData>
 
 export interface ILikeSignData {
     imageId: string;
-    salt: string;
+    salt: string | undefined | null;
 }

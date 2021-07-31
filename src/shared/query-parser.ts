@@ -1,8 +1,8 @@
 import { IFilter, IOrderBy } from "../services/base.service";
 
 export default class QueryParser {
-  static parseByPrefix(prefix: string, object: unknown) : IFilter | IOrderBy {
-    const newObject = {};
+  static parseByPrefix(prefix: string, object: any) : IFilter | IOrderBy {
+    const newObject: any = {};
     Object.keys(object).forEach(key => {
       if(key.includes(prefix)) {
         newObject[key.replace(`${prefix}.`, '')] = object[key];
@@ -11,8 +11,8 @@ export default class QueryParser {
     return newObject;
   }
 
-  static parseExcludePrefix(prefix: string, object: unknown) : IFilter | IOrderBy {
-    const newObject = {};
+  static parseExcludePrefix(prefix: string, object: any) : IFilter | IOrderBy {
+    const newObject: any = {};
     Object.keys(object).forEach(key => {
       if(!key.includes(prefix)) {
         newObject[key] = object[key];

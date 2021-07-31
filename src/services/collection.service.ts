@@ -11,14 +11,14 @@ import { disconnect } from 'mongoose';
 export default class CollectionService extends BaseCRUDService<ICollection> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
     try {
-      await this._connect();
-      
+      await this.connect();
+
       const data = await CollectionContext
         .find(this.translateToMongoQuery(filter))
         .sort(this.translateToMongoOrder(order));
-      
+
       return Result.success<ICollection[]>(null, data);
-    } catch(ex) {
+    } catch (ex) {
       return Result.fail<ICollection[]>(ex.toString(), null);
     } finally {
       await disconnect();
@@ -26,55 +26,41 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
-    try {
-      await this._connect();
-      const query = this.translateToMongoQuery(filter);
-      const count = await CollectionContext.find(query).countDocuments();
-      
-      const data = await CollectionContext
-        .find(query)
-        .sort(this.translateToMongoOrder(order))
-        .skip((page - 1) * (perPage))
-        .limit(perPage);
-      
-      return Result.success<Paged<ICollection>>(null, {
-        count,
-        currPage: page,
-        pages: Math.round(count / perPage),
-        perPage,
-        data
-      });
-    } catch(ex) {
-      return Result.fail<Paged<ICollection>>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const query = this.translateToMongoQuery(filter);
+    const count = await CollectionContext.find(query).countDocuments();
+
+    const data = await CollectionContext
+      .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    await disconnect();
+    return Result.success<Paged<ICollection>>(null, {
+      count,
+      currPage: page,
+      pages: Math.round(count / perPage),
+      perPage,
+      data
+    });
   }
 
   async getAsync(id: string): Promise<Result<ICollection>> {
-    try {
-      await this._connect();
-      const data = await CollectionContext.findById(id);
-      return Result.success<ICollection>(null, data);
-    } catch(ex) {
-      return Result.fail<ICollection>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const data = await CollectionContext.findById(id);
+    await disconnect();
+    return Result.success<ICollection>(null, data);
   }
 
   async createAsync(createdItem: ICollection): Promise<Result<ICollection>> {
-    try {
-      await this._connect();
-      const input = await CollectionContext.create(createdItem);
-      return Result.success<ICollection>(null, input);
-    } catch(ex) {
-      return Result.fail<ICollection>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const input = await CollectionContext.create(createdItem);
+    await disconnect();
+    return Result.success<ICollection>(null, input);
   }
-  updateAsync(updatedItem: ICollection): Promise<Result<ICollection>> {
+
+  updateAsync(id: string, updatedItem: ICollection): Promise<Result<ICollection>> {
     throw new Error("Method not implemented.");
   }
 

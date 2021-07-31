@@ -2,10 +2,11 @@ import Result from "../shared/result";
 import { ImageContext, IImage } from "../domain/image";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
-import { disconnect, ObjectId } from 'mongoose';
+import { disconnect } from 'mongoose';
 import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
+import SignService from "./sign.service";
 
 /**
  * Image service class
@@ -13,99 +14,94 @@ import { AuctionContext } from "../domain/auction";
  */
 export default class ImageService extends BaseCRUDService<IImage> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IImage[]>> {
-    try {
-      await this._connect();
-      
-      const data = await ImageContext
-        .find(this.translateToMongoQuery(filter))
-        .sort(this.translateToMongoOrder(order));
-      
-      return Result.success<IImage[]>(null, data);
-    } catch(ex) {
-      return Result.fail<IImage[]>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+
+    const data = await ImageContext
+      .find(this.translateToMongoQuery(filter))
+      .sort(this.translateToMongoOrder(order));
+
+    await disconnect();
+    return Result.success<IImage[]>(null, data);
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
-    try {
-      await this._connect();
-      const query = this.translateToMongoQuery(filter);
-      const count = await ImageContext.find(query).countDocuments();
-      
-      const data = await ImageContext
-        .find(query)
-        .sort(this.translateToMongoOrder(order))
-        .skip((page - 1) * (perPage))
-        .limit(perPage);
-      
-      return Result.success<Paged<IImage>>(null, {
-        count,
-        currPage: page,
-        pages: Math.round(count / perPage),
-        perPage,
-        data
-      });
-    } catch(ex) {
-      return Result.fail<Paged<IImage>>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const query = this.translateToMongoQuery(filter);
+    const count = await ImageContext.find(query).countDocuments();
+
+    const data = await ImageContext
+      .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    await disconnect();
+    return Result.success<Paged<IImage>>(null, {
+      count,
+      currPage: page,
+      pages: Math.round(count / perPage),
+      perPage,
+      data
+    });
   }
 
   async getAsync(id: string): Promise<Result<IImage>> {
-    try {
-      await this._connect();
-      const data = await ImageContext.findById(id);
-      return Result.success<IImage>(null, data);
-    } catch(ex) {
-      return Result.fail<IImage>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const data = await ImageContext.findById(id);
+    await disconnect();
+    return Result.success<IImage>(null, data);
   }
 
   async createAsync(createdItem: IImage): Promise<Result<IImage>> {
-    try {
-      await this._connect();
-      const input = await ImageContext.create(createdItem);
-      return Result.success<IImage>(null, input);
-    } catch(ex) {
-      return Result.fail<IImage>(ex.toString(), null);
-    } finally {
-      await disconnect();
-    }
+    await this.connect();
+    const input = await ImageContext.create(createdItem);
+    await disconnect();
+    return Result.success<IImage>(null, input);
   }
 
-  updateAsync(updatedItem: IImage): Promise<Result<IImage>> {
-    throw new Error("Method not implemented.");
+  updateAsync(id: string, updatedItem: IImage): Promise<Result<IImage>> {
+    throw new Error("Method not implemented." + id + JSON.stringify(updatedItem));
   }
 
-  async likeAsync(id: string, request: ILikeRequest) : Promise<Result<IImage>> {
-    try {
-      if(!this.validateSignature<ILikeSignData>(request, { imageId: id, salt: request.salt }))
-        throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
-      await this._connect();
-      await ImageContext.findOneAndUpdate({ _id: id }, { $inc : { 'likes' : 1 } });
-      await AuctionContext.updateMany({ 'item._id' : id }, { $inc : { 'item.likes' : 1 } });
-      return Result.success<IImage>(null, null);
-    } finally {
-      await disconnect();
-    }
+  private async _validateLikeSign(request: ILikeRequest, id: string) {
+    const signService = new SignService();
+    if (!await signService.validate<ILikeSignData>(request, { imageId: id, salt: request.salt }, 'like'))
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
   }
 
-  async dislikeAsync(id: string, request: ILikeRequest) : Promise<Result<IImage>> {
-    try {
-      if(!this.validateSignature<ILikeSignData>(request, { imageId: id, salt: request.salt }))
-        throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
-      await this._connect();
-      await ImageContext.findOneAndUpdate({ _id: id }, { $inc : { 'likes' : -1 } });
-      await AuctionContext.updateMany({ 'item._id' : id }, { $inc : { 'item.likes' : -1 } });
-      return Result.success<IImage>(null, null);
-    } finally {
-      await disconnect();
-    }
+  async likeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
+    await this.connect();
+    const imageToChange = await ImageContext.findById(id);
+    if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
+      return Result.custom<IImage>(false, "This account already liked the image", null, 409);
+    await this._validateLikeSign(request, id);
+    await ImageContext.findOneAndUpdate({ _id: id }, {
+      $inc: { 'likes': 1 },
+      $push: { 'likers': request.account }
+    });
+    await AuctionContext.updateMany({ 'item._id': id }, {
+      $inc: { 'item.likes': 1 },
+      $push: { 'item.likers': request.account }
+    });
+    await disconnect();
+    return Result.success<IImage>(null, null);
   }
 
+  async dislikeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
+    await this.connect();
+    const imageToChange = await ImageContext.findById(id);
+    if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
+      return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
+    await this._validateLikeSign(request, id);
+    await ImageContext.findOneAndUpdate({ _id: id }, {
+      $inc: { 'likes': -1 },
+      $pull: { 'likers': request.account }
+    });
+    await AuctionContext.updateMany({ 'item._id': id }, {
+      $inc: { 'item.likes': -1 },
+      $pull: { 'item.likers': request.account }
+    });
+    await disconnect();
+    return Result.success<IImage>(null, null);
+  }
 }

@@ -42,16 +42,20 @@ export default abstract class BaseController {
   handleResult(actionResult: Result<unknown> | null, res: Response<unknown, Record<string, unknown>>): void {
     try {
       if(actionResult == null) {
-        res.status(204).send();
+        res.status(204)
+        .set('X-Powered-By', 'AlgoPainter')
+        .send();
       } else {
         if (actionResult.success) {
           res.status(actionResult.type || 200)
+             .set('X-Powered-By', 'AlgoPainter')
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(JSON.stringify(actionResult.data || actionResult.message))
+             .send(JSON.stringify(actionResult.data || actionResult.message || ''))
         } else {
           res.status(actionResult.type || 400)
+             .set('X-Powered-By', 'AlgoPainter')
              .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(JSON.stringify(actionResult.data || actionResult.message))
+             .send(JSON.stringify(actionResult.data || actionResult.message || ''))
         }
       }
     } catch (ex) {
@@ -62,9 +66,13 @@ export default abstract class BaseController {
   handleException(ex: Error | Exception, res: Response<unknown, Record<string, unknown>>): void {
     console.error(ex);
     if (ex instanceof Exception) {
-      res.status(400).send(ex.formattedMessage);
+      res.status(400)
+      .set('X-Powered-By', 'AlgoPainter')
+      .send(ex.formattedMessage);
     } else {
-      res.status(500).send(ex.toString());
+      res.status(500)
+      .set('X-Powered-By', 'AlgoPainter')
+      .send(ex.toString());
     }
   }
 

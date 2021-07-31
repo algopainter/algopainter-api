@@ -3,11 +3,11 @@ import { ICollection } from "./domain/collection";
 import { IImage } from "./domain/image";
 import { IUser } from "./domain/user";
 
-const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
+const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuction => { return {
   isHot: isHot,
   fee: {
     bidBack: 10,
-    royalities: [
+    royalties: [
       { type: 'creator', value: 10 },
       { type: 'investor', value: 10 },
     ],
@@ -19,11 +19,12 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
   expirationDt: new Date(),
   categories: ['Digital', 'Photo', 'Classic'],
   item: {
-    _id: imageID,
+    _id: imageID, 
+    collectionName: collection,
     likes: Math.floor(Math.random() * 101),
     previewImageUrl: "https://gateway.pinata.cloud/ipfs/Qme37jp8q5u12GAs43n3NAKvGoJKoeiQjYVk3MHqiawcCa",
     title: 'Amazing Galaxy',
-    tags: ['Galaxy', 'Art', 'Creation']
+    tags: ['Galaxy', 'Art', 'Creation'],
   },
   minimumBid: {
     amount: 600,
@@ -42,13 +43,6 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
       role: 'creator',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Director of Criptonomia'
     }
@@ -65,13 +59,6 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
       role: 'owner',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Product Manager of Criptonomia'
     }
@@ -89,13 +76,6 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
         role: 'creator',
         updatedAt: new Date(),
         _id: "60b6c7adf1cd1b3be43aa60e",
-        networks: [
-          {
-            name: '@algopainter',
-            type: 'instagram',
-            url: 'https://instagram.com/algopainter'
-          }
-        ],
         type: 'developer',
         bio: 'Director of Criptonomia'
       }
@@ -112,13 +92,6 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
         role: 'owner',
         updatedAt: new Date(),
         _id: "60b6c7adf1cd1b3be43aa60e",
-        networks: [
-          {
-            name: '@algopainter',
-            type: 'instagram',
-            url: 'https://instagram.com/algopainter'
-          }
-        ],
         type: 'developer',
         bio: 'Product Manager of Criptonomia'
       }
@@ -133,31 +106,17 @@ const auctionData = (imageID: string, isHot: boolean) : IAuction => { return {
       role: 'creator',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Director of Criptonomia'
     },
     {
       account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
       createdAt: new Date(),
       name: 'Lincoln',
       role: 'owner',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Product Manager of Criptonomia'
     }
@@ -169,25 +128,18 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
   description: 'A ' + prefix + ' collection ' + Math.floor(Math.random() * 101),
   owner: {
     account: '0x0FR71571GTAHJU',
-    avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+    avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
     createdAt: new Date(),
     name: 'Lincoln',
     role: 'owner',
     updatedAt: new Date(),
     _id: "60b6c7adf1cd1b3be43aa60e",
-    networks: [
-      {
-        name: '@algopainter',
-        type: 'instagram',
-        url: 'https://instagram.com/algopainter'
-      }
-    ],
     type: 'developer',
     bio: 'Product Manager of Criptonomia'
   },
   images: [
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -197,31 +149,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -245,13 +183,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -268,7 +199,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -278,31 +209,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -326,13 +243,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -349,7 +259,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -359,31 +269,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -407,13 +303,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -430,7 +319,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -440,31 +329,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -488,13 +363,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -511,7 +379,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -521,31 +389,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -569,13 +423,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -592,7 +439,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -602,31 +449,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -650,13 +483,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -673,7 +499,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -683,31 +509,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -731,13 +543,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -754,7 +559,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -764,31 +569,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -812,13 +603,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -835,7 +619,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -845,31 +629,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -893,13 +663,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -916,7 +679,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
       }
     },
     {
-      _id: imageID,
+      _id: imageID, collectionName: prefix,
       users: [
         {
           account: '0x0FR71571GTAHJU',
@@ -926,31 +689,17 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           role: 'creator',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Director of Criptonomia'
         },
         {
           account: '0x0FR71571GTAHJU',
-          avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+          avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
           createdAt: new Date(),
           name: 'Lincoln',
           role: 'owner',
           updatedAt: new Date(),
           _id: "60b6c7adf1cd1b3be43aa60e",
-          networks: [
-            {
-              name: '@algopainter',
-              type: 'instagram',
-              url: 'https://instagram.com/algopainter'
-            }
-          ],
           type: 'developer',
           bio: 'Product Manager of Criptonomia'
         }
@@ -974,13 +723,6 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
           type: 'developer',
           _id: '',
           updatedAt: new Date(),
-          networks: [
-            {
-              name: "ms-algopainter-gwei",
-              type: "github",
-              url: "https://github.com/algopainter/ms-algopainter-gwei"
-            }
-          ]
         },
         image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
         previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -999,7 +741,7 @@ const collectionData = (prefix:string, imageID: string) : ICollection => { retur
   ]
 }};
 
-const imagesData = () : IImage => { return {
+const imagesData = (collection: string) : IImage => { return {
   users: [
     {
       account: '0x0FR71571GTAHJU',
@@ -1009,31 +751,17 @@ const imagesData = () : IImage => { return {
       role: 'creator',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Director of Criptonomia'
     },
     {
       account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/.jpg',
+      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
       createdAt: new Date(),
       name: 'Lincoln',
       role: 'owner',
       updatedAt: new Date(),
       _id: "60b6c7adf1cd1b3be43aa60e",
-      networks: [
-        {
-          name: '@algopainter',
-          type: 'instagram',
-          url: 'https://instagram.com/algopainter'
-        }
-      ],
       type: 'developer',
       bio: 'Product Manager of Criptonomia'
     }
@@ -1041,6 +769,7 @@ const imagesData = () : IImage => { return {
   description: 'Image Description ' + Math.floor(Math.random() * 101),
   likes: Math.floor(Math.random() * 101),
   title: 'Ímage ' + Math.floor(Math.random() * 101),
+  collectionName: collection,
   tags: [ 'Nice', 'Awesome' ],
   nft: {
     _id: "60cbcbeceddab1956ce0685f",
@@ -1057,13 +786,6 @@ const imagesData = () : IImage => { return {
       type: 'developer',
       _id: '',
       updatedAt: new Date(),
-      networks: [
-        {
-          name: "ms-algopainter-gwei",
-          type: "github",
-          url: "https://github.com/algopainter/ms-algopainter-gwei"
-        }
-      ]
     },
     image:"https://gateway.pinata.cloud/ipfs/QmYbtF5aRXXLgs1HEgBWNxqJxzywLgHc8PtDdDGEsjK1zQ",
     previewImage:"https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP",
@@ -1084,13 +806,6 @@ const usersData = () : IUser => { return {
   account: "0x7dDFb53887D2EB323CE0409E792759F916B0e229",
   createdAt: new Date(),
   name: 'Gleisson de Assis',
-  networks: [
-    {
-      name: "gleisson.assis",
-      type: 'instagram',
-      url: 'https://instagram.com/gleisson.assis'
-    }
-  ],
   role: 'owner',
   type: 'developer',
   updatedAt: new Date(),
