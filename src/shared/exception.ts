@@ -21,8 +21,6 @@ export default class Exception {
   }
 
   get formattedMessage() : string {
-    return `[${this.code}][${this.status}] ${this.message} ${
-      this.metadata ? os.EOL + this.metadata : ''
-    }`;
+    return `[${this.status}] ${this.message}`;
   }
 }

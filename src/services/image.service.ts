@@ -2,7 +2,6 @@ import Result from "../shared/result";
 import { ImageContext, IImage } from "../domain/image";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
-import { disconnect } from 'mongoose';
 import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
@@ -14,18 +13,13 @@ import SignService from "./sign.service";
  */
 export default class ImageService extends BaseCRUDService<IImage> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IImage[]>> {
-    await this.connect();
-
     const data = await ImageContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
-
-    await disconnect();
     return Result.success<IImage[]>(null, data);
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
-    await this.connect();
     const query = this.translateToMongoQuery(filter);
     const count = await ImageContext.find(query).countDocuments();
 
@@ -34,8 +28,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);
-
-    await disconnect();
+    
     return Result.success<Paged<IImage>>(null, {
       count,
       currPage: page,
@@ -46,16 +39,12 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async getAsync(id: string): Promise<Result<IImage>> {
-    await this.connect();
     const data = await ImageContext.findById(id);
-    await disconnect();
     return Result.success<IImage>(null, data);
   }
 
   async createAsync(createdItem: IImage): Promise<Result<IImage>> {
-    await this.connect();
     const input = await ImageContext.create(createdItem);
-    await disconnect();
     return Result.success<IImage>(null, input);
   }
 
@@ -70,7 +59,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async likeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
-    await this.connect();
     const imageToChange = await ImageContext.findById(id);
     if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account already liked the image", null, 409);
@@ -83,12 +71,11 @@ export default class ImageService extends BaseCRUDService<IImage> {
       $inc: { 'item.likes': 1 },
       $push: { 'item.likers': request.account }
     });
-    await disconnect();
+    
     return Result.success<IImage>(null, null);
   }
 
   async dislikeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
-    await this.connect();
     const imageToChange = await ImageContext.findById(id);
     if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
@@ -101,7 +88,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
       $inc: { 'item.likes': -1 },
       $pull: { 'item.likers': request.account }
     });
-    await disconnect();
     return Result.success<IImage>(null, null);
   }
 }

@@ -1,22 +1,7 @@
 import Paged from "../shared/paged";
 import Result from "../shared/result";
 import MongoQS from 'mongo-querystring'
-import { connect, Mongoose } from "mongoose";
-import Settings from "../shared/settings";
-
 export abstract class BaseService {
-  /**
-   * Connects to database
-   */
-  public async connect(): Promise<Mongoose> {
-    return await connect(Settings.mongoURL(), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    });
-  }
-
   /**
    * Translate a filter to mongo query
    * @param filter 

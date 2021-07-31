@@ -16,13 +16,9 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<IAuction[]>>
    */
   async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IAuction[]>> {
-    await this.connect();
-
     const data = await AuctionContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
-
-    await disconnect();
     return Result.success<IAuction[]>(null, data);
   }
 
@@ -32,9 +28,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<IAuction>>
    */
   async getAsync(id: string): Promise<Result<IAuction>> {
-    await this.connect();
     const data = await AuctionContext.findById(id);
-    await disconnect();
     return Result.success<IAuction>(null, data);
   }
 
@@ -47,7 +41,6 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @returns Promise<Result<Paged<IAuction>>>
    */
   async pagedAsync(filter: IFilter, order: IOrderBy | null, page: number, perPage: number): Promise<Result<Paged<IAuction>>> {
-    await this.connect();
     const query = this.translateToMongoQuery(filter);
     const count = await AuctionContext.find(query).countDocuments();
 
@@ -57,7 +50,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
       .skip((page - 1) * (perPage))
       .limit(perPage);
 
-    await disconnect();
+    
     return Result.success<Paged<IAuction>>(null, {
       count,
       currPage: page,
@@ -72,9 +65,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
    * @param createdItem Auction data to be created
    */
   async createAsync(createdItem: IAuction): Promise<Result<IAuction>> {
-    await this.connect();
     const input = await AuctionContext.create(createdItem);
-    await disconnect();
     return Result.success<IAuction>(null, input);
   }
 

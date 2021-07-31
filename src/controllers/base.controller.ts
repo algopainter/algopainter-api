@@ -10,7 +10,7 @@ export default abstract class BaseController {
   abstract get path(): string;
   abstract intializeRoutes(router: Router): void;
 
-  pageParams(req: Request<any, any, any, any, any>) : IPageParams {
+  pageParams(req: Request<any, any, any, any, any>): IPageParams {
     const page = parseInt(req.query['page']?.toString() || '-1');
     const perPage = parseInt(req.query['perPage']?.toString() || '-1');
 
@@ -21,15 +21,15 @@ export default abstract class BaseController {
     return { page, perPage }
   }
 
-  orderParams(req: Request<any, any, any, any, any>) : IOrderBy {
+  orderParams(req: Request<any, any, any, any, any>): IOrderBy {
     return QueryParser.parseByPrefix('order', req.query);
   }
 
-  filterParams(req: Request<any, any, any, any, any>) : IOrderBy {
+  filterParams(req: Request<any, any, any, any, any>): IOrderBy {
     return QueryParser.parseExcludePrefix('order', req.query);
   }
 
-  requestParams(req: Request<any, any, any, any, any>) : IRequestParams {
+  requestParams(req: Request<any, any, any, any, any>): IRequestParams {
     const paging = this.pageParams(req);
     const order = this.orderParams(req);
     const filter = this.filterParams(req);
@@ -41,21 +41,21 @@ export default abstract class BaseController {
 
   handleResult(actionResult: Result<unknown> | null, res: Response<unknown, Record<string, unknown>>): void {
     try {
-      if(actionResult == null) {
+      if (actionResult == null) {
         res.status(204)
-        .set('X-Powered-By', 'AlgoPainter')
-        .send();
+          .set('X-Powered-By', 'AlgoPainter')
+          .send();
       } else {
         if (actionResult.success) {
           res.status(actionResult.type || 200)
-             .set('X-Powered-By', 'AlgoPainter')
-             .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(JSON.stringify(actionResult.data || actionResult.message || ''))
+            .set('X-Powered-By', 'AlgoPainter')
+            .set('Content-Type', 'application/json')
+            .send(JSON.stringify(actionResult.data || actionResult))
         } else {
           res.status(actionResult.type || 400)
-             .set('X-Powered-By', 'AlgoPainter')
-             .set('Content-Type', actionResult.data ? 'application/json' : 'text/plain')
-             .send(JSON.stringify(actionResult.data || actionResult.message || ''))
+            .set('X-Powered-By', 'AlgoPainter')
+            .set('Content-Type', 'application/json')
+            .send(JSON.stringify(actionResult))
         }
       }
     } catch (ex) {
@@ -67,22 +67,24 @@ export default abstract class BaseController {
     console.error(ex);
     if (ex instanceof Exception) {
       res.status(400)
-      .set('X-Powered-By', 'AlgoPainter')
-      .send(ex.formattedMessage);
+        .set('X-Powered-By', 'AlgoPainter')
+        .set('Content-Type', 'application/json')
+        .send(Result.fail<unknown>(ex.formattedMessage, ex.metadata, ex.code));
     } else {
       res.status(500)
-      .set('X-Powered-By', 'AlgoPainter')
-      .send(ex.toString());
+        .set('X-Powered-By', 'AlgoPainter')
+        .set('Content-Type', 'application/json')
+        .send(Result.fail<unknown>(ex.toString(), ex, 500));
     }
   }
 
-  async sleep(ms: number) : Promise<void> {
+  async sleep(ms: number): Promise<void> {
     return new Promise<void>(resolve => setTimeout(resolve, ms))
   }
 }
 
 export interface IPageParams {
-  page: number; 
+  page: number;
   perPage: number;
 }
 

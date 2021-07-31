@@ -3,7 +3,6 @@ import { ISign, SignContext } from "../domain/sign";
 import Result from "../shared/result";
 import { BaseService } from "./base.service";
 import Web3 from 'web3';
-import { disconnect } from "mongoose";
 
 export default class SignService extends BaseService {
   /**
@@ -68,16 +67,12 @@ export default class SignService extends BaseService {
   }
 
   async createAsync<T>(sign: ISign<T>): Promise<Result<ISign<T>>> {
-    await this.connect();
     await SignContext.create(sign);
-    await disconnect();
     return Result.success<ISign<T>>(null, null);
   }
 
   private async _existSalt(salt: string): Promise<boolean> {
-    await this.connect();
     const found = await SignContext.findOne({ 'salt': salt });
-    await disconnect();
     if (found && found._id)
       return true;
     return false;

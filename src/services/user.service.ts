@@ -13,18 +13,18 @@ import Exception from "../shared/exception";
  */
 export default class UserService extends BaseCRUDService<IUser> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IUser[]>> {
-    await this.connect();
+    
 
     const data = await UserContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
 
-    await disconnect();
+    
     return Result.success<IUser[]>(null, data);
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IUser>>> {
-    await this.connect();
+    
     const query = this.translateToMongoQuery(filter);
     const count = await UserContext.find(query).countDocuments();
 
@@ -34,7 +34,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       .skip((page - 1) * (perPage))
       .limit(perPage);
 
-    await disconnect();
+    
     return Result.success<Paged<IUser>>(null, {
       count,
       currPage: page,
@@ -45,28 +45,28 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async getAsync(id: string): Promise<Result<IUser>> {
-    await this.connect();
+    
     const data = await UserContext.findOne({ account: id });
-    await disconnect();
+    
     return Result.success<IUser>(null, (data as IUser));
   }
 
   async createAsync(createdItem: IUser): Promise<Result<IUser>> {
-    await this.connect();
+    
     const input = await UserContext.create(createdItem);
-    await disconnect();
+    
     return Result.success<IUser>(null, (input as IUser));
   }
 
   async updateAsync(id: string, updatedItem: IUser): Promise<Result<IUser>> {
-    await this.connect();
+    
     const input = await UserContext.findByIdAndUpdate(id, updatedItem);
-    await disconnect();
+    
     return Result.success<IUser>(null, (input as IUser));
   }
 
   async updateUser(account: string, request: IUserUpdateRequest): Promise<Result<IUser>> {
-    await this.connect();
+    
     const signService = new SignService();
     if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
@@ -109,7 +109,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       });
       responseResult = createResult;
     }
-    await disconnect();
+    
     return responseResult;
   }
 }
