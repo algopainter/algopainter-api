@@ -112,7 +112,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
         }
       }
     }, {
-      $inc: { 'images.$.likes': -11 },
+      $inc: { 'images.$.likes': -1 },
       $pull: { 'images.$.likers': request.account }
     });
 
