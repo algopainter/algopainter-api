@@ -46,7 +46,7 @@ export default class UserService extends BaseCRUDService<IUser> {
 
   async getAsync(id: string): Promise<Result<IUser>> {
     
-    const data = await UserContext.findOne({ account: id });
+    const data = await UserContext.findOne({ account: id.toLowerCase() });
     
     return Result.success<IUser>(null, (data as IUser));
   }
@@ -74,7 +74,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     const result = await this.getAsync(account);
     if (result.success && result.data && result.data.account) {
       await this.updateAsync((result.data as UserDocument)._id, {
-        account: account,
+        account: account.toLowerCase(),
         updatedAt: new Date(),
         customProfile: request.data.customProfile,
         createdAt: result.data.createdAt,
@@ -92,7 +92,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       responseResult = await this.getAsync(account);
     } else {
       const createResult = await this.createAsync({
-        account: account,
+        account: account.toLowerCase(),
         updatedAt: new Date(),
         customProfile: request.data.customProfile,
         createdAt: new Date(),
