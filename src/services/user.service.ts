@@ -2,7 +2,6 @@ import Result from "../shared/result";
 import { UserContext, IUser, UserDocument } from "../domain/user";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
-import { disconnect } from 'mongoose';
 import { IUserUpdateRequest, IUserUpdateSignData } from '../requests/user.update.request';
 import SignService from "./sign.service";
 import Exception from "../shared/exception";

@@ -51,22 +51,40 @@ class DiagnosticController extends BaseController {
         const collectionService = new CollectionService();
         const imageService = new ImageService();
 
-        let imageCreated: any = await imageService.createAsync(imagesData("Gwei"));
-
-        for (let index = 0; index < 20; index++) {
-          await auctionService.createAsync(auctionData(imageCreated.data['_id'], index % 2 == 0, "Gwei"));
-          await this.sleep(1000);
+        const gweiImages = [];
+        for (let index = 0; index < 10; index++) {
+          const newImage: any = await imageService.createAsync(imagesData("Gwei"));
+          await this.sleep(500);
+          gweiImages.push(newImage.data);
+          await auctionService.createAsync(auctionData(newImage.data['_id'], index % 2 == 0, "Gwei"));
+          await this.sleep(500);
         }
 
-        await collectionService.createAsync(collectionData('Gwei', imageCreated.data['_id']));
-        await this.sleep(1000);
+        await collectionService.createAsync(collectionData('Gwei', gweiImages));
+        await this.sleep(500);
 
-        imageCreated = await imageService.createAsync(imagesData("Expressions"));
-        await collectionService.createAsync(collectionData('Expressions', imageCreated.data['_id']));
-        await this.sleep(1000);
+        const expressionsImages = [];
+        for (let index = 0; index < 10; index++) {
+          const newImage: any = await imageService.createAsync(imagesData("Expressions"));
+          await this.sleep(500);
+          expressionsImages.push(newImage.data);
+          await auctionService.createAsync(auctionData(newImage.data['_id'], index % 2 == 0, "Expressions"));
+          await this.sleep(500);
+        }
+
+        await collectionService.createAsync(collectionData('Expressions', expressionsImages));
+        await this.sleep(500);
+
+        const moneroImages = [];
+        for (let index = 0; index < 10; index++) {
+          const newImage: any = await imageService.createAsync(imagesData("Monero"));
+          await this.sleep(500);
+          moneroImages.push(newImage.data);
+          await auctionService.createAsync(auctionData(newImage.data['_id'], index % 2 == 0, "Monero"));
+          await this.sleep(500);
+        }
         
-        imageCreated = await imageService.createAsync(imagesData("Monero"));
-        await collectionService.createAsync(collectionData('Monero', imageCreated.data['_id']));
+        await collectionService.createAsync(collectionData('Monero', moneroImages));
 
         res.status(200).send('Data created!');
       } else {

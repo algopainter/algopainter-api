@@ -2,7 +2,6 @@ import Result from "../shared/result";
 import { AuctionContext, IAuction } from "../domain/auction";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
-import { disconnect } from 'mongoose';
 /**
  * Auction service class
  * @class AuctionService @extends BaseCRUDService<IAuction>

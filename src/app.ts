@@ -41,17 +41,17 @@ class Application {
       res.on('finish', async () => await disconnect());
       res.on('close', async () => await disconnect());
 
-      const signService = new SignService();
-      const result = await signService.validatePreRequest(req.body);
-      if (result === null || result === true)
-        next();
-      else {
-        const badResult = Result.fail<unknown>('Unable to continue with the Request, the data may have conflicts.', null, 409);
-        res.status(409)
-          .set('X-Powered-By', 'AlgoPainter')
-          .set('Content-Type', 'application/json')
-          .send(JSON.stringify(badResult));
-      }
+      // const signService = new SignService();
+      // const result = await signService.validatePreRequest(req.body);
+      // if (result === null || result === true)
+         next();
+      // else {
+      //   const badResult = Result.fail<unknown>('Unable to continue with the Request, the data may have conflicts.', null, 409);
+      //   res.status(409)
+      //     .set('X-Powered-By', 'AlgoPainter')
+      //     .set('Content-Type', 'application/json')
+      //     .send(JSON.stringify(badResult));
+      // }
     })
     this.app.use('/api', this.router); // Netlify redirects
     this.app.use('/', (req, res) => res.status(200).send('AlgoPainter - API'));

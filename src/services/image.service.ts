@@ -61,10 +61,10 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async likeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
-    const imageToChange = await ImageContext.findById(id);
-    if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
-      return Result.custom<IImage>(false, "This account already liked the image", null, 409);
-    await this._validateLikeSign(request, id);
+    // const imageToChange = await ImageContext.findById(id);
+    // if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
+    //   return Result.custom<IImage>(false, "This account already liked the image", null, 409);
+    // await this._validateLikeSign(request, id);
     await ImageContext.findOneAndUpdate({ _id: id }, {
       $inc: { 'likes': 1 },
       $push: { 'likers': request.account }
@@ -90,10 +90,10 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async dislikeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
-    const imageToChange = await ImageContext.findById(id);
-    if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
-      return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
-    await this._validateLikeSign(request, id);
+    // const imageToChange = await ImageContext.findById(id);
+    // if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
+    //   return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
+    // await this._validateLikeSign(request, id);
 
     await ImageContext.findOneAndUpdate({ _id: id }, {
       $inc: { 'likes': -1 },

@@ -4,7 +4,8 @@ export interface UserDocument extends Document {
   createdAt: Date;
   updatedAt: Date;
   avatar?: string;
-  name: string;
+  name?: string;
+  email?: string;
   bio?: string;
   type: 'algop' | 'developer' | 'user'
   role?: "creator" | "bidder" | "owner" | 'developer' | 'investor' | null;
@@ -23,7 +24,8 @@ export interface IUser {
   updatedAt: UserDocument['updatedAt'];
   avatar?: UserDocument['avatar'];
   bio?: UserDocument['bio'];
-  name: UserDocument['name'];
+  name?: UserDocument['name'];
+  email?: UserDocument['email'];
   type: UserDocument['type'];
   role?: UserDocument['role'];
   customProfile?: UserDocument['customProfile'];
@@ -39,10 +41,11 @@ export const UserSchema: Schema = new Schema({
   account: { type: String, required: true, index: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
-  avatar: { type: String, required: true },
+  avatar: { type: String, required: false },
   bio: { type: String, required: false },
-  name: { type: String, required: true },
-  type: { type: String, required: true },
+  name: { type: String, required: false },
+  email: { type: String, required: false },
+  type: { type: String, required: false },
   role: { type: String, required: false },
   customProfile: { type: String, required: false },
   webSite: { type: String, required: false },
