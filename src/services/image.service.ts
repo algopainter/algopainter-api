@@ -6,6 +6,8 @@ import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
+import { CollectionContext } from "../domain/collection";
+import { Types } from 'mongoose';
 
 /**
  * Image service class
@@ -28,7 +30,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);
-    
+
     return Result.success<Paged<IImage>>(null, {
       count,
       currPage: page,
@@ -67,11 +69,23 @@ export default class ImageService extends BaseCRUDService<IImage> {
       $inc: { 'likes': 1 },
       $push: { 'likers': request.account }
     });
+
     await AuctionContext.updateMany({ 'item._id': id }, {
       $inc: { 'item.likes': 1 },
       $push: { 'item.likers': request.account }
     });
-    
+
+    await CollectionContext.updateMany({
+      images: {
+        $elemMatch: {
+          _id: Types.ObjectId(id)
+        }
+      }
+    }, {
+      $inc: { 'images.$.likes': 1 },
+      $push: { 'images.$.likers': request.account }
+    });
+
     return Result.success<IImage>(null, null);
   }
 
@@ -80,14 +94,28 @@ export default class ImageService extends BaseCRUDService<IImage> {
     if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
     await this._validateLikeSign(request, id);
+
     await ImageContext.findOneAndUpdate({ _id: id }, {
       $inc: { 'likes': -1 },
       $pull: { 'likers': request.account }
     });
+
     await AuctionContext.updateMany({ 'item._id': id }, {
       $inc: { 'item.likes': -1 },
       $pull: { 'item.likers': request.account }
     });
+
+    await CollectionContext.updateMany({
+      images: {
+        $elemMatch: {
+          _id: Types.ObjectId(id)
+        }
+      }
+    }, {
+      $inc: { 'images.$.likes': -11 },
+      $pull: { 'images.$.likers': request.account }
+    });
+
     return Result.success<IImage>(null, null);
   }
 }
