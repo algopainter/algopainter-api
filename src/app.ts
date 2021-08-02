@@ -31,15 +31,15 @@ class Application {
     this.app.use(bodyParser.json());
     this.app.use(cors());
     this.app.use(async (req, res, next) => {
-      connect(Settings.mongoURL(), {
+      await connect(Settings.mongoURL(), {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true,
       });
 
-      res.on('finish', disconnect);
-      res.on('close', disconnect);
+      res.on('finish', async () => await disconnect());
+      res.on('close', async () => await disconnect());
 
       const signService = new SignService();
       const result = await signService.validatePreRequest(req.body);
