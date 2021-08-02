@@ -58,7 +58,7 @@ export const routesExtractor = (app: any, opts: any | null = null) => {
           if (!routeLogged[method] && method) {
             const stackMethod = method;
             const stackPath = [options.prefix, stack.routerPath, stack.route.path, route.path].filter((s) => !!s).join('/');
-            routes.push({ method: stackMethod, path: stackPath });
+            routes.push({ key: stackMethod + '|' + stackPath, method: stackMethod, path: stackPath });
             routeLogged[method] = true;
           }
         }
@@ -69,8 +69,8 @@ export const routesExtractor = (app: any, opts: any | null = null) => {
   const result = [];
   const map = new Map();
   for (const item of routes) {
-    if (!map.has(item.path)) {
-      map.set(item.path, true);
+    if (!map.has(item.key)) {
+      map.set(item.key, true);
       result.push({
         method: item.method,
         path: item.path
