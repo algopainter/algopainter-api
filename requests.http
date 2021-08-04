@@ -61,7 +61,7 @@ content-type: application/json
 
 ###
 
-GET http://localhost:3000/api/bids?bidder=0xcabea325744d9524fe3cac533996c144b0fc275c HTTP/1.1
+GET http://localhost:3000/api/bids?bidder=0xcabea325744d9524fe3cac533996c144b0fc275c&page=1&perPage=3 HTTP/1.1
 
 ###
 

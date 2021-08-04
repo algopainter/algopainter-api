@@ -31,7 +31,7 @@ const bidItemSchema: Schema = new Schema({
 
 export const CollectionSchema: Schema = new Schema({
   bidder: { type: String, required: true },
-  amount: { type: String, required: true },
+  amount: { type: Number, required: true },
   tokenSymbol: { type: String, required: true },
   createdAt: { type: Date, required: true },
   bidBack: { type: Number, required: true },
