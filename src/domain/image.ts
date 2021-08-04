@@ -11,10 +11,6 @@ export interface IImageNFTInfo {
   parameters: Record<string, unknown>;
 }
 
-export interface IImageAuthority extends IUser {
-  _id: string;
-}
-
 export interface ImageDocument extends Document {
   title: string;
   likes: number;
@@ -23,12 +19,14 @@ export interface ImageDocument extends Document {
   tags: string[];
   nft: IImageNFTInfo;
   owner: string;
+  users: IUser[];
   likers?: string[] | null;
 }
 
 export interface IImage {
   title: ImageDocument['title'];
   likes: ImageDocument['likes'];
+  users: ImageDocument['users'];
   collectionName: ImageDocument['collectionName'];
   description: ImageDocument['description'];
   tags: ImageDocument['tags'];
@@ -40,6 +38,7 @@ export interface IImage {
 export const ImageSchema: Schema = new Schema({
   title: { type: String, required: true },
   likes: { type: Number, required: true },
+  users: { type: [Object], required: true },
   description: { type: String, required: true },
   collectionName: { type: String, required: true },
   tags: { type: [String], required: true },

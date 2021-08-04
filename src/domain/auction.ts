@@ -1,15 +1,11 @@
 import { model, Schema, Model, Document } from 'mongoose';
 import { IUser } from './user';
 
-export interface IAuctionUser extends IUser {
-  _id: string;
-}
-
 export interface IAuctionBid {
   amount: number;
   tokenSymbol: string;
   createdAt: Date;
-  bidder?: IAuctionUser | null;
+  bidder?: IUser | null;
 }
 
 export interface IAuctionItem {
@@ -42,6 +38,7 @@ export interface AuctionDocument extends Document {
   fee: IAuctionFees;
   isHot: boolean;
   owner: string;
+  users: IUser[];
   bids: IAuctionBid[];
   categories: string[];
   minimumBid: IAuctionBid;
@@ -54,6 +51,7 @@ export interface IAuction {
   expirationDt: AuctionDocument['expirationDt'];
   fee: AuctionDocument['fee'];
   item: AuctionDocument['item'];
+  users: AuctionDocument['users'];
   createdAt: AuctionDocument['createdAt'];
   updatedAt: AuctionDocument['updatedAt'];
   isHot: AuctionDocument['isHot'];
@@ -84,6 +82,7 @@ export const AuctionSchema: Schema = new Schema({
   isHot: { type: Boolean, required: true },
   owner: { type: String, required: true },
   bids: { type: [Object], required: false },
+  users: { type: [Object], required: false },
   minimumBid: { type: Object, required: false },
   highestBid: { type: Object, required: false },
   lowestBid: { type: Object, required: false },

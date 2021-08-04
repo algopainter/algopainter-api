@@ -4,7 +4,7 @@ import { IImage } from "./domain/image";
 import { IUser } from "./domain/user";
 import { IBid } from "./domain/bid";
 
-const auctionData = (imageID: string, likes: number, isHot: boolean, collection:string, account:string) : IAuction => { return {
+const auctionData = (imageID: string, likes: number, isHot: boolean, collection:string, account:string, account2: string) : IAuction => { return {
   isHot: isHot,
   fee: {
     bidBack: 10,
@@ -43,7 +43,6 @@ const auctionData = (imageID: string, likes: number, isHot: boolean, collection:
       name: 'Gleisson',
       role: 'creator',
       updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
       type: 'developer',
       bio: 'Director of Criptonomia'
     }
@@ -59,7 +58,6 @@ const auctionData = (imageID: string, likes: number, isHot: boolean, collection:
       name: 'Lincoln',
       role: 'owner',
       updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
       type: 'developer',
       bio: 'Product Manager of Criptonomia'
     }
@@ -76,7 +74,6 @@ const auctionData = (imageID: string, likes: number, isHot: boolean, collection:
         name: 'Gleisson',
         role: 'creator',
         updatedAt: new Date(),
-        _id: "60b6c7adf1cd1b3be43aa60e",
         type: 'developer',
         bio: 'Director of Criptonomia'
       }
@@ -86,19 +83,38 @@ const auctionData = (imageID: string, likes: number, isHot: boolean, collection:
       createdAt: new Date(),
       tokenSymbol: 'ETH',
       bidder: {
-        account: account,
+        account: account2,
         avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
         createdAt: new Date(),
         name: 'Lincoln',
         role: 'owner',
         updatedAt: new Date(),
-        _id: "60b6c7adf1cd1b3be43aa60e",
         type: 'developer',
         bio: 'Product Manager of Criptonomia'
       }
     }
   ],
-  owner: account
+  owner: account,
+  users: [
+    {
+      account: account,
+      createdAt: new Date(),
+      type: 'user',
+      role: 'owner',
+      name: 'Image Owner',
+      updatedAt: new Date(),
+      avatar: 'https://randomuser.me/api/portraits/men/67.jpg'
+    },
+    {
+      account: account2,
+      createdAt: new Date(),
+      type: 'algop',
+      role: 'creator',
+      name: 'Image Creator',
+      updatedAt: new Date(),
+      avatar: 'https://randomuser.me/api/portraits/men/7.jpg'
+    },
+  ]
 }};
 
 const collectionData = (prefix:string, images: ICollectionImage[], account: string) : ICollection => { return {
@@ -108,11 +124,31 @@ const collectionData = (prefix:string, images: ICollectionImage[], account: stri
   images: images
 }};
 
-const imagesData = (collection: string, account: string) : IImage => { return {
+const imagesData = (collection: string, account: string, account2: string) : IImage => { return {
   owner: account,
+  users: [
+    {
+      account: account,
+      createdAt: new Date(),
+      type: 'user',
+      role: 'owner',
+      name: 'Image Owner',
+      updatedAt: new Date(),
+      avatar: 'https://randomuser.me/api/portraits/men/67.jpg'
+    },
+    {
+      account: account2,
+      createdAt: new Date(),
+      type: 'algop',
+      role: 'creator',
+      name: 'Image Creator',
+      updatedAt: new Date(),
+      avatar: 'https://randomuser.me/api/portraits/men/7.jpg'
+    },
+  ],
   description: 'Image Description ' + Math.floor(Math.random() * 101),
   likes: Math.floor(Math.random() * 1001),
-  title: 'Ímage ' + Math.floor(Math.random() * 101),
+  title: 'Image ' + Math.floor(Math.random() * 101),
   collectionName: collection,
   tags: [ 'Nice', 'Awesome' ],
   nft: {
