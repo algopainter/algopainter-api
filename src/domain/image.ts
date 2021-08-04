@@ -22,7 +22,7 @@ export interface ImageDocument extends Document {
   collectionName: string;
   tags: string[];
   nft: IImageNFTInfo;
-  users: IImageAuthority[];
+  owner: string;
   likers?: string[] | null;
 }
 
@@ -33,7 +33,7 @@ export interface IImage {
   description: ImageDocument['description'];
   tags: ImageDocument['tags'];
   nft: ImageDocument['nft'];
-  users: ImageDocument['users'];
+  owner: ImageDocument['owner'];
   likers?: ImageDocument['likers'];
 }
 
@@ -44,7 +44,7 @@ export const ImageSchema: Schema = new Schema({
   collectionName: { type: String, required: true },
   tags: { type: [String], required: true },
   nft: { type: Object, required: true },
-  users: { type: [Object], required: true },
+  owner: { type: String, required: true },
   likers: { type: [String], required: false },
 });
 

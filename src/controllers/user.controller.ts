@@ -1,15 +1,17 @@
 import { Router } from "express";
-import { UserDocument } from "src/domain/user";
-import { IUserUpdateRequest } from "src/requests/user.update.request";
+import { IUserUpdateRequest } from "../requests/user.update.request";
+import ImageService from "../services/image.service";
 import UserService from "../services/user.service";
 import BaseController from "./base.controller"
 
 class UserController extends BaseController {
   private service: UserService;
+  private imageService: ImageService;
 
   constructor() {
     super();
     this.service = new UserService();
+    this.imageService = new ImageService();
   }
 
   get path() : string {
@@ -21,6 +23,15 @@ class UserController extends BaseController {
       try {
         const result = await this.service.getAsync(req.params.account);
         this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.get(`${this.path}/:account/images`, async (req, res) => {
+      try {
+        const images = await this.imageService.getByOwnerAsync(req.params.account);
+        this.handleResult(images, res);
       } catch (error) {
         this.handleException(error, res);
       }

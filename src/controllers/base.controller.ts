@@ -50,6 +50,7 @@ export default abstract class BaseController {
           res.status(actionResult.type || 200)
             .set('X-Powered-By', 'AlgoPainter')
             .set('Content-Type', 'application/json')
+            .set('x-total-items', Array.isArray(actionResult.data) ? actionResult.data.length.toString() : (actionResult.data ? '1' : '0'))
             .send(JSON.stringify(actionResult.data || actionResult))
         } else {
           res.status(actionResult.type || 400)

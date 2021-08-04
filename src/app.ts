@@ -29,7 +29,9 @@ class Application {
 
   private initializeMiddlewares() {
     this.app.use(bodyParser.json());
-    this.app.use(cors());
+    this.app.use(cors({
+      exposedHeaders: [ 'x-total-items' ]
+    }));
     this.app.use(async (req, res, next) => {
       await connect(Settings.mongoURL(), {
         useNewUrlParser: true,

@@ -5,7 +5,7 @@ export interface IAuctionUser extends IUser {
   _id: string;
 }
 
-export interface IBid {
+export interface IAuctionBid {
   amount: number;
   tokenSymbol: string;
   createdAt: Date;
@@ -41,12 +41,12 @@ export interface AuctionDocument extends Document {
   expirationDt: Date;
   fee: IAuctionFees;
   isHot: boolean;
-  users: IAuctionUser[];
-  bids: IBid[];
+  owner: string;
+  bids: IAuctionBid[];
   categories: string[];
-  minimumBid: IBid;
-  highestBid: IBid;
-  lowestBid: IBid;
+  minimumBid: IAuctionBid;
+  highestBid: IAuctionBid;
+  lowestBid: IAuctionBid;
 }
 
 export interface IAuction {
@@ -57,7 +57,7 @@ export interface IAuction {
   createdAt: AuctionDocument['createdAt'];
   updatedAt: AuctionDocument['updatedAt'];
   isHot: AuctionDocument['isHot'];
-  users: AuctionDocument['users'];
+  owner: AuctionDocument['owner'];
   bids: AuctionDocument['bids'];
   minimumBid: AuctionDocument['minimumBid'];
   highestBid: AuctionDocument['highestBid'];
@@ -82,7 +82,7 @@ export const AuctionSchema: Schema = new Schema({
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
   isHot: { type: Boolean, required: true },
-  users: { type: [Object], required: true },
+  owner: { type: String, required: true },
   bids: { type: [Object], required: false },
   minimumBid: { type: Object, required: false },
   highestBid: { type: Object, required: false },

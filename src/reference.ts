@@ -2,8 +2,9 @@ import { IAuction } from "./domain/auction";
 import { ICollection, ICollectionImage } from "./domain/collection";
 import { IImage } from "./domain/image";
 import { IUser } from "./domain/user";
+import { IBid } from "./domain/bid";
 
-const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuction => { return {
+const auctionData = (imageID: string, likes: number, isHot: boolean, collection:string, account:string) : IAuction => { return {
   isHot: isHot,
   fee: {
     bidBack: 10,
@@ -21,7 +22,7 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
   item: {
     _id: imageID, 
     collectionName: collection,
-    likes: Math.floor(Math.random() * 101),
+    likes: likes,
     previewImageUrl: "https://gateway.pinata.cloud/ipfs/Qme37jp8q5u12GAs43n3NAKvGoJKoeiQjYVk3MHqiawcCa",
     title: 'Amazing Galaxy',
     tags: ['Galaxy', 'Art', 'Creation'],
@@ -36,7 +37,7 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
     createdAt: new Date(),
     tokenSymbol: 'USD',
     bidder: {
-      account: '0x0FR71571GTAHJU',
+      account: account,
       avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
       createdAt: new Date(),
       name: 'Gleisson',
@@ -52,7 +53,7 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
     createdAt: new Date(),
     tokenSymbol: 'ETH',
     bidder: {
-      account: '0x0FR71571GTAHJU',
+      account: account,
       avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
       createdAt: new Date(),
       name: 'Lincoln',
@@ -69,7 +70,7 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
       createdAt: new Date(),
       tokenSymbol: 'USD',
       bidder: {
-        account: '0x0FR71571GTAHJU',
+        account: account,
         avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
         createdAt: new Date(),
         name: 'Gleisson',
@@ -85,7 +86,7 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
       createdAt: new Date(),
       tokenSymbol: 'ETH',
       bidder: {
-        account: '0x0FR71571GTAHJU',
+        account: account,
         avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
         createdAt: new Date(),
         name: 'Lincoln',
@@ -97,76 +98,20 @@ const auctionData = (imageID: string, isHot: boolean, collection:string) : IAuct
       }
     }
   ],
-  users: [
-    {
-      account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-      createdAt: new Date(),
-      name: 'Gleisson',
-      role: 'creator',
-      updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
-      type: 'developer',
-      bio: 'Director of Criptonomia'
-    },
-    {
-      account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-      createdAt: new Date(),
-      name: 'Lincoln',
-      role: 'owner',
-      updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
-      type: 'developer',
-      bio: 'Product Manager of Criptonomia'
-    }
-  ]
+  owner: account
 }};
 
-const collectionData = (prefix:string, images: ICollectionImage[]) : ICollection => { return {
-  title: prefix + ' ' + Math.floor(Math.random() * 101),
+const collectionData = (prefix:string, images: ICollectionImage[], account: string) : ICollection => { return {
+  title: prefix,
   description: 'A ' + prefix + ' collection',
-  owner: {
-    account: '0x0FR71571GTAHJU',
-    avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-    createdAt: new Date(),
-    name: 'Lincoln',
-    role: 'owner',
-    updatedAt: new Date(),
-    _id: "60b6c7adf1cd1b3be43aa60e",
-    type: 'developer',
-    bio: 'Product Manager of Criptonomia'
-  },
+  owner: account,
   images: images
 }};
 
-const imagesData = (collection: string) : IImage => { return {
-  users: [
-    {
-      account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-      createdAt: new Date(),
-      name: 'Gleisson',
-      role: 'creator',
-      updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
-      type: 'developer',
-      bio: 'Director of Criptonomia'
-    },
-    {
-      account: '0x0FR71571GTAHJU',
-      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-      createdAt: new Date(),
-      name: 'Lincoln',
-      role: 'owner',
-      updatedAt: new Date(),
-      _id: "60b6c7adf1cd1b3be43aa60e",
-      type: 'developer',
-      bio: 'Product Manager of Criptonomia'
-    }
-  ],
+const imagesData = (collection: string, account: string) : IImage => { return {
+  owner: account,
   description: 'Image Description ' + Math.floor(Math.random() * 101),
-  likes: Math.floor(Math.random() * 101),
+  likes: Math.floor(Math.random() * 1001),
   title: 'Ímage ' + Math.floor(Math.random() * 101),
   collectionName: collection,
   tags: [ 'Nice', 'Awesome' ],
@@ -202,7 +147,7 @@ const imagesData = (collection: string) : IImage => { return {
 }};
 
 const usersData = () : IUser => { return {
-  account: "0x7dDFb53887D2EB323CE0409E792759F916B0e229",
+  account: "0x4E9F8B25Ea6007ef3E7e1d195d4216C6dC04a5d2",
   createdAt: new Date(),
   name: 'Gleisson de Assis',
   role: 'owner',
@@ -212,9 +157,23 @@ const usersData = () : IUser => { return {
   bio: 'Director of Criptonomia'
 }};
 
+const bidsData = (account: string, imageId: string) : IBid => { return {
+  amount: Math.floor(Math.random() * 10001),
+  bidBack: Math.floor(Math.random() * 11),
+  bidder: account,
+  createdAt: new Date(),
+  item: {
+    _id: imageId,
+    title: 'Bid item',
+    previewImageUrl: 'https://gateway.pinata.cloud/ipfs/QmTnJ8mpEeX3KX9BHc1B8sBdKWCDEKWk1fP9J5vUCZLrZP'
+  },
+  tokenSymbol: 'ETH'
+} };
+
 export {
   auctionData, 
   collectionData, 
   usersData,
-  imagesData
+  imagesData,
+  bidsData
 }

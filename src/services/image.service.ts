@@ -45,6 +45,11 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, data);
   }
 
+  async getByOwnerAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ owner: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
+
   async createAsync(createdItem: IImage): Promise<Result<IImage>> {
     const input = await ImageContext.create(createdItem);
     return Result.success<IImage>(null, input);
@@ -65,14 +70,15 @@ export default class ImageService extends BaseCRUDService<IImage> {
     // if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
     //   return Result.custom<IImage>(false, "This account already liked the image", null, 409);
     // await this._validateLikeSign(request, id);
+
     await ImageContext.findOneAndUpdate({ _id: id }, {
       $inc: { 'likes': 1 },
-      $push: { 'likers': request.account }
+      $push: { 'likers': request.account.toLowerCase() }
     });
 
     await AuctionContext.updateMany({ 'item._id': id }, {
       $inc: { 'item.likes': 1 },
-      $push: { 'item.likers': request.account }
+      $push: { 'item.likers': request.account.toLowerCase() }
     });
 
     await CollectionContext.updateMany({
@@ -83,26 +89,29 @@ export default class ImageService extends BaseCRUDService<IImage> {
       }
     }, {
       $inc: { 'images.$.likes': 1 },
-      $push: { 'images.$.likers': request.account }
+      $push: { 'images.$.likers': request.account.toLowerCase() }
     });
 
     return Result.success<IImage>(null, null);
   }
 
-  async dislikeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
+  async dislikeAsync(id: string, request: ILikeRequest | null): Promise<Result<IImage>> {
     // const imageToChange = await ImageContext.findById(id);
     // if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
     //   return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
     // await this._validateLikeSign(request, id);
 
+    if(!request)
+      return Result.fail<IImage>("The payload to validade the sign is empty.", null);
+
     await ImageContext.findOneAndUpdate({ _id: id }, {
       $inc: { 'likes': -1 },
-      $pull: { 'likers': request.account }
+      $pull: { 'likers': request.account.toLowerCase() }
     });
 
     await AuctionContext.updateMany({ 'item._id': id }, {
       $inc: { 'item.likes': -1 },
-      $pull: { 'item.likers': request.account }
+      $pull: { 'item.likers': request.account.toLowerCase() }
     });
 
     await CollectionContext.updateMany({
@@ -113,7 +122,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       }
     }, {
       $inc: { 'images.$.likes': -1 },
-      $pull: { 'images.$.likers': request.account }
+      $pull: { 'images.$.likers': request.account.toLowerCase() }
     });
 
     return Result.success<IImage>(null, null);
