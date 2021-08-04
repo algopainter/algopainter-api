@@ -5,14 +5,13 @@ import AuctionController from './controllers/auction.controller'
 import CollectionController from './controllers/collection.controller'
 import DiagnosticController from './controllers/diagnostic.controller'
 import ImageController from './controllers/image.controller'
+import BidController from './controllers/bid.controller'
 import NFTController from './controllers/nft.controller'
 import ReportController from './controllers/report.controller'
 import UserController from './controllers/user.controller'
 import cors from 'cors';
-import SignService from './services/sign.service';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
-import Result from './shared/result';
 
 class Application {
   public app: express.Application;
@@ -84,6 +83,7 @@ App.initializeControllers([
   new ReportController(),
   new UserController(),
   new AuctionController(),
+  new BidController(),
   new DiagnosticController(App.expressApp),
 ]);
 

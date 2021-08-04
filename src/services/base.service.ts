@@ -10,6 +10,11 @@ export abstract class BaseService {
   translateToMongoQuery(filter: IFilter): IFilter {
     const qs = new MongoQS();
     const query = Object.keys(filter).length ? qs.parse(filter) : null;
+    for (let index = 0; index < Object.keys(filter).length; index++) {
+      if(filter[Object.keys(filter)[index]]?.startsWith('0x')) { //is a Hash
+        query[Object.keys(filter)[index]] = filter[Object.keys(filter)[index]];
+      }
+    }
     return query;
   }
 
