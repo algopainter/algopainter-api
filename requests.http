@@ -65,6 +65,10 @@ GET http://localhost:3000/api/bids?bidder=0xcabea325744d9524fe3cac533996c144b0fc
 
 ###
 
+GET http://localhost:3000/api/reports/top/sellers HTTP/1.1
+
+###
+
 GET http://localhost:3000/api/diagnostics/seed/AlgoPainter HTTP/1.1
 
 ###
@@ -73,4 +77,4 @@ GET http://localhost:3000/api/diagnostics/seed/AlgoPainter/fix HTTP/1.1
 
 ###
 
-GET http://localhost:3000/api/diagnostics HTTP/1.1
+GET http://localhost:3000/api/collections/61108f31500744822077b698/images HTTP/1.1

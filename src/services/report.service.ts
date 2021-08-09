@@ -20,7 +20,17 @@ export default class ReportService extends BaseService {
       });
     }
 
-    return Result.success<ISeller[]>(null, reportTopSellers);
+    reportTopSellers.sort((a, b) => {
+      if (a.amount > b.amount) {
+        return -1;
+      }
+      if (a.amount < b.amount) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return Result.success<ISeller[]>(null, reportTopSellers.slice(0, Math.min(5, reportTopSellers.length)));
   }
 
   async topBuyers() : Promise<Result<IBuyer[]>> {
@@ -38,6 +48,16 @@ export default class ReportService extends BaseService {
       });
     }
 
-    return Result.success<IBuyer[]>(null, reportTopSellers);
+    reportTopSellers.sort((a, b) => {
+      if (a.amount > b.amount) {
+        return -1;
+      }
+      if (a.amount < b.amount) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return Result.success<IBuyer[]>(null, reportTopSellers.slice(0, Math.min(5, reportTopSellers.length)));
   }
 }
