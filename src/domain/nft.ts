@@ -3,12 +3,6 @@ import { IUser } from './user';
 
 export interface INFTArtist extends IUser {
   _id: string;
-  //Temporary fields, this will be changed after collector is update
-  address: string; //will be account from IUser
-  website?: string; //Will use networks array
-  twitter?: string; //Will use networks array
-  github?: string; //Will use networks array
-  instagram?: string; //Will use networks array
 }
 
 export interface INFTPrice {

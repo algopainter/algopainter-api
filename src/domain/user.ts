@@ -5,6 +5,7 @@ export interface UserDocument extends Document {
   updatedAt: Date;
   avatar?: string;
   name?: string;
+  nick?: string;
   email?: string;
   bio?: string;
   type: 'algop' | 'developer' | 'user'
@@ -25,6 +26,7 @@ export interface IUser {
   avatar?: UserDocument['avatar'];
   bio?: UserDocument['bio'];
   name?: UserDocument['name'];
+  nick?: UserDocument['nick'];
   email?: UserDocument['email'];
   type: UserDocument['type'];
   role?: UserDocument['role'];
@@ -44,6 +46,7 @@ export const UserSchema: Schema = new Schema({
   avatar: { type: String, required: false },
   bio: { type: String, required: false },
   name: { type: String, required: false },
+  nick: { type: String, required: false },
   email: { type: String, required: false },
   type: { type: String, required: false },
   role: { type: String, required: false },

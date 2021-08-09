@@ -8,6 +8,7 @@ export interface IBidItem {
 
 export interface BidDocument extends Document {
   bidder: string;
+  auctionId: string;
   amount: number;
   tokenSymbol: string;
   createdAt: Date;
@@ -17,6 +18,7 @@ export interface BidDocument extends Document {
 
 export interface IBid {
   bidder: BidDocument['bidder'];
+  auctionId: BidDocument['auctionId'];
   amount: BidDocument['amount'];
   tokenSymbol: BidDocument['tokenSymbol'];
   createdAt: BidDocument['createdAt'];
@@ -31,6 +33,7 @@ const bidItemSchema: Schema = new Schema({
 
 export const CollectionSchema: Schema = new Schema({
   bidder: { type: String, required: true },
+  auctionId: { type: String, required: true },
   amount: { type: Number, required: true },
   tokenSymbol: { type: String, required: true },
   createdAt: { type: Date, required: true },

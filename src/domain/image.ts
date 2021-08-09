@@ -1,5 +1,4 @@
 import { model, Schema, Model, Document } from 'mongoose';
-import { INFTArtist } from "./nft";
 import { IUser } from './user';
 
 export interface IImageNFTInfo {
@@ -7,7 +6,6 @@ export interface IImageNFTInfo {
   image: string;
   previewImage: string;
   rawImage: string;
-  artist: INFTArtist;
   parameters: Record<string, unknown>;
 }
 
@@ -16,9 +14,13 @@ export interface ImageDocument extends Document {
   likes: number;
   description: string;
   collectionName: string;
+  collectionOwner: string;
+  createdAt: Date;
+  updatedAt: Date;
   tags: string[];
   nft: IImageNFTInfo;
   owner: string;
+  creator: string;
   users: IUser[];
   likers?: string[] | null;
 }
@@ -28,10 +30,14 @@ export interface IImage {
   likes: ImageDocument['likes'];
   users: ImageDocument['users'];
   collectionName: ImageDocument['collectionName'];
+  collectionOwner: ImageDocument['collectionOwner'];
+  createdAt: ImageDocument['createdAt'];
+  updatedAt: ImageDocument['updatedAt'];
   description: ImageDocument['description'];
   tags: ImageDocument['tags'];
   nft: ImageDocument['nft'];
   owner: ImageDocument['owner'];
+  creator: ImageDocument['creator'];
   likers?: ImageDocument['likers'];
 }
 
@@ -41,9 +47,13 @@ export const ImageSchema: Schema = new Schema({
   users: { type: [Object], required: true },
   description: { type: String, required: true },
   collectionName: { type: String, required: true },
+  collectionOwner: { type: String, required: true },
   tags: { type: [String], required: true },
+  createAt: { type: Date, required: true },
+  updatedAt: { type: Date, required: true },
   nft: { type: Object, required: true },
-  owner: { type: String, required: true },
+  owner: { type: String, required: true, index: true },
+  creator: { type: String, required: true, index: true },
   likers: { type: [String], required: false },
 });
 

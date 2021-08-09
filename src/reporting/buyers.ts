@@ -1,6 +1,7 @@
 export interface IBuyer {
-  name: string;
+  name?: string;
   amount: number;
+  account: string;
   tokenSymbol: string;
   avatar: string;
 }

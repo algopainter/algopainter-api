@@ -6,19 +6,25 @@ import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
-import { CollectionContext } from "../domain/collection";
-import { Types } from 'mongoose';
 
 /**
  * Image service class
  * @class ImageService @extends BaseService<IImage>
  */
 export default class ImageService extends BaseCRUDService<IImage> {
-  async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IImage[]>> {
+  async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IImage[]>> {
     const data = await ImageContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
     return Result.success<IImage[]>(null, data);
+  }
+
+  async getByCollection(collectionId: string) : Promise<IImage[]> {
+    const data = await ImageContext
+      .find({ collectionId: collectionId })
+      .sort({ createdAt: -1 });
+
+    return data;
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
@@ -47,6 +53,11 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
   async getByOwnerAsync(account: string): Promise<Result<IImage[]>> {
     const data = await ImageContext.find({ owner: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
+
+  async getByCreatorAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ creator: account.toLowerCase() });
     return Result.success<IImage[]>(null, data);
   }
 
@@ -81,17 +92,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
       $push: { 'item.likers': request.account.toLowerCase() }
     });
 
-    await CollectionContext.updateMany({
-      images: {
-        $elemMatch: {
-          _id: Types.ObjectId(id)
-        }
-      }
-    }, {
-      $inc: { 'images.$.likes': 1 },
-      $push: { 'images.$.likers': request.account.toLowerCase() }
-    });
-
     return Result.success<IImage>(null, null);
   }
 
@@ -112,17 +112,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
     await AuctionContext.updateMany({ 'item._id': id }, {
       $inc: { 'item.likes': -1 },
       $pull: { 'item.likers': request.account.toLowerCase() }
-    });
-
-    await CollectionContext.updateMany({
-      images: {
-        $elemMatch: {
-          _id: Types.ObjectId(id)
-        }
-      }
-    }, {
-      $inc: { 'images.$.likes': -1 },
-      $pull: { 'images.$.likers': request.account.toLowerCase() }
     });
 
     return Result.success<IImage>(null, null);

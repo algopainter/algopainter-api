@@ -46,6 +46,15 @@ class AuctionController extends BaseController {
         this.handleException(error, res);
       }
     });
+
+    router.get(`${this.path}/:id/bids`, async (req, res) => {
+      try {
+        const result = await this.service.getAsync(req.params.id);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
   }
 }
 

@@ -2,6 +2,8 @@
  * Generic Result class for majority of actions
  */
 export default class Result<T> {
+  static get TYPE_NOT_FOUND(): string { return 'NOTFOUND' }
+
   data: T | null;
   success: boolean;
   message: string | null;
@@ -24,5 +26,18 @@ export default class Result<T> {
 
   static fail<TInner>(message: string | null = null, data: TInner | undefined | null = null, type: number | null = null) : Result<TInner> {
     return new Result<TInner>(false, message, data, type);
+  }
+
+  static failure(message: string | null = null, data: never | undefined | null = null, type: number | null = null) : Result<never> {
+    return new Result<never>(false, message, data, type);
+  }
+  
+  static message(type: string) : string {
+    switch(type) {
+      case this.TYPE_NOT_FOUND:
+        return 'The request data is not found!'
+      default:
+        return '';
+    }
   }
 }

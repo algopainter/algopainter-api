@@ -44,9 +44,9 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async getAsync(id: string): Promise<Result<IUser>> {
-    
     const data = await UserContext.findOne({ account: id.toLowerCase() });
-    
+    if(!data)
+      return Result.success<never>(null, null, 404);
     return Result.success<IUser>(null, (data as IUser));
   }
 

@@ -3,7 +3,7 @@
 import { Router, Request, Response } from "express";
 import Result from "../shared/result";
 import Exception from "../shared/exception";
-import { IFilter, IOrderBy } from "src/services/base.service";
+import { IFilter, IOrderBy } from "../services/base.service";
 import QueryParser from "../shared/query-parser";
 
 export default abstract class BaseController {
@@ -47,11 +47,13 @@ export default abstract class BaseController {
           .send();
       } else {
         if (actionResult.success) {
-          res.status(actionResult.type || 200)
+          if((actionResult.data || (Array.isArray(actionResult.data) && actionResult.data.length)) && !actionResult.type) {
+            res.status(actionResult.type || 200)
             .set('X-Powered-By', 'AlgoPainter')
             .set('Content-Type', 'application/json')
             .set('x-total-items', Array.isArray(actionResult.data) ? actionResult.data.length.toString() : (actionResult.data ? '1' : '0'))
             .send(JSON.stringify(actionResult.data || actionResult))
+          }
         } else {
           res.status(actionResult.type || 400)
             .set('X-Powered-By', 'AlgoPainter')
