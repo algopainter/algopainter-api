@@ -21,7 +21,7 @@ class UserController extends BaseController {
   intializeRoutes(router : Router) : void {
     router.get(`${this.path}/:account`, async (req, res) => {
       try {
-        const result = await this.service.getAsync(req.params.account);
+        const result = await this.service.getAsync(req.params.account.toLowerCase());
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
@@ -30,7 +30,7 @@ class UserController extends BaseController {
 
     router.get(`${this.path}/:account/images`, async (req, res) => {
       try {
-        const images = await this.imageService.getByOwnerAsync(req.params.account);
+        const images = await this.imageService.getByOwnerAsync(req.params.account.toLowerCase());
         this.handleResult(images, res);
       } catch (error) {
         this.handleException(error, res);
@@ -39,7 +39,7 @@ class UserController extends BaseController {
 
     router.put(`${this.path}/:account`, async (req, res) => {
       try {
-        const result = await this.service.updateUser(req.params.account, req.body as IUserUpdateRequest);
+        const result = await this.service.updateUser(req.params.account.toLowerCase(), req.body as IUserUpdateRequest);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

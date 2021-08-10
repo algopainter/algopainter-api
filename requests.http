@@ -78,3 +78,7 @@ GET http://localhost:3000/api/diagnostics/seed/AlgoPainter/fix HTTP/1.1
 ###
 
 GET http://localhost:3000/api/collections/61108f31500744822077b698/images HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/users/0x7A8476832Eb89189F0aDbC183A1B70C447Bb311a/images HTTP/1.1
