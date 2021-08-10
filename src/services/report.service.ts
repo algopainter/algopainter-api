@@ -15,7 +15,7 @@ export default class ReportService extends BaseService {
         name: user.nick || user.name,
         amount: Math.floor(Math.random() * 10001),
         account: user.account,
-        avatar: user.avatar || 'https://freeiconshop.com/wp-content/uploads/edd/person-outline-filled.png',
+        avatar: user.avatar || '',
         tokenSymbol: 'ETH'
       });
     }
@@ -43,8 +43,8 @@ export default class ReportService extends BaseService {
         name: user.nick || user.name,
         amount: Math.floor(Math.random() * 10001),
         account: user.account,
-        avatar: user.avatar || 'https://freeiconshop.com/wp-content/uploads/edd/person-outline-filled.png',
-        tokenSymbol: 'ETH'
+        avatar: user.avatar || '',
+        tokenSymbol: 'USD'
       });
     }
 
