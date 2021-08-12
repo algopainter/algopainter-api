@@ -18,6 +18,9 @@ export interface NFTDocument extends Document {
   contractAddress: string;
   mintedBy: string;
   name: string;
+  collectionName: string;
+  descriptor: string;
+  description: string;
   image: string;
   previewImage: string;
   rawImage: string;
@@ -32,6 +35,9 @@ export interface INFT {
   contractAddress: NFTDocument['contractAddress'];
   mintedBy: NFTDocument['mintedBy'];
   name: NFTDocument['name'];
+  collectionName: NFTDocument['collectionName'];
+  descriptor: NFTDocument['descriptor'];
+  description: NFTDocument['description'];
   image: NFTDocument['image'];
   previewImage: NFTDocument['previewImage'];
   rawImage: NFTDocument['rawImage'];
@@ -55,6 +61,15 @@ export const NFTSchema: Schema = new Schema({
   },
   name: {
     type: String, required: true,
+  },
+  collectionName: {
+    type: String, required: true,
+  },
+  descriptor: {
+    type: String, required: false,
+  },
+  description: {
+    type: String, required: false,
   },
   image: {
     type: String, required: true,

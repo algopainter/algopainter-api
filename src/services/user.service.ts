@@ -5,6 +5,8 @@ import Paged from "../shared/paged";
 import { IUserUpdateRequest, IUserUpdateSignData } from '../requests/user.update.request';
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
+import { AuctionContext } from "../domain/auction";
+import { ImageContext } from "../domain/image";
 
 /**
  * User service class
@@ -65,12 +67,12 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async updateUser(account: string, request: IUserUpdateRequest): Promise<Result<IUser>> {
-    
     const signService = new SignService();
     if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
     let responseResult: Result<IUser>;
     const result = await this.getAsync(account);
+
     if (result.success && result.data && result.data.account) {
       await this.updateAsync((result.data as UserDocument)._id, {
         account: account.toLowerCase(),
@@ -108,7 +110,47 @@ export default class UserService extends BaseCRUDService<IUser> {
       });
       responseResult = createResult;
     }
+
+    try {
+      await this._propagateUserChanges(account, request.data);
+    } catch(e) {
+      console.log('Failed to propagate user changes.', e);
+    }
     
     return responseResult;
+  }
+
+  private async _checkUnique(account: string, userInfo: IUserUpdateSignData) {
+    const foundUsers = await UserContext.find({
+      account: { $ne: account.toLowerCase() }
+    });
+
+    return false;
+  }
+
+  private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
+    await ImageContext.updateMany({
+      users: {
+        $elemMatch: {
+          account: account.toLowerCase()
+        }
+      }
+    }, {
+      'users.$.name': userInfo.name,
+      'users.$.avatar': userInfo.avatar,
+      'users.$.customProfile': userInfo.customProfile
+    });
+
+    await AuctionContext.updateMany({
+      users: {
+        $elemMatch: {
+          account: account.toLowerCase()
+        }
+      }
+    }, {
+      'users.$.name': userInfo.name,
+      'users.$.avatar': userInfo.avatar,
+      'users.$.customProfile': userInfo.customProfile
+    })
   }
 }

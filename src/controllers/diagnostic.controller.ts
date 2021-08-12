@@ -92,13 +92,8 @@ class DiagnosticController extends BaseController {
           return accounts[Math.floor(Math.random() * accounts.length)].toLowerCase();
         }
 
-        const gweiCollection = '0x7dDFb53887D2EB323CE0409E792759F916B0e229'.toLowerCase();
-        await collectionService.createAsync({
-          description: "Hashily Gwei",
-          owner: gweiCollection,
-          title: 'Gwei'
-        });
-        const gweiImages = (await imageService.getByCreatorAsync(gweiCollection)).data as IImage[];
+        const gweiCollection = '0x4b7ef899cbb24689a47a66d3864f57ec13e01b35'.toLowerCase();
+        const gweiImages = (await imageService.getByCollectionOwnerAsync(gweiCollection)).data as IImage[];
 
         for (let index = 0; index < 15; index++) {
           const acc = rndAcc();
@@ -108,6 +103,31 @@ class DiagnosticController extends BaseController {
             newImage.likes, 
             index % 2 == 0, 
             "Gwei", 
+            acc, rndAcc(),
+            newImage.nft.previewImage,
+            newImage.title
+          ));
+          await this.sleep(500);
+          await bidService.createAsync(bidsData(
+            acc, 
+            (newImage as any)._id, 
+            newImage.title, 
+            newImage.nft.previewImage, 
+            (auction.data as AuctionDocument)._id));
+          await this.sleep(500);
+        }
+
+        const expressionsCollection = '0xb413ccfd8e7d75d8642c81ab012235fedd946eeb'.toLowerCase();
+        const expressionsImages = (await imageService.getByCollectionOwnerAsync(expressionsCollection)).data as IImage[];
+
+        for (let index = 0; index < 15; index++) {
+          const acc = rndAcc();
+          const newImage: IImage = expressionsImages[Math.floor(Math.random() * expressionsImages.length)];
+          const auction = await auctionService.createAsync(auctionData(
+            (newImage as any)._id, 
+            newImage.likes, 
+            index % 2 == 0, 
+            "Expressions", 
             acc, rndAcc(),
             newImage.nft.previewImage,
             newImage.title

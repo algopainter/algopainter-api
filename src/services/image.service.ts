@@ -61,6 +61,11 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
+  async getByCollectionOwnerAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ collectionOwner: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
+
   async createAsync(createdItem: IImage): Promise<Result<IImage>> {
     const input = await ImageContext.create(createdItem);
     return Result.success<IImage>(null, input);

@@ -1,6 +1,7 @@
 #netlify
 .netlify
 bin
+.env.dev
 
 # Logs
 logs

@@ -3,6 +3,7 @@ import { IUser } from './user';
 
 export interface IImageNFTInfo {
   _id: string;
+  index: number;
   image: string;
   previewImage: string;
   rawImage: string;
