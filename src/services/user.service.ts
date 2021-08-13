@@ -136,9 +136,11 @@ export default class UserService extends BaseCRUDService<IUser> {
         }
       }
     }, {
-      'users.$.name': userInfo.name,
-      'users.$.avatar': userInfo.avatar,
-      'users.$.customProfile': userInfo.customProfile
+      'users.$[].name': userInfo.name,
+      'users.$[].avatar': userInfo.avatar,
+      'users.$[].customProfile': userInfo.customProfile
+    }, { 
+      multi: true 
     });
 
     await AuctionContext.updateMany({
@@ -148,9 +150,11 @@ export default class UserService extends BaseCRUDService<IUser> {
         }
       }
     }, {
-      'users.$.name': userInfo.name,
-      'users.$.avatar': userInfo.avatar,
-      'users.$.customProfile': userInfo.customProfile
-    })
+      'users.$[].name': userInfo.name,
+      'users.$[].avatar': userInfo.avatar,
+      'users.$[].customProfile': userInfo.customProfile
+    }, { 
+      multi: true 
+    });
   }
 }
