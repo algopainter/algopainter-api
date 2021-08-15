@@ -40,13 +40,6 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return Result.fail<ICollection>('Collection not found!', null, 404);
   }
 
-  async getByOwnerAsync(account: string): Promise<Result<ICollection>> {
-    const data = await CollectionContext.findOne({ owner: account.toLowerCase() });
-    if(data)
-      return Result.success<ICollection>(null, data);
-    return Result.fail<ICollection>('Collection not found!', null, 404);
-  }
-
   async createAsync(createdItem: ICollection): Promise<Result<ICollection>> {
     const input = await CollectionContext.create(createdItem);
     return Result.success<ICollection>(null, input);

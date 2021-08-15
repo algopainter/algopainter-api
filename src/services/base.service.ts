@@ -1,5 +1,6 @@
 import Paged from "../shared/paged";
 import Result from "../shared/result";
+/// <reference types="../../typings/mongo-querystring" />
 import MongoQS from 'mongo-querystring'
 export abstract class BaseService {
   /**

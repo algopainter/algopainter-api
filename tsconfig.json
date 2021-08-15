@@ -21,6 +21,11 @@
     "lib": [
       "es2018",
       "dom"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./typings"
+
     ]
   },
   "angularCompilerOptions": {
@@ -33,7 +38,8 @@
     "src/server.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "typings/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",

@@ -51,15 +51,6 @@ class CollectionController extends BaseController {
       }
     });
 
-    router.get(`${this.path}/:owner`, async (req, res) => {
-      try {
-        const result = await this.service.getByOwnerAsync(req.params.owner);
-        this.handleResult(result, res);
-      } catch (error) {
-        this.handleException(error, res);
-      }
-    });
-
     router.get(`${this.path}/:id/images`, async (req, res) => {
       try {
         const resultCollection = await this.service.getAsync(req.params.id);

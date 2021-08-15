@@ -11,11 +11,7 @@ export default class EndpointTest {
   }
 
   public url(uri: string) : string {
-    return `${this.baseUrl}/${uri}`;
-  }
-
-  public async init(): Promise<void> {
-    await this.api.get(this.url("api/diagnostics/seed/AlgoPainter"));
+    return `${this.baseUrl}${uri}`;
   }
 
   public async AssertGet<TResult>(endpoint: string, responseCode: number) : Promise<TResult | null | undefined> {
@@ -25,16 +21,18 @@ export default class EndpointTest {
     return response.body as TResult | null | undefined;
   }
 
-  public async AssertPost(endpoint: string, json: string, responseCode: number) : Promise<void> {
+  public async AssertPost<T>(endpoint: string, json: any, responseCode: number) : Promise<T | null | undefined> {
     const response = await this.api.post(this.url(endpoint)).send(json);
     expect(response).not.be.null;
     expect(response.statusCode).to.be.equal(responseCode);
+    return response?.body as T | null | undefined;
   }
 
-  public async AssertPut(endpoint: string, json: string, responseCode: number) : Promise<void> {
+  public async AssertPut<T>(endpoint: string, json: any, responseCode: number) : Promise<T | null | undefined> {
     const response = await this.api.put(this.url(endpoint)).send(json);
     expect(response).not.be.null;
     expect(response.statusCode).to.be.equal(responseCode);
+    return response?.body as T | null | undefined;
   }
 
   public async AssertDelete(endpoint: string, responseCode: number) : Promise<void> {

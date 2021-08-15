@@ -6,6 +6,7 @@ import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
+import { Types } from "mongoose";
 
 /**
  * Image service class
@@ -87,12 +88,15 @@ export default class ImageService extends BaseCRUDService<IImage> {
     //   return Result.custom<IImage>(false, "This account already liked the image", null, 409);
     // await this._validateLikeSign(request, id);
 
-    await ImageContext.findOneAndUpdate({ _id: id }, {
+    if(!request)
+      return Result.fail<IImage>("The payload to validade the sign is empty.", null);
+
+    await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
       $inc: { 'likes': 1 },
       $push: { 'likers': request.account.toLowerCase() }
     });
 
-    await AuctionContext.updateMany({ 'item._id': id }, {
+    await AuctionContext.updateMany({ 'item._id': Types.ObjectId(id) }, {
       $inc: { 'item.likes': 1 },
       $push: { 'item.likers': request.account.toLowerCase() }
     });
@@ -109,12 +113,12 @@ export default class ImageService extends BaseCRUDService<IImage> {
     if(!request)
       return Result.fail<IImage>("The payload to validade the sign is empty.", null);
 
-    await ImageContext.findOneAndUpdate({ _id: id }, {
+    await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
       $inc: { 'likes': -1 },
       $pull: { 'likers': request.account.toLowerCase() }
     });
 
-    await AuctionContext.updateMany({ 'item._id': id }, {
+    await AuctionContext.updateMany({ 'item._id': Types.ObjectId(id) }, {
       $inc: { 'item.likes': -1 },
       $pull: { 'item.likers': request.account.toLowerCase() }
     });
