@@ -68,45 +68,52 @@ export default class UserService extends BaseCRUDService<IUser> {
     const signService = new SignService();
     if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
-    let responseResult: Result<IUser>;
-    const result = await this.getAsync(account);
+    let responseResult: Result<IUser> = Result.fail<IUser>("The request is invalid.", null, 400);
 
-    if (result.success && result.data && result.data.account) {
-      await this.updateAsync((result.data as UserDocument)._id, {
-        account: account.toLowerCase(),
-        updatedAt: new Date(),
-        customProfile: request.data.customProfile,
-        createdAt: result.data.createdAt,
-        avatar: request.data.avatar,
-        bio: request.data.bio,
-        name: request.data.name,
-        type: result.data.type,
-        webSite: request.data.webSite,
-        facebook: request.data.facebook,
-        instagram: request.data.instagram,
-        twitter: request.data.twitter,
-        telegram: request.data.telegram,
-        gmail: request.data.gmail,
-      });
-      responseResult = await this.getAsync(account);
+    if(!(await this._checkUniqueness(account, request.data))) {
+      const result = await this.getAsync(account);
+
+      if (result.success && result.data && result.data.account) {
+        await this.updateAsync((result.data as UserDocument)._id, {
+          account: account.toLowerCase(),
+          updatedAt: new Date(),
+          customProfile: request.data.customProfile,
+          createdAt: result.data.createdAt,
+          avatar: request.data.avatar,
+          email: request.data.email,
+          bio: request.data.bio,
+          name: request.data.name,
+          type: result.data.type,
+          webSite: request.data.webSite,
+          facebook: request.data.facebook,
+          instagram: request.data.instagram,
+          twitter: request.data.twitter,
+          telegram: request.data.telegram,
+          gmail: request.data.gmail,
+        });
+        responseResult = await this.getAsync(account);
+      } else {
+        const createResult = await this.createAsync({
+          account: account.toLowerCase(),
+          updatedAt: new Date(),
+          customProfile: request.data.customProfile,
+          createdAt: new Date(),
+          avatar: request.data.avatar,
+          bio: request.data.bio,
+          email: request.data.email,
+          name: request.data.name,
+          type: 'user',
+          webSite: request.data.webSite,
+          facebook: request.data.facebook,
+          instagram: request.data.instagram,
+          twitter: request.data.twitter,
+          telegram: request.data.telegram,
+          gmail: request.data.gmail,
+        });
+        responseResult = createResult;
+      }
     } else {
-      const createResult = await this.createAsync({
-        account: account.toLowerCase(),
-        updatedAt: new Date(),
-        customProfile: request.data.customProfile,
-        createdAt: new Date(),
-        avatar: request.data.avatar,
-        bio: request.data.bio,
-        name: request.data.name,
-        type: 'user',
-        webSite: request.data.webSite,
-        facebook: request.data.facebook,
-        instagram: request.data.instagram,
-        twitter: request.data.twitter,
-        telegram: request.data.telegram,
-        gmail: request.data.gmail,
-      });
-      responseResult = createResult;
+      responseResult = Result.custom<IUser>(false, "The data sent is not unique!", null, 409, 390);
     }
 
     try {
@@ -118,21 +125,26 @@ export default class UserService extends BaseCRUDService<IUser> {
     return responseResult;
   }
 
-  private async _checkUnique(account: string, userInfo: IUserUpdateSignData) {
+  private async _checkUniqueness(account: string, userInfo: IUserUpdateSignData) {
     const foundUsers = await UserContext.find({
-      account: { $ne: account.toLowerCase() }
+      account: { 
+        $ne: account.toLowerCase() 
+      }
     });
 
-    if(userInfo.email && userInfo.customProfile) {
-      return foundUsers.some(a => 
-        a.email?.toLowerCase() == userInfo.email?.toLocaleLowerCase() ||  
-        a.customProfile?.toLocaleLowerCase() == userInfo.customProfile?.toLocaleLowerCase()
+    if(userInfo.email || userInfo.customProfile) {
+      const checkEmail = foundUsers.some(a => 
+        (a.email && a.email?.toLowerCase().trim() == userInfo.email?.toLowerCase().trim())
       );
-    } else {
-      return true;
+
+      const checkCustomProfile = foundUsers.some(a => 
+        (a.customProfile && a.customProfile?.toLowerCase().trim() == userInfo.customProfile?.toLowerCase().trim())
+      );
+
+      return checkEmail || checkCustomProfile;
     }
 
-    return false;
+    return true;
   }
 
   private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
