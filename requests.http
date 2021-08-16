@@ -53,7 +53,7 @@ content-type: application/json
 
 ###
 
-GET http://localhost:3000/api/users/0xde201f115f48a10878d831cc21a2edd1aae92121/images
+GET http://localhost:3000/api/users/0xde201f115f48a10878d831cc21a2edd1aae92121/images?page=1&perPage=1
 
 ###
 

@@ -25,7 +25,6 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IUser>>> {
-    
     const query = this.translateToMongoQuery(filter);
     const count = await UserContext.find(query).countDocuments();
 
@@ -34,7 +33,6 @@ export default class UserService extends BaseCRUDService<IUser> {
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);
-
     
     return Result.success<Paged<IUser>>(null, {
       count,
@@ -124,6 +122,15 @@ export default class UserService extends BaseCRUDService<IUser> {
     const foundUsers = await UserContext.find({
       account: { $ne: account.toLowerCase() }
     });
+
+    if(userInfo.email && userInfo.customProfile) {
+      return foundUsers.some(a => 
+        a.email?.toLowerCase() == userInfo.email?.toLocaleLowerCase() ||  
+        a.customProfile?.toLocaleLowerCase() == userInfo.customProfile?.toLocaleLowerCase()
+      );
+    } else {
+      return true;
+    }
 
     return false;
   }
