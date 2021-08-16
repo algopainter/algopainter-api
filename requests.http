@@ -53,6 +53,10 @@ content-type: application/json
 
 ###
 
+GET http://localhost:3000/api/users/0xde201f115f48a10878d831cc21a2edd1aae92121/images
+
+###
+
 GET http://localhost:3000/api/bids?bidder=0xcabea325744d9524fe3cac533996c144b0fc275c&page=1&perPage=3 HTTP/1.1
 
 ###

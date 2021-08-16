@@ -49,7 +49,6 @@ describe("'api/images' endpoint tests", () => {
   });
 
   it('PUT /api/images/:id/likes', async function () {
-    this.timeout(10000000);
     const resImages = await client.AssertGet<IImage[]>('?nft.index=420', 200);
     if(resImages) {
       if (resImages) {
@@ -77,7 +76,6 @@ describe("'api/images' endpoint tests", () => {
         expect(updatedImage).not.be.null
 
         if(updatedImage) {
-          console.log(updatedImage)
           expect(updatedImage.likes).to.be.greaterThan(resImages[0].likes);
           expect(updatedImage.likers?.some(a => a.toLowerCase() == accountInfo.address.toLowerCase())).to.be.true;
         }
