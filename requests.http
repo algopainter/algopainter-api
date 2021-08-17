@@ -1,0 +1,87 @@
+GET http://localhost:3000/api/users/0xd804c94c7ed47b97809394e988e447ac66b78df3/images
+
+###
+
+GET http://localhost:3000/api/collections
+
+###
+
+POST http://localhost:3000/api/images/6115469d4fb5ed1d60bafcfe/likes HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "imageId":"6115469d4fb5ed1d60bafcfe",
+        "salt":"IccEJjK4SS2aBewTt2V9h"
+    },
+    "salt":"IccEJjK4SS2aBewTt2V9h",
+    "account":"0x08a9b7fc864cf87c4a5cc82a7f6450cde32e60a5","signature":"0xb6e2033ce84287867412da30e681f6d5576fc66d911bb28c4191261794b825095965dc4977408f42d64d25fc5e4e59752f6cc04f5ffbb0131a5352f6ded1ffc11c"
+}
+
+###
+
+DELETE http://localhost:3000/api/images/610559fb918760519c5804d0/likes HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "imageId":"610559fb918760519c5804d0",
+        "salt":"sgQtXNGNOqR2KiYlgIXqE"
+    },
+    "salt":"sgQtXNGNOqR2KiYlgIXqE",
+    "account":"0x025e01188f3803c739d5491a18985fffe5e7f79f",
+    "signature":"0xc6fc1b82f8540459c89075de1ee25c53f01968eac0ccc2d9de0888362a3bb12b465310efc2b1b58decd94724cbd187596b60f792daf470a8eb15b93ce62ef74f1c"
+}
+
+###
+
+PUT http://localhost:3000/api/users/0x025e01188f3803c739d5491a18985fffe5e7f79f HTTP/1.1
+content-type: application/json
+
+{
+    "data":{
+        "name": "Rodrigo Coura",
+        "email": "rrcoura@gmail.com",
+        "customProfile": "lincolnquerProducaohj",
+        "avatar": "",
+        "webSite" : "google.com.br",
+        "bio": "bio, test, good",
+        "facebook": "rodrigo",
+        "instagram": "rodrigo",
+        "twitter": "rodrigo",
+        "telegram": "rodrigo",
+        "gmail": "rodrigo",
+        "salt": "BQWg0PmJ5fspMzKm8Yp-C"
+    },
+    "salt":"BQWg0PmJ5fspMzKm8Yp-C",
+    "account":"0x025e01188f3803c739d5491a18985fffe5e7f79f",
+    "signature":"0x8b918e8390173018a43e3738d33d46a0b0cddde1231c7c12561a50fb5c7f974d0a06d65fbf23cd74cb5641f512a0e073bd0e3c4db3c513f8c1af2fce75d39ba41b"
+}
+
+###
+
+GET http://localhost:3000/api/users/0xde201f115f48a10878d831cc21a2edd1aae92121/images?page=1&perPage=1
+
+###
+
+GET http://localhost:3000/api/bids?bidder=0xcabea325744d9524fe3cac533996c144b0fc275c&page=1&perPage=3 HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/reports/top/sellers HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/diagnostics/seed/AlgoPainter HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/diagnostics/seed/AlgoPainter/fix HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/collections/61108f31500744822077b698/images HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/users/0x7A8476832Eb89189F0aDbC183A1B70C447Bb311a/images HTTP/1.1
