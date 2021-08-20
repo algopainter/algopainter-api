@@ -151,11 +151,11 @@ export default class UserService extends BaseCRUDService<IUser> {
     if (userInfo.email || userInfo.customProfile) {
       const checkEmail = userInfo.email ? foundUsers.some(a =>
         (a.email && a.email?.toLowerCase().trim() == userInfo.email?.toLowerCase().trim())
-      ) : true;
+      ) : false;
 
       const checkCustomProfile = userInfo.customProfile ? foundUsers.some(a => 
         (a.customProfile && a.customProfile?.toLowerCase().trim() == userInfo.customProfile?.toLowerCase().trim())
-      ) : true;
+      ) : false;
 
       return checkEmail || checkCustomProfile;
     }
