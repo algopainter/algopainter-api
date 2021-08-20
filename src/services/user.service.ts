@@ -160,7 +160,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       return checkEmail || checkCustomProfile;
     }
 
-    return true;
+    return false;
   }
 
   private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
