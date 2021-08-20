@@ -20,7 +20,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
-  async getByCollection(collectionId: string) : Promise<IImage[]> {
+  async getByCollection(collectionId: string): Promise<IImage[]> {
     const data = await ImageContext
       .find({ collectionId: collectionId })
       .sort({ createdAt: -1 });
@@ -83,13 +83,14 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async likeAsync(id: string, request: ILikeRequest): Promise<Result<IImage>> {
-    // const imageToChange = await ImageContext.findById(id);
-    // if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
-    //   return Result.custom<IImage>(false, "This account already liked the image", null, 409);
-    // await this._validateLikeSign(request, id);
-
-    if(!request)
+    if (!request)
       return Result.fail<IImage>("The payload to validade the sign is empty.", null);
+
+    const imageToChange = await ImageContext.findById(id);
+    if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
+      return Result.custom<IImage>(false, "This account already liked the image", null, 409);
+    
+    // await this._validateLikeSign(request, id);
 
     await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
       $inc: { 'likes': 1 },
@@ -105,13 +106,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async dislikeAsync(id: string, request: ILikeRequest | null): Promise<Result<IImage>> {
-    // const imageToChange = await ImageContext.findById(id);
-    // if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
-    //   return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
+    if (!request)
+      return Result.fail<IImage>("The payload to validade the sign is empty.", null);
+
+    const imageToChange = await ImageContext.findById(id);
+    if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
+      return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
+    
     // await this._validateLikeSign(request, id);
 
-    if(!request)
-      return Result.fail<IImage>("The payload to validade the sign is empty.", null);
+    if(imageToChange?.likes == 0)
+      return Result.custom<IImage>(false, "You can`t have negative likes.", null, 409);
 
     await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
       $inc: { 'likes': -1 },

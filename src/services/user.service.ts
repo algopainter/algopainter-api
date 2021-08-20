@@ -14,13 +14,13 @@ import { ImageContext } from "../domain/image";
  */
 export default class UserService extends BaseCRUDService<IUser> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IUser[]>> {
-    
+
 
     const data = await UserContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
 
-    
+
     return Result.success<IUser[]>(null, data);
   }
 
@@ -33,7 +33,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);
-    
+
     return Result.success<Paged<IUser>>(null, {
       count,
       currPage: page,
@@ -43,24 +43,32 @@ export default class UserService extends BaseCRUDService<IUser> {
     });
   }
 
+  async getAccountByCustomUrl(customProfile: string): Promise<Result<string>> {
+    const user = await UserContext.findOne({ customProfile: customProfile });
+
+    if(user)
+      return Result.success<string>(null, user.account, 200);
+    return Result.fail<string>("The user with specified custom profile does not exists.", null, 404, 391);
+  }
+
   async getAsync(id: string): Promise<Result<IUser>> {
     const data = await UserContext.findOne({ account: id.toLowerCase() });
-    if(!data)
+    if (!data)
       return Result.success<never>(null, null, 404);
     return Result.success<IUser>(null, (data as IUser));
   }
 
   async createAsync(createdItem: IUser): Promise<Result<IUser>> {
-    
+
     const input = await UserContext.create(createdItem);
-    
+
     return Result.success<IUser>(null, (input as IUser));
   }
 
   async updateAsync(id: string, updatedItem: IUser): Promise<Result<IUser>> {
-    
+
     const input = await UserContext.findByIdAndUpdate(id, updatedItem);
-    
+
     return Result.success<IUser>(null, (input as IUser));
   }
 
@@ -70,14 +78,14 @@ export default class UserService extends BaseCRUDService<IUser> {
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
     let responseResult: Result<IUser> = Result.fail<IUser>("The request is invalid.", null, 400);
 
-    if(!(await this._checkUniqueness(account, request.data))) {
+    if (!(await this._checkUniqueness(account, request.data))) {
       const result = await this.getAsync(account);
 
       if (result.success && result.data && result.data.account) {
         await this.updateAsync((result.data as UserDocument)._id, {
           account: account.toLowerCase(),
           updatedAt: new Date(),
-          customProfile: request.data.customProfile,
+          customProfile: this._sanitizeCustomUrl(request.data.customProfile),
           createdAt: result.data.createdAt,
           avatar: request.data.avatar,
           email: request.data.email,
@@ -96,7 +104,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         const createResult = await this.createAsync({
           account: account.toLowerCase(),
           updatedAt: new Date(),
-          customProfile: request.data.customProfile,
+          customProfile: this._sanitizeCustomUrl(request.data.customProfile),
           createdAt: new Date(),
           avatar: request.data.avatar,
           bio: request.data.bio,
@@ -118,33 +126,41 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     try {
       await this._propagateUserChanges(account, request.data);
-    } catch(e) {
+    } catch (e) {
       console.log('Failed to propagate user changes.', e);
     }
-    
+
     return responseResult;
+  }
+
+  private _sanitizeCustomUrl(url: string | null | undefined) : string {
+    if(url) {
+      const notAllowed = /[^a-zA-Z0-9-]/g;
+      return !notAllowed.test(url) ? url : '' ;
+    }
+    return '';
   }
 
   private async _checkUniqueness(account: string, userInfo: IUserUpdateSignData) {
     const foundUsers = await UserContext.find({
-      account: { 
-        $ne: account.toLowerCase() 
+      account: {
+        $ne: account.toLowerCase()
       }
     });
 
-    if(userInfo.email || userInfo.customProfile) {
-      const checkEmail = foundUsers.some(a => 
+    if (userInfo.email || userInfo.customProfile) {
+      const checkEmail = userInfo.email ? foundUsers.some(a =>
         (a.email && a.email?.toLowerCase().trim() == userInfo.email?.toLowerCase().trim())
-      );
+      ) : false;
 
-      // const checkCustomProfile = foundUsers.some(a => 
-      //   (a.customProfile && a.customProfile?.toLowerCase().trim() == userInfo.customProfile?.toLowerCase().trim())
-      // );
+      const checkCustomProfile = userInfo.customProfile ? foundUsers.some(a => 
+        (a.customProfile && a.customProfile?.toLowerCase().trim() == userInfo.customProfile?.toLowerCase().trim())
+      ) : false;
 
-      return checkEmail/* || checkCustomProfile*/;
+      return checkEmail || checkCustomProfile;
     }
 
-    return true;
+    return false;
   }
 
   private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
@@ -158,8 +174,8 @@ export default class UserService extends BaseCRUDService<IUser> {
       'users.$[].name': userInfo.name,
       'users.$[].avatar': userInfo.avatar,
       'users.$[].customProfile': userInfo.customProfile
-    }, { 
-      multi: true 
+    }, {
+      multi: true
     });
 
     await AuctionContext.updateMany({
@@ -172,8 +188,8 @@ export default class UserService extends BaseCRUDService<IUser> {
       'users.$[].name': userInfo.name,
       'users.$[].avatar': userInfo.avatar,
       'users.$[].customProfile': userInfo.customProfile
-    }, { 
-      multi: true 
+    }, {
+      multi: true
     });
   }
 }
