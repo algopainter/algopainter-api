@@ -67,6 +67,15 @@ class UserController extends BaseController {
         this.handleException(error, res);
       }
     });
+
+    router.put(`${this.path}/:customProfile`, async (req, res) => {
+      try {
+        const result = await this.service.getAccountByCustomUrl(req.params.customProfile);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
   }
 }
 
