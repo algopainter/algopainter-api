@@ -43,12 +43,12 @@ export default class UserService extends BaseCRUDService<IUser> {
     });
   }
 
-  async getAccountByCustomUrl(customProfile: string): Promise<Result<string>> {
-    const user = await UserContext.findOne({ customProfile: customProfile });
+  async getAccountByCustomUrl(customProfileQuery: string): Promise<Result<unknown>> {
+    const user = await UserContext.findOne({ customProfile: customProfileQuery });
 
     if(user)
-      return Result.success<string>(null, user.account, 200);
-    return Result.fail<string>("The user with specified custom profile does not exists.", null, 404, 391);
+      return Result.success<unknown>(null, { account: user.account }, 200);
+    return Result.fail<unknown>("The user with specified custom profile does not exists.", null, 404, 391);
   }
 
   async getAsync(id: string): Promise<Result<IUser>> {

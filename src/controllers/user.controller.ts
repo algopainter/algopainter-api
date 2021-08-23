@@ -68,7 +68,7 @@ class UserController extends BaseController {
       }
     });
 
-    router.get(`${this.path}/:customProfile`, async (req, res) => {
+    router.get(`${this.path}/:customProfile/account`, async (req, res) => {
       try {
         const result = await this.service.getAccountByCustomUrl(req.params.customProfile);
         this.handleResult(result, res);
