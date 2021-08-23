@@ -84,7 +84,7 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if(request.data.customProfile !== null && 
        request.data.customProfile !== undefined && 
-       request.data.customProfile.startsWith('0x')) {
+       (request.data.customProfile.startsWith('0x')) || /^\s+$/.test(request.data.customProfile as string)) {
       return Result.fail<IUser>("The custom profile url is invalid.", null, 400, 392);
     }
 
