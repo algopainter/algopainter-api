@@ -95,7 +95,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         await this.updateAsync((result.data as UserDocument)._id, {
           account: account.toLowerCase(),
           updatedAt: new Date(),
-          customProfile: this._sanitizeCustomUrl(request.data.customProfile),
+          customProfile: this._sanitizeCustomUrl(request.data.customProfile?.trim()),
           createdAt: result.data.createdAt,
           avatar: request.data.avatar,
           email: request.data.email,
@@ -114,7 +114,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         const createResult = await this.createAsync({
           account: account.toLowerCase(),
           updatedAt: new Date(),
-          customProfile: this._sanitizeCustomUrl(request.data.customProfile),
+          customProfile: this._sanitizeCustomUrl(request.data.customProfile?.trim()),
           createdAt: new Date(),
           avatar: request.data.avatar,
           bio: request.data.bio,
