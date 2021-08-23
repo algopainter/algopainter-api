@@ -90,7 +90,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account already liked the image", null, 409);
     
-    // await this._validateLikeSign(request, id);
+    await this._validateLikeSign(request, id);
 
     await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
       $inc: { 'likes': 1 },
@@ -113,7 +113,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
     
-    // await this._validateLikeSign(request, id);
+    await this._validateLikeSign(request, id);
 
     if(imageToChange?.likes == 0)
       return Result.custom<IImage>(false, "You can`t have negative likes.", null, 409);

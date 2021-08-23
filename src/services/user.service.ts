@@ -73,10 +73,20 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async updateUser(account: string, request: IUserUpdateRequest): Promise<Result<IUser>> {
+    let responseResult: Result<IUser> = Result.fail<IUser>("The request is invalid.", null, 400);
+
+    if(!request || !request.data)
+      return responseResult;
+
     const signService = new SignService();
     if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
-    let responseResult: Result<IUser> = Result.fail<IUser>("The request is invalid.", null, 400);
+
+    if(request.data.customProfile !== null && 
+       request.data.customProfile !== undefined && 
+       request.data.customProfile.startsWith('0x')) {
+      return Result.fail<IUser>("The custom profile url is invalid.", null, 400, 392);
+    }
 
     if (!(await this._checkUniqueness(account, request.data))) {
       const result = await this.getAsync(account);
