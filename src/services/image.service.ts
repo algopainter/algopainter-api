@@ -20,12 +20,46 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
+  async listLikedBy(account: string, filter: IFilter, order: IOrderBy | null) : Promise<Result<IImage[]>> {
+    const filterBy = {
+      likers: account.toLowerCase(),
+      ...this.translateToMongoQuery(filter)
+    }
+    
+    const data = await ImageContext
+      .find(filterBy)
+      .sort(this.translateToMongoOrder(order));
+    return Result.success<IImage[]>(null, data);
+  }
+
   async getByCollection(collectionId: string): Promise<IImage[]> {
     const data = await ImageContext
       .find({ collectionId: collectionId })
       .sort({ createdAt: -1 });
 
     return data;
+  }
+
+  async pagedLikedByAsync(account: string, filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
+    const query = {
+      likers: account.toLowerCase(),
+      ...this.translateToMongoQuery(filter)
+    }
+    const count = await ImageContext.find(query).countDocuments();
+
+    const data = await ImageContext
+      .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    return Result.success<Paged<IImage>>(null, {
+      count,
+      currPage: page,
+      pages: Math.round(count / perPage),
+      perPage,
+      data
+    });
   }
 
   async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
