@@ -17,6 +17,7 @@ export interface NFTDocument extends Document {
   supplyIndex: number;
   contractAddress: string;
   mintedBy: string;
+  owner: string;
   name: string;
   collectionName: string;
   descriptor: string;
@@ -34,6 +35,7 @@ export interface INFT {
   supplyIndex: NFTDocument['supplyIndex'];
   contractAddress: NFTDocument['contractAddress'];
   mintedBy: NFTDocument['mintedBy'];
+  owner: NFTDocument['owner'];
   name: NFTDocument['name'];
   collectionName: NFTDocument['collectionName'];
   descriptor: NFTDocument['descriptor'];
@@ -58,6 +60,9 @@ export const NFTSchema: Schema = new Schema({
   },
   mintedBy: {
     type: String, required: true,
+  },
+  owner: {
+    type: String,
   },
   name: {
     type: String, required: true,
