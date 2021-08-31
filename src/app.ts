@@ -9,6 +9,7 @@ import BidController from './controllers/bid.controller'
 import NFTController from './controllers/nft.controller'
 import ReportController from './controllers/report.controller'
 import UserController from './controllers/user.controller'
+import LikeController from './controllers/like.controller'
 import cors from 'cors';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
@@ -77,6 +78,7 @@ class Application {
 
 const App: Application = new Application(3000);
 App.initializeControllers([
+  new LikeController(),
   new CollectionController(),
   new ImageController(),
   new NFTController(),

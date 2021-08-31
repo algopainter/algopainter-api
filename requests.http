@@ -71,3 +71,12 @@ GET http://localhost:3000/api/users/0x7A8476832Eb89189F0aDbC183A1B70C447Bb311a/i
 ###
 
 GET http://localhost:3000/api/users/lincolnaugusto/account HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/likes/0xd804c94c7ed47b97809394e988e447ac66b78df3?page=2&perPage=1 HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/diagnostics HTTP/1.1
+
