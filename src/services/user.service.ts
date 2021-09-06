@@ -189,7 +189,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     });
 
     await AuctionContext.updateMany({
-      users: {
+      bids: {
         $elemMatch: {
           account: account.toLowerCase()
         }
@@ -200,6 +200,22 @@ export default class UserService extends BaseCRUDService<IUser> {
       'users.$[].customProfile': userInfo.customProfile
     }, {
       multi: true
+    });
+
+    await AuctionContext.updateMany({
+      'highestBid.account': account.toLowerCase()
+    }, {
+      'name': userInfo.name,
+      'avatar': userInfo.avatar,
+      'customProfile': userInfo.customProfile
+    });
+
+    await AuctionContext.updateMany({
+      'lowestBid.account': account.toLowerCase()
+    }, {
+      'name': userInfo.name,
+      'avatar': userInfo.avatar,
+      'customProfile': userInfo.customProfile
     });
   }
 }
