@@ -26,8 +26,10 @@ export interface IAuctionRoyalty {
 
 export interface IAuctionFees {
   bidBack: number;
-  royalties: IAuctionRoyalty[];
-  service: number;
+  //royalties: IAuctionRoyalty[];
+  //service: number;
+  address: string;
+  auction: string;
 }
 
 export interface AuctionDocument extends Document {
@@ -79,6 +81,7 @@ export const AuctionSchema: Schema = new Schema({
   expirationDt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
   isHot: { type: Boolean, required: true },
+  ended: { type: Boolean, required: true },
   owner: { type: String, required: true },
   bids: { type: [Object], required: false },
   users: { type: [Object], required: false },
