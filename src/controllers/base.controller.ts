@@ -71,7 +71,7 @@ export default abstract class BaseController {
     }
   }
 
-  handleException(ex: Error | Exception, res: Response<unknown, Record<string, unknown>>): void {
+  handleException(ex: Error | Exception | any, res: Response<unknown, Record<string, unknown>>): void {
     console.error(ex);
     if (ex instanceof Exception) {
       res.status(400)

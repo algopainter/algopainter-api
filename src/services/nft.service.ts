@@ -1,5 +1,6 @@
 import Result from "../shared/result";
 import { NFTContext, INFT } from "../domain/nft";
+import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
 
@@ -32,6 +33,16 @@ export default class NFTService extends BaseCRUDService<INFT> {
       perPage,
       data
     });
+  }
+
+  async getByTokenIdAsync(id: number, contract: string): Promise<Result<INFT>> {
+    const data = await NFTContext.findOne({ supplyIndex: id, contractAddress: contract.toLowerCase() });
+    return Result.success<INFT>(null, data);
+  }
+
+  async getOwnersByTokenIdAsync(id: number, contract: string): Promise<Result<IHistoricalOwners[]>> {
+    const data = await HistoricalOwnersContext.find({ token: id, contract: contract.toLowerCase() });
+    return Result.success<IHistoricalOwners[]>(null, data);
   }
 
   async getAsync(id: string): Promise<Result<INFT>> {
