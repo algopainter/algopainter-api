@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Exception from "src/shared/exception";
+import Exception from "../shared/exception";
 import { INFT } from "../domain/nft";
 import NFTService from "../services/nft.service";
 import Paged from "../shared/paged";

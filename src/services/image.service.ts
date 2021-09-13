@@ -7,7 +7,7 @@ import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
 import { Types } from "mongoose";
-import { HistoricalOwnersContext } from "src/domain/historical.owners";
+import { HistoricalOwnersContext } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
 
 /**
