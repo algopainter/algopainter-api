@@ -12,6 +12,7 @@ export interface IImageNFTInfo {
 
 export interface ImageDocument extends Document {
   title: string;
+  onSale: boolean;
   likes: number;
   description: string;
   collectionName: string;
@@ -30,6 +31,7 @@ export interface IImage {
   title: ImageDocument['title'];
   likes: ImageDocument['likes'];
   users: ImageDocument['users'];
+  onSale: ImageDocument['onSale'];
   collectionName: ImageDocument['collectionName'];
   collectionOwner: ImageDocument['collectionOwner'];
   createdAt: ImageDocument['createdAt'];
@@ -49,6 +51,7 @@ export const ImageSchema: Schema = new Schema({
   description: { type: String, required: true },
   collectionName: { type: String, required: true },
   collectionOwner: { type: String, required: true },
+  onSale: { type: Boolean, default: false },
   tags: { type: [String], required: true },
   createAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },

@@ -14,6 +14,7 @@ export interface INFTPrice {
 export interface NFTDocument extends Document {
   artist: INFTArtist;
   isRecovered: boolean;
+  onSale: boolean;
   supplyIndex: number;
   contractAddress: string;
   mintedBy: string;
@@ -32,6 +33,7 @@ export interface NFTDocument extends Document {
 export interface INFT {
   artist: NFTDocument['artist'];
   isRecovered: NFTDocument['isRecovered'];
+  onSale: NFTDocument['onSale'];
   supplyIndex: NFTDocument['supplyIndex'];
   contractAddress: NFTDocument['contractAddress'];
   mintedBy: NFTDocument['mintedBy'];
@@ -52,6 +54,7 @@ export const NFTSchema: Schema = new Schema({
   isRecovered: {
     type: Boolean, required: true,
   },
+  onSale: { type: Boolean, default: false },
   supplyIndex: {
     type: Number, required: true,
   },
