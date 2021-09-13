@@ -7,6 +7,8 @@ import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
 import { Types } from "mongoose";
+import { HistoricalOwnersContext } from "src/domain/historical.owners";
+import Helpers from '../shared/helpers';
 
 /**
  * Image service class
@@ -20,12 +22,72 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
-  async listLikedBy(account: string, filter: IFilter, order: IOrderBy | null) : Promise<Result<IImage[]>> {
+  async listImagesIWasOwnerAsync(account: string): Promise<Result<IImage[]>> {
+    let tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+    const images = <IImage[]>[];
+
+    if (tokensIwasOwner) {
+      tokensIwasOwner = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner);
+      for (let index = 0; index < tokensIwasOwner.length; index++) {
+        const nftInfo = tokensIwasOwner[index];
+        const image = await ImageContext.findOne({
+          'nft.index': nftInfo.token,
+          collectionOwner: nftInfo.contract
+        });
+
+        if (image) {
+          images.push(image);
+        }
+      }
+    }
+
+    return Result.success<IImage[]>(null, images, 200);
+  }
+
+  async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
+    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+
+    if (tokensIwasOwner) {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner).map(a => {
+        return {
+          "nft.index": a.token,
+          "collectionOwner": a.contract
+        }
+      });
+      const count = await ImageContext.find({
+        $or: query
+      }).countDocuments();
+
+      const data = await ImageContext.find({
+        $or: query
+      }).sort({ "nft.index": -1 })
+        .skip((page - 1) * (perPage))
+        .limit(perPage);
+
+      return Result.success<Paged<IImage>>(null, {
+        count,
+        currPage: page,
+        pages: Math.round(count / perPage),
+        perPage,
+        data
+      });
+    }
+
+    return Result.success<Paged<IImage>>(null, {
+      count: 0,
+      currPage: 0,
+      pages: 0,
+      perPage,
+      data: <IImage[]>[]
+    });
+  }
+
+  async listLikedBy(account: string, filter: IFilter, order: IOrderBy | null): Promise<Result<IImage[]>> {
     const filterBy = {
       likers: account.toLowerCase(),
       ...this.translateToMongoQuery(filter)
     }
-    
+
     const data = await ImageContext
       .find(filterBy)
       .sort(this.translateToMongoOrder(order));
@@ -123,7 +185,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const imageToChange = await ImageContext.findById(id);
     if (imageToChange && imageToChange.likers && imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account already liked the image", null, 409);
-    
+
     await this._validateLikeSign(request, id);
 
     await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {
@@ -146,10 +208,10 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const imageToChange = await ImageContext.findById(id);
     if (imageToChange && imageToChange.likers && !imageToChange.likers.includes(request.account))
       return Result.custom<IImage>(false, "This account didn`t liked the image.", null, 409);
-    
+
     await this._validateLikeSign(request, id);
 
-    if(imageToChange?.likes == 0)
+    if (imageToChange?.likes == 0)
       return Result.custom<IImage>(false, "You can`t have negative likes.", null, 409);
 
     await ImageContext.findOneAndUpdate({ _id: Types.ObjectId(id) }, {

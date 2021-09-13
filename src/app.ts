@@ -1,15 +1,16 @@
 import express, { Router } from 'express';
 import bodyParser from 'body-parser';
-import BaseController from './controllers/base.controller'
-import AuctionController from './controllers/auction.controller'
-import CollectionController from './controllers/collection.controller'
-import DiagnosticController from './controllers/diagnostic.controller'
-import ImageController from './controllers/image.controller'
-import BidController from './controllers/bid.controller'
-import NFTController from './controllers/nft.controller'
-import ReportController from './controllers/report.controller'
-import UserController from './controllers/user.controller'
-import LikeController from './controllers/like.controller'
+import BaseController from './controllers/base.controller';
+import AuctionController from './controllers/auction.controller';
+import CollectionController from './controllers/collection.controller';
+import DiagnosticController from './controllers/diagnostic.controller';
+import ImageController from './controllers/image.controller';
+import BidController from './controllers/bid.controller';
+import NFTController from './controllers/nft.controller';
+import ReportController from './controllers/report.controller';
+import UserController from './controllers/user.controller';
+import LikeController from './controllers/like.controller';
+import HistoryController from './controllers/history.controller';
 import cors from 'cors';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
@@ -86,6 +87,7 @@ App.initializeControllers([
   new UserController(),
   new AuctionController(),
   new BidController(),
+  new HistoryController(),
   new DiagnosticController(App.expressApp),
 ]);
 

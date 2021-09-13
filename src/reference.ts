@@ -7,11 +7,8 @@ const auctionData = (imageID: string, likes: number, isHot: boolean, collection:
     isHot: isHot,
     fee: {
       bidBack: 10,
-      royalties: [
-        { type: 'creator', value: 10 },
-        { type: 'investor', value: 10 },
-      ],
-      service: 1
+      address: '',
+      auction: ''
     },
     createdAt: new Date(),
     expirationDt: new Date(),

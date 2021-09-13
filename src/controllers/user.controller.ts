@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { IImage } from "../domain/image";
-import { IUser } from "../domain/user";
 import Paged from "../shared/paged";
 import Result from "../shared/result";
 import { IUserUpdateRequest } from "../requests/user.update.request";
