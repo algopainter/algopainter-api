@@ -50,7 +50,7 @@ class AuctionController extends BaseController {
     router.get(`${this.path}/:id/bids`, async (req, res) => {
       try {
         const result = await this.service.getAsync(req.params.id);
-        this.handleResult(result, res);
+        this.handleResult(Result.success(null, result.data?.bids), res);
       } catch (error) {
         this.handleException(error, res);
       }

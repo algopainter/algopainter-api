@@ -5,7 +5,7 @@ import Paged from "../shared/paged";
 import { IUserUpdateRequest, IUserUpdateSignData } from '../requests/user.update.request';
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
-import { AuctionContext } from "../domain/auction";
+import { AuctionContext, IAuction } from "../domain/auction";
 import { ImageContext } from "../domain/image";
 
 /**
@@ -46,7 +46,7 @@ export default class UserService extends BaseCRUDService<IUser> {
   async getAccountByCustomUrl(customProfileQuery: string): Promise<Result<unknown>> {
     const user = await UserContext.findOne({ customProfile: customProfileQuery });
 
-    if(user)
+    if (user)
       return Result.success<unknown>(null, { account: user.account }, 200);
     return Result.fail<unknown>("The user with specified custom profile does not exists.", null, 404, 391);
   }
@@ -56,6 +56,32 @@ export default class UserService extends BaseCRUDService<IUser> {
     if (!data)
       return Result.success<never>(null, null, 404);
     return Result.success<IUser>(null, (data as IUser));
+  }
+
+  async getAuctionsThatUserBidAsync(account: string, page: number | undefined, perPage: number | undefined) :
+    Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
+    if (page && perPage && page != -1 && perPage != -1) {
+      const count = await AuctionContext.find({ "bids.bidder": account.toLowerCase() }).countDocuments();
+      const data = await AuctionContext
+        .find({ "bids.bidder": account.toLowerCase() })
+        .skip((page - 1) * (perPage))
+        .sort({ expirationDt: 1 })
+        .limit(perPage);
+
+      return Result.success<Paged<IAuction>>(null, {
+        count,
+        currPage: page,
+        pages: Math.round(count / perPage),
+        perPage,
+        data: data as IAuction[]
+      });
+    } else {
+      const data = await AuctionContext
+        .find({ "bids.bidder": account.toLowerCase() })
+        .sort({ expirationDt: 1 });
+
+      return Result.success<IAuction[]>(null, data);
+    }
   }
 
   async createAsync(createdItem: IUser): Promise<Result<IUser>> {
@@ -75,16 +101,16 @@ export default class UserService extends BaseCRUDService<IUser> {
   async updateUser(account: string, request: IUserUpdateRequest): Promise<Result<IUser>> {
     let responseResult: Result<IUser> = Result.fail<IUser>("The request is invalid.", null, 400);
 
-    if(!request || !request.data)
+    if (!request || !request.data)
       return responseResult;
 
     const signService = new SignService();
     if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
-    if(request.data.customProfile !== null && 
-       request.data.customProfile !== undefined && 
-       (request.data.customProfile.startsWith('0x')) || /^\s+$/.test(request.data.customProfile as string)) {
+    if (request.data.customProfile !== null &&
+      request.data.customProfile !== undefined &&
+      (request.data.customProfile.startsWith('0x')) || /^\s+$/.test(request.data.customProfile as string)) {
       return Result.fail<IUser>("The custom profile url is invalid.", null, 400, 392);
     }
 
@@ -143,10 +169,10 @@ export default class UserService extends BaseCRUDService<IUser> {
     return responseResult;
   }
 
-  private _sanitizeCustomUrl(url: string | null | undefined) : string {
-    if(url) {
+  private _sanitizeCustomUrl(url: string | null | undefined): string {
+    if (url) {
       const notAllowed = /[^a-zA-Z0-9-]/g;
-      return !notAllowed.test(url) ? url : '' ;
+      return !notAllowed.test(url) ? url : '';
     }
     return '';
   }
@@ -163,7 +189,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         (a.email && a.email?.toLowerCase().trim() == userInfo.email?.toLowerCase().trim())
       ) : false;
 
-      const checkCustomProfile = userInfo.customProfile ? foundUsers.some(a => 
+      const checkCustomProfile = userInfo.customProfile ? foundUsers.some(a =>
         (a.customProfile && a.customProfile?.toLowerCase().trim() == userInfo.customProfile?.toLowerCase().trim())
       ) : false;
 

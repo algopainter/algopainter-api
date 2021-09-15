@@ -1,4 +1,5 @@
 import { model, Schema, Model, Document } from 'mongoose';
+import { IBid } from './bid';
 import { IUser } from './user';
 
 export interface IAuctionBid {
@@ -6,7 +7,8 @@ export interface IAuctionBid {
   tokenSymbol: string;
 }
 
-export interface IAuctionBidWithUser extends IAuctionBid, IUser {
+export interface IAuctionBidWithUser extends IBid, IUser {
+  _id: string;
 }
 
 export interface IAuctionItem {
@@ -19,15 +21,8 @@ export interface IAuctionItem {
   likers?: string[] | null
 }
 
-export interface IAuctionRoyalty {
-  value: number;
-  type: 'creator' | 'investor'
-}
-
 export interface IAuctionFees {
   bidBack: number;
-  //royalties: IAuctionRoyalty[];
-  //service: number;
   address: string;
   auction: string;
 }

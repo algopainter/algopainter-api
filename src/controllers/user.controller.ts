@@ -17,11 +17,11 @@ class UserController extends BaseController {
     this.imageService = new ImageService();
   }
 
-  get path() : string {
+  get path(): string {
     return "/users"
   }
 
-  intializeRoutes(router : Router) : void {
+  intializeRoutes(router: Router): void {
     router.get(`${this.path}/:account`, async (req, res) => {
       try {
         const result = await this.service.getAsync(req.params.account.toLowerCase());
@@ -70,6 +70,16 @@ class UserController extends BaseController {
     router.get(`${this.path}/:customProfile/account`, async (req, res) => {
       try {
         const result = await this.service.getAccountByCustomUrl(req.params.customProfile);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.get(`${this.path}/:account/auctions/biding`, async (req, res) => {
+      try {
+        const params = this.requestParams(req);
+        const result = await this.service.getAuctionsThatUserBidAsync(req.params.account, params.paging.page, params.paging.perPage);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
