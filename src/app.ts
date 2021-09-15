@@ -11,6 +11,7 @@ import ReportController from './controllers/report.controller';
 import UserController from './controllers/user.controller';
 import LikeController from './controllers/like.controller';
 import HistoryController from './controllers/history.controller';
+import TradeInsController from './controllers/tradeins.controller';
 import cors from 'cors';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
@@ -88,6 +89,7 @@ App.initializeControllers([
   new AuctionController(),
   new BidController(),
   new HistoryController(),
+  new TradeInsController(),
   new DiagnosticController(App.expressApp),
 ]);
 

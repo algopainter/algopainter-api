@@ -23,7 +23,7 @@ export interface IBid {
   item: BidDocument['item'];
 }
 
-export const CollectionSchema: Schema = new Schema({
+export const BidsSchema: Schema = new Schema({
   bidder: { type: String, required: true },
   auctionId: { type: String, required: true },
   amount: { type: Number, required: true },
@@ -34,4 +34,4 @@ export const CollectionSchema: Schema = new Schema({
   item: { type: Object, required: true }
 });
 
-export const BidContext: Model<BidDocument> = model('bids', CollectionSchema);
+export const BidContext: Model<BidDocument> = model('bids', BidsSchema);
