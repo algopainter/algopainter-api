@@ -47,6 +47,15 @@ class ImageController extends BaseController {
       }
     });
 
+    router.get(`${this.path}/:id/owners`, async (req, res) => {
+      try {
+        const result = await this.service.getOwnersOfAsync(req.params.id);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
     router.post(`${this.path}/:id/likes`, async (req, res) => {
       try {
         const result = await this.service.likeAsync(req.params.id, req.body);

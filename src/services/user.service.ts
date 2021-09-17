@@ -15,11 +15,9 @@ import { ImageContext } from "../domain/image";
 export default class UserService extends BaseCRUDService<IUser> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IUser[]>> {
 
-
     const data = await UserContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
-
 
     return Result.success<IUser[]>(null, data);
   }
@@ -58,7 +56,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     return Result.success<IUser>(null, (data as IUser));
   }
 
-  async getAuctionsThatUserBidAsync(account: string, page: number | undefined, perPage: number | undefined) :
+  async getAuctionsThatUserBidAsync(account: string, page: number | undefined, perPage: number | undefined):
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
     if (page && perPage && page != -1 && perPage != -1) {
       const count = await AuctionContext.find({ "bids.bidder": account.toLowerCase() }).countDocuments();
@@ -85,16 +83,12 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   async createAsync(createdItem: IUser): Promise<Result<IUser>> {
-
     const input = await UserContext.create(createdItem);
-
     return Result.success<IUser>(null, (input as IUser));
   }
 
   async updateAsync(id: string, updatedItem: IUser): Promise<Result<IUser>> {
-
     const input = await UserContext.findByIdAndUpdate(id, updatedItem);
-
     return Result.success<IUser>(null, (input as IUser));
   }
 
@@ -209,7 +203,14 @@ export default class UserService extends BaseCRUDService<IUser> {
     }, {
       'users.$[].name': userInfo.name,
       'users.$[].avatar': userInfo.avatar,
-      'users.$[].customProfile': userInfo.customProfile
+      'users.$[].customProfile': userInfo.customProfile,
+      'users.$[].webSite': userInfo.webSite,
+      'users.$[].email': userInfo.email,
+      'users.$[].facebook': userInfo.facebook,
+      'users.$[].instagram': userInfo.instagram,
+      'users.$[].twitter': userInfo.twitter,
+      'users.$[].telegram': userInfo.telegram,
+      'users.$[].gmail': userInfo.gmail
     }, {
       multi: true
     });
@@ -221,9 +222,16 @@ export default class UserService extends BaseCRUDService<IUser> {
         }
       }
     }, {
-      'users.$[].name': userInfo.name,
-      'users.$[].avatar': userInfo.avatar,
-      'users.$[].customProfile': userInfo.customProfile
+      'bids.$[].name': userInfo.name,
+      'bids.$[].avatar': userInfo.avatar,
+      'bids.$[].customProfile': userInfo.customProfile,
+      'bids.$[].webSite': userInfo.webSite,
+      'bids.$[].email': userInfo.email,
+      'bids.$[].facebook': userInfo.facebook,
+      'bids.$[].instagram': userInfo.instagram,
+      'bids.$[].twitter': userInfo.twitter,
+      'bids.$[].telegram': userInfo.telegram,
+      'bids.$[].gmail': userInfo.gmail
     }, {
       multi: true
     });
@@ -233,7 +241,14 @@ export default class UserService extends BaseCRUDService<IUser> {
     }, {
       'name': userInfo.name,
       'avatar': userInfo.avatar,
-      'customProfile': userInfo.customProfile
+      'customProfile': userInfo.customProfile,
+      'webSite': userInfo.webSite,
+      'email': userInfo.email,
+      'facebook': userInfo.facebook,
+      'instagram': userInfo.instagram,
+      'twitter': userInfo.twitter,
+      'telegram': userInfo.telegram,
+      'gmail': userInfo.gmail
     });
 
     await AuctionContext.updateMany({
@@ -241,7 +256,14 @@ export default class UserService extends BaseCRUDService<IUser> {
     }, {
       'name': userInfo.name,
       'avatar': userInfo.avatar,
-      'customProfile': userInfo.customProfile
+      'customProfile': userInfo.customProfile,
+      'webSite': userInfo.webSite,
+      'email': userInfo.email,
+      'facebook': userInfo.facebook,
+      'instagram': userInfo.instagram,
+      'twitter': userInfo.twitter,
+      'telegram': userInfo.telegram,
+      'gmail': userInfo.gmail
     });
   }
 }

@@ -9,6 +9,7 @@ import SignService from "./sign.service";
 import { Types } from "mongoose";
 import { HistoricalOwnersContext } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
+import { IUser, UserContext } from "../domain/user";
 
 /**
  * Image service class
@@ -146,6 +147,24 @@ export default class ImageService extends BaseCRUDService<IImage> {
   async getAsync(id: string): Promise<Result<IImage>> {
     const data = await ImageContext.findById(id);
     return Result.success<IImage>(null, data);
+  }
+
+  async getOwnersOfAsync(id: string): Promise<Result<IUser[]>> {
+    const data = await ImageContext.findById(id);
+
+    if(data) {
+      const histOwners = await HistoricalOwnersContext.find({
+        contract: data.collectionOwner.toLowerCase(),
+        token: data.nft.index
+      });
+  
+      const ownerList = histOwners.map(a => a.owner.toLowerCase());
+      const users = await UserContext.find({ account: { $in : ownerList } })
+  
+      return Result.success<IUser[]>(null, users);
+    } else {
+      return Result.custom<IUser[]>(false, "Image not found.", null, 404, 404);
+    }
   }
 
   async getByOwnerAsync(account: string): Promise<Result<IImage[]>> {
