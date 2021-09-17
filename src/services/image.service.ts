@@ -7,7 +7,7 @@ import Exception from "../shared/exception";
 import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
 import { Types } from "mongoose";
-import { HistoricalOwnersContext } from "../domain/historical.owners";
+import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
 import { IUser, UserContext } from "../domain/user";
 
@@ -164,6 +164,21 @@ export default class ImageService extends BaseCRUDService<IImage> {
       return Result.success<IUser[]>(null, users);
     } else {
       return Result.custom<IUser[]>(false, "Image not found.", null, 404, 404);
+    }
+  }
+
+  async getHistoryOwnersOfAsync(id: string): Promise<Result<IHistoricalOwners[]>> {
+    const data = await ImageContext.findById(id);
+
+    if(data) {
+      const histOwners = await HistoricalOwnersContext.find({
+        contract: data.collectionOwner.toLowerCase(),
+        token: data.nft.index
+      });
+  
+      return Result.success<IHistoricalOwners[]>(null, histOwners);
+    } else {
+      return Result.custom<IHistoricalOwners[]>(false, "Image not found.", null, 404, 404);
     }
   }
 

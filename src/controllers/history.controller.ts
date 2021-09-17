@@ -36,6 +36,15 @@ class HistoryController extends BaseController {
         this.handleException(error, res);
       }
     });
+
+    router.get(`${this.path}/images/:id/owners`, async (req, res) => {
+      try {
+        const result = await this.imgSvc.getHistoryOwnersOfAsync(req.params.id);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
   }
 }
 

@@ -33,7 +33,7 @@ class DiagnosticController extends BaseController {
           </head>
           <body style='font-family: Consolas'>
             <h1>AlgoPainter - Diagnostics</h1>
-            <h2>API v1.10.73 - Endpoints</h2>
+            <h2>API v1.10.74 - Endpoints</h2>
             <ul>
               ${this.routes?.map((item) => `<li><b>${item.method}</b> /api${item.path}</li>`)?.join('')}
             </ul>

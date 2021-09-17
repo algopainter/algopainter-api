@@ -57,8 +57,18 @@ export const routesExtractor = (app: any, opts: any | null = null) => {
           const method = route.method ? route.method.toUpperCase() : null;
           if (!routeLogged[method] && method) {
             const stackMethod = method;
-            const stackPath = [options.prefix, stack.routerPath, stack.route.path, route.path].filter((s) => !!s).join('/');
-            routes.push({ key: stackMethod + '|' + stackPath, method: stackMethod, path: stackPath });
+            const stackPath = [
+              options.prefix, 
+              stack.routerPath, 
+              stack.route.path, 
+              route.path
+            ].filter((s) => !!s).join('/');
+
+            routes.push({ 
+              key: stackMethod + '|' + stackPath, 
+              method: stackMethod, 
+              path: stackPath 
+            });
             routeLogged[method] = true;
           }
         }
