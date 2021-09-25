@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Result from "../shared/result";
 import { ImageContext, IImage } from "../domain/image";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
@@ -152,15 +153,15 @@ export default class ImageService extends BaseCRUDService<IImage> {
   async getOwnersOfAsync(id: string): Promise<Result<IUser[]>> {
     const data = await ImageContext.findById(id);
 
-    if(data) {
+    if (data) {
       const histOwners = await HistoricalOwnersContext.find({
         contract: data.collectionOwner.toLowerCase(),
         token: data.nft.index
       });
-  
+
       const ownerList = histOwners.map(a => a.owner.toLowerCase());
-      const users = await UserContext.find({ account: { $in : ownerList } })
-  
+      const users = await UserContext.find({ account: { $in: ownerList } })
+
       return Result.success<IUser[]>(null, users);
     } else {
       return Result.custom<IUser[]>(false, "Image not found.", null, 404, 404);
@@ -170,41 +171,83 @@ export default class ImageService extends BaseCRUDService<IImage> {
   async getHistoryOwnersOfAsync(id: string): Promise<Result<IHistoricalOwners[]>> {
     const data = await ImageContext.findById(id);
 
-    if(data) {
+    if (data) {
       const histOwners = await HistoricalOwnersContext.find({
         contract: data.collectionOwner.toLowerCase(),
         token: data.nft.index
       });
-  
+
       return Result.success<IHistoricalOwners[]>(null, histOwners);
     } else {
       return Result.custom<IHistoricalOwners[]>(false, "Image not found.", null, 404, 404);
     }
   }
 
-  async getByOwnerAsync(account: string): Promise<Result<IImage[]>> {
-    const data = await ImageContext.find({ owner: account.toLowerCase() });
-    return Result.success<IImage[]>(null, data);
+  async getByOwnerCountingAuctions(account: string, filter: IFilter, order: IOrderBy, page: number | undefined, perPage: number | undefined):
+    Promise<Result<IImage[] | Paged<IImage>>> {
+    const dataImagesImOwner = await ImageContext.find({ owner: account.toLowerCase() }, { _id: 1 });
+    const dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase() }, { 'item._id': 1 });
+
+    const myImages: any[] = [];
+
+    if (dataImagesImOwner && dataImagesImOwner.length > 0)
+      dataImagesImOwner.map(a => myImages.push(a._id));
+
+    if (dataImagesImSelling && dataImagesImSelling.length > 0)
+      dataImagesImSelling.map(a => myImages.push(a.item._id));
+
+    const query = this.translateToMongoQuery(filter);
+
+    query["_id"] = { $in: myImages };
+
+    if (page && perPage && page != -1 && perPage != -1) {
+      const count = await ImageContext.find(query).countDocuments();
+
+      const data = await ImageContext
+        .find(query)
+        .sort(this.translateToMongoOrder(order))
+        .skip((page - 1) * (perPage))
+        .limit(perPage);
+
+      return Result.success<Paged<IImage>>(null, {
+        count,
+        currPage: page,
+        pages: Math.round(count / perPage),
+        perPage,
+        data
+      });
+    } else {
+      const data = await ImageContext
+        .find(query)
+        .sort(this.translateToMongoOrder(order));
+
+      return Result.success<IImage[]>(null, data);
+    }
   }
 
-  async getByCreatorAsync(account: string): Promise<Result<IImage[]>> {
-    const data = await ImageContext.find({ creator: account.toLowerCase() });
-    return Result.success<IImage[]>(null, data);
-  }
+  async getByOwnerAsync(account: string): Promise < Result < IImage[] >> {
+      const data = await ImageContext.find({ owner: account.toLowerCase() });
+      return Result.success<IImage[]>(null, data);
+    }
 
-  async getByCollectionOwnerAsync(account: string): Promise<Result<IImage[]>> {
-    const data = await ImageContext.find({ collectionOwner: account.toLowerCase() });
-    return Result.success<IImage[]>(null, data);
-  }
+  async getByCreatorAsync(account: string): Promise < Result < IImage[] >> {
+      const data = await ImageContext.find({ creator: account.toLowerCase() });
+      return Result.success<IImage[]>(null, data);
+    }
 
-  async createAsync(createdItem: IImage): Promise<Result<IImage>> {
-    const input = await ImageContext.create(createdItem);
-    return Result.success<IImage>(null, input);
-  }
+  async getByCollectionOwnerAsync(account: string): Promise < Result < IImage[] >> {
+      const data = await ImageContext.find({ collectionOwner: account.toLowerCase() });
+      return Result.success<IImage[]>(null, data);
+    }
 
-  updateAsync(id: string, updatedItem: IImage): Promise<Result<IImage>> {
-    throw new Error("Method not implemented." + id + JSON.stringify(updatedItem));
-  }
+  async createAsync(createdItem: IImage): Promise < Result < IImage >> {
+      const input = await ImageContext.create(createdItem);
+      return Result.success<IImage>(null, input);
+    }
+
+    updateAsync(id: string, updatedItem: IImage): Promise < Result < IImage >> {
+      throw new Error("Method not implemented." + id + JSON.stringify(updatedItem));
+    }
 
   private async _validateLikeSign(request: ILikeRequest, id: string) {
     const signService = new SignService();

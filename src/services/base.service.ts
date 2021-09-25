@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Paged from "../shared/paged";
 import Result from "../shared/result";
 /// <reference types="../../typings/mongo-querystring" />
@@ -52,7 +53,7 @@ export abstract class BaseCRUDService<T> extends BaseService {
 }
 
 export interface IFilter {
-  [name: string]: string | undefined
+  [name: string]: string | any | undefined
 }
 
 export interface IOrderBy {

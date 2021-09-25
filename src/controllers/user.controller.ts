@@ -34,21 +34,18 @@ class UserController extends BaseController {
     router.get(`${this.path}/:account/images`, async (req, res) => {
       try {
         if (req.params.account) {
-          req.query.owner = req.params.account.toLowerCase();
           delete req.query.id;
           delete req.query.account;
           const params = this.requestParams(req);
-          let result: Result<Paged<IImage>> | Result<IImage[]> | null = null;
-          if (params.paging.page === -1 || params.paging.page === -1) {
-            result = await this.imageService.listAsync(params.filter, params.order);
-          } else {
-            result = await this.imageService.pagedAsync(
-              params.filter,
-              params.order,
-              params.paging.page,
-              params.paging.perPage
-            );
-          }
+
+          const result = await this.imageService.getByOwnerCountingAuctions(
+            req.params.account,
+            params.filter,
+            params.order,
+            params.paging.page,
+            params.paging.perPage
+          )
+
           this.handleResult(result, res);
         } else {
           this.handleResult(Result.failure(null, null, 404), res);
