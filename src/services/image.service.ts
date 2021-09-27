@@ -196,7 +196,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     if (dataImagesImSelling && dataImagesImSelling.length > 0)
       dataImagesImSelling.map(a => myImages.push(a.item._id));
 
-    const query = this.translateToMongoQuery(filter);
+    const query = this.translateToMongoQuery(filter) || {};
 
     query["_id"] = { $in: myImages };
 
