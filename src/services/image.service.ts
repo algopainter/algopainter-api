@@ -10,6 +10,7 @@ import SignService from "./sign.service";
 import { Types } from "mongoose";
 import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
+import Stack from '../shared/stack';
 import { IUser, UserContext } from "../domain/user";
 import { SettingsContext } from "../domain/settings";
 
@@ -200,6 +201,54 @@ export default class ImageService extends BaseCRUDService<IImage> {
     }
   }
 
+  async getDetailedOwnersOfAsync(id: string): Promise<Result<IUser[]>> {
+    const data = await ImageContext.findById(id);
+
+    if (data) {
+      const histOwners = await HistoricalOwnersContext.find({
+        contract: data.collectionOwner.toLowerCase(),
+        token: data.nft.index
+      }).sort({ createdAt: 1 });
+
+      const stack = new Stack(undefined);
+
+      const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
+      const ownerList : string[] = [];
+
+      if (unWantedHashes) {
+        histOwners.forEach(hist => {
+          if (!unWantedHashes.some(a => a == hist.owner))
+            ownerList.push(hist.owner.toLowerCase());
+
+          if (!unWantedHashes.some(a => a == hist.from))
+            ownerList.push(hist.from.toLowerCase());
+        });
+      }
+
+      const usersFound = await UserContext.find({ account: { $in: ownerList } });
+      const users : IUser[] = [...usersFound];
+
+      ownerList.forEach(owner => {
+        if(!usersFound.some(a => a.account == owner))
+          users.push({
+            account: owner.toLowerCase(),
+            updatedAt: new Date(),
+            customProfile: owner.toLowerCase(),
+            createdAt: new Date(),
+            avatar: '',
+            email: '',
+            bio: '',
+            name: owner.toLowerCase(),
+            type: 'user'
+          })
+      });
+
+      return Result.success<any>(null, users);
+    } else {
+      return Result.custom<any>(false, "Image not found.", null, 404, 404);
+    }
+  }
+
   async getHistoryOwnersOfAsync(id: string): Promise<Result<IHistoricalOwners[]>> {
     const data = await ImageContext.findById(id);
 
@@ -218,7 +267,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
   async getByOwnerCountingAuctions(account: string, filter: IFilter, order: IOrderBy, page: number | undefined, perPage: number | undefined):
     Promise<Result<IImage[] | Paged<IImage>>> {
     const dataImagesImOwner = await ImageContext.find({ owner: account.toLowerCase() }, { _id: 1 });
-    const dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase() }, { 'item._id': 1 });
+    const dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase(), ended: false }, { 'item._id': 1 });
 
     const myImages: any[] = [];
 
