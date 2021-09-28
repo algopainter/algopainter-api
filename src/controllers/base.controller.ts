@@ -21,6 +21,21 @@ export default abstract class BaseController {
     return { page, perPage }
   }
 
+  getBoolean(value: any) {
+    switch (value) {
+      case true:
+      case "true":
+      case 1:
+      case "1":
+      case "on":
+      case "yes":
+      case "sim":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   orderParams(req: Request<any, any, any, any, any>): IOrderBy {
     return QueryParser.parseByPrefix('order', req.query);
   }
@@ -47,17 +62,17 @@ export default abstract class BaseController {
           .send();
       } else {
         if (actionResult.success) {
-          if((actionResult.data || (Array.isArray(actionResult.data) && actionResult.data.length)) && !actionResult.type) {
+          if ((actionResult.data || (Array.isArray(actionResult.data) && actionResult.data.length)) && !actionResult.type) {
             res.status(actionResult.type || 200)
-            .set('X-Powered-By', 'AlgoPainter')
-            .set('Content-Type', 'application/json')
-            .set('x-total-items', Array.isArray(actionResult.data) ? actionResult.data.length.toString() : (actionResult.data ? '1' : '0'))
-            .send(JSON.stringify(actionResult.data || actionResult))
+              .set('X-Powered-By', 'AlgoPainter')
+              .set('Content-Type', 'application/json')
+              .set('x-total-items', Array.isArray(actionResult.data) ? actionResult.data.length.toString() : (actionResult.data ? '1' : '0'))
+              .send(JSON.stringify(actionResult.data || actionResult))
           } else {
             res.status(actionResult.type || 200)
-            .set('X-Powered-By', 'AlgoPainter')
-            .set('Content-Type', 'application/json')
-            .send(JSON.stringify(actionResult.data || actionResult))
+              .set('X-Powered-By', 'AlgoPainter')
+              .set('Content-Type', 'application/json')
+              .send(JSON.stringify(actionResult.data || actionResult))
           }
         } else {
           res.status(actionResult.type || 400)

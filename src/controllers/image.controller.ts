@@ -49,7 +49,7 @@ class ImageController extends BaseController {
 
     router.get(`${this.path}/:id/owners`, async (req, res) => {
       try {
-        const result = await this.service.getOwnersOfAsync(req.params.id);
+        const result = await this.service.getOwnersOfAsync(req.params.id, this.getBoolean(req.query.excludeCurrentOwner));
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

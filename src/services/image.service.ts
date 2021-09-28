@@ -11,6 +11,7 @@ import { Types } from "mongoose";
 import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
 import { IUser, UserContext } from "../domain/user";
+import { SettingsContext } from "../domain/settings";
 
 /**
  * Image service class
@@ -150,17 +151,48 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, data);
   }
 
-  async getOwnersOfAsync(id: string): Promise<Result<IUser[]>> {
+  async getOwnersOfAsync(id: string, excludeCurrentOwner: boolean): Promise<Result<IUser[]>> {
     const data = await ImageContext.findById(id);
 
     if (data) {
       const histOwners = await HistoricalOwnersContext.find({
         contract: data.collectionOwner.toLowerCase(),
         token: data.nft.index
-      });
+      }).sort({ createdAt: -1 });
 
-      const ownerList = histOwners.map(a => a.owner.toLowerCase());
-      const users = await UserContext.find({ account: { $in: ownerList } })
+      const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
+      const ownerList : string[] = [];
+
+      if(!excludeCurrentOwner)
+        unWantedHashes.push(data.owner);
+
+      if (unWantedHashes) {
+        histOwners.forEach(hist => {
+          if (!unWantedHashes.some(a => a == hist.owner))
+            ownerList.push(hist.owner.toLowerCase());
+
+          if (!unWantedHashes.some(a => a == hist.from))
+            ownerList.push(hist.from.toLowerCase());
+        });
+      }
+
+      const usersFound = await UserContext.find({ account: { $in: ownerList } });
+      const users : IUser[] = [...usersFound];
+
+      ownerList.forEach(owner => {
+        if(!usersFound.some(a => a.account == owner))
+          users.push({
+            account: owner.toLowerCase(),
+            updatedAt: new Date(),
+            customProfile: owner.toLowerCase(),
+            createdAt: new Date(),
+            avatar: '',
+            email: '',
+            bio: '',
+            name: owner.toLowerCase(),
+            type: 'user'
+          })
+      });
 
       return Result.success<IUser[]>(null, users);
     } else {
@@ -225,29 +257,29 @@ export default class ImageService extends BaseCRUDService<IImage> {
     }
   }
 
-  async getByOwnerAsync(account: string): Promise < Result < IImage[] >> {
-      const data = await ImageContext.find({ owner: account.toLowerCase() });
-      return Result.success<IImage[]>(null, data);
-    }
+  async getByOwnerAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ owner: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
 
-  async getByCreatorAsync(account: string): Promise < Result < IImage[] >> {
-      const data = await ImageContext.find({ creator: account.toLowerCase() });
-      return Result.success<IImage[]>(null, data);
-    }
+  async getByCreatorAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ creator: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
 
-  async getByCollectionOwnerAsync(account: string): Promise < Result < IImage[] >> {
-      const data = await ImageContext.find({ collectionOwner: account.toLowerCase() });
-      return Result.success<IImage[]>(null, data);
-    }
+  async getByCollectionOwnerAsync(account: string): Promise<Result<IImage[]>> {
+    const data = await ImageContext.find({ collectionOwner: account.toLowerCase() });
+    return Result.success<IImage[]>(null, data);
+  }
 
-  async createAsync(createdItem: IImage): Promise < Result < IImage >> {
-      const input = await ImageContext.create(createdItem);
-      return Result.success<IImage>(null, input);
-    }
+  async createAsync(createdItem: IImage): Promise<Result<IImage>> {
+    const input = await ImageContext.create(createdItem);
+    return Result.success<IImage>(null, input);
+  }
 
-    updateAsync(id: string, updatedItem: IImage): Promise < Result < IImage >> {
-      throw new Error("Method not implemented." + id + JSON.stringify(updatedItem));
-    }
+  updateAsync(id: string, updatedItem: IImage): Promise<Result<IImage>> {
+    throw new Error("Method not implemented." + id + JSON.stringify(updatedItem));
+  }
 
   private async _validateLikeSign(request: ILikeRequest, id: string) {
     const signService = new SignService();

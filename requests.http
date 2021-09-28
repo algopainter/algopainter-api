@@ -93,3 +93,7 @@ GET http://localhost:3000/api/users/0x3249341a70324baf2c92367889335fc560c012ff/i
 ###
 
 GET http://localhost:3000/api/users/0xA62CE1F85461D67c874ef625F0E488C57Af2335d/images HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/images/615275eda8a4a50014b5ae15/owners HTTP/1.1
