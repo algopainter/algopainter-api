@@ -163,7 +163,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
       const ownerList : string[] = [];
 
-      if(!excludeCurrentOwner)
+      if(excludeCurrentOwner)
         unWantedHashes.push(data.owner);
 
       if (unWantedHashes) {
