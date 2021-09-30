@@ -3,7 +3,7 @@ import { model, Schema, Model, Document } from 'mongoose';
 
 export interface TradeInDocument extends Document {
   from: string;
-  to: number;
+  to: string;
   tradedAt: Date;
   amount: number;
   feeAmount: number;
@@ -23,7 +23,7 @@ export interface ITradeIn {
 
 export const TradeinSchema: Schema = new Schema({
   from: { type: String, required: true },
-  to: { type: Number, required: true },
+  to: { type: String, required: true },
   tradedAt: { type: Date, required: true },
   amount: { type: Number, required: true },
   feeAmount: { type: Number, required: true },

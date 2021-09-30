@@ -40,7 +40,7 @@ export interface AuctionDocument extends Document {
   owner: string;
   users: IUser[];
   bids: IAuctionBidWithUser[];
-  returns: IReturn[];
+  returns: IReturn;
   categories: string[];
   minimumBid: IAuctionBid;
   highestBid: IAuctionBidWithUser;
@@ -85,7 +85,7 @@ export const AuctionSchema: Schema = new Schema({
   ended: { type: Boolean, required: true },
   owner: { type: String, required: true },
   bids: { type: [Object], required: false },
-  returns: { type: [Object], required: false },
+  returns: { type: Object, required: false },
   users: { type: [Object], required: false },
   minimumBid: { type: Object, required: false },
   highestBid: { type: Object, required: false },
