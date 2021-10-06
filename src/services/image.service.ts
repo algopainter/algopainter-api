@@ -264,10 +264,15 @@ export default class ImageService extends BaseCRUDService<IImage> {
     }
   }
 
-  async getByOwnerCountingAuctions(account: string, filter: IFilter, order: IOrderBy, page: number | undefined, perPage: number | undefined):
+  async getByOwnerCountingAuctions(account: string, filter: IFilter, order: IOrderBy, page: number | undefined, perPage: number | undefined, includeExpiredAuctions: boolean):
     Promise<Result<IImage[] | Paged<IImage>>> {
     const dataImagesImOwner = await ImageContext.find({ owner: account.toLowerCase() }, { _id: 1 });
-    const dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase(), ended: false }, { 'item._id': 1 });
+    let dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase(), ended: false }, { expirationDt: 1, 'item._id': 1 });
+
+    if(!includeExpiredAuctions) {
+      const now = new Date().getTime();
+      dataImagesImSelling = dataImagesImSelling.filter(a => now < a.expirationDt.getTime())
+    }
 
     const myImages: any[] = [];
 

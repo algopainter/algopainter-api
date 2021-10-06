@@ -36,6 +36,9 @@ class UserController extends BaseController {
         if (req.params.account) {
           delete req.query.id;
           delete req.query.account;
+
+          const includeExpiredAuctions = req.query.includeExpired ? Boolean(req.query.includeExpired).valueOf() : true;
+          delete req.query.includeExpired;
           const params = this.requestParams(req);
 
           const result = await this.imageService.getByOwnerCountingAuctions(
@@ -43,7 +46,8 @@ class UserController extends BaseController {
             params.filter,
             params.order,
             params.paging.page,
-            params.paging.perPage
+            params.paging.perPage,
+            includeExpiredAuctions
           )
 
           this.handleResult(result, res);
