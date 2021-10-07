@@ -97,3 +97,8 @@ GET http://localhost:3000/api/users/0xA62CE1F85461D67c874ef625F0E488C57Af2335d/i
 ###
 
 GET http://localhost:3000/api/images/615275eda8a4a50014b5ae15/owners HTTP/1.1
+
+
+###
+
+GET http://localhost:3000/api/users/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/images?onSale=true&includeExpired=false HTTP/1.1

@@ -235,49 +235,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     }, {
       multi: true
     });
-
-    await AuctionContext.updateMany({
-      returns: {
-        $elemMatch: {
-          account: account.toLowerCase()
-        }
-      }
-    }, {
-      'returns.$[].name': userInfo.name,
-      'returns.$[].avatar': userInfo.avatar,
-      'returns.$[].customProfile': userInfo.customProfile,
-      'returns.$[].webSite': userInfo.webSite,
-      'returns.$[].email': userInfo.email,
-      'returns.$[].facebook': userInfo.facebook,
-      'returns.$[].instagram': userInfo.instagram,
-      'returns.$[].twitter': userInfo.twitter,
-      'returns.$[].telegram': userInfo.telegram,
-      'returns.$[].gmail': userInfo.gmail
-    }, {
-      multi: true
-    });
-
-    await AuctionContext.updateMany({
-      withdraws: {
-        $elemMatch: {
-          account: account.toLowerCase()
-        }
-      }
-    }, {
-      'withdraws.$[].name': userInfo.name,
-      'withdraws.$[].avatar': userInfo.avatar,
-      'withdraws.$[].customProfile': userInfo.customProfile,
-      'withdraws.$[].webSite': userInfo.webSite,
-      'withdraws.$[].email': userInfo.email,
-      'withdraws.$[].facebook': userInfo.facebook,
-      'withdraws.$[].instagram': userInfo.instagram,
-      'withdraws.$[].twitter': userInfo.twitter,
-      'withdraws.$[].telegram': userInfo.telegram,
-      'withdraws.$[].gmail': userInfo.gmail
-    }, {
-      multi: true
-    });
-
+    
     await AuctionContext.updateMany({
       'highestBid.account': account.toLowerCase()
     }, {

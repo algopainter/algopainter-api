@@ -37,7 +37,7 @@ class UserController extends BaseController {
           delete req.query.id;
           delete req.query.account;
 
-          const includeExpiredAuctions = req.query.includeExpired ? Boolean(req.query.includeExpired).valueOf() : true;
+          const includeExpiredAuctions = this.getBoolean(req.query.includeExpired);
           delete req.query.includeExpired;
           const params = this.requestParams(req);
 
