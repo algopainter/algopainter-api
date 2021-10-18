@@ -54,9 +54,12 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
   async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
     const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
 
-    if (tokensIwasOwner) {
-      const query = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner).map(a => {
+    const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
+
+    if (tokensInfo) {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo).map(a => {
         return {
           "nft.index": a.token,
           "collectionOwner": a.contract
