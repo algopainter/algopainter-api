@@ -40,7 +40,8 @@ export default class ImageService extends BaseCRUDService<IImage> {
         const nftInfo = tokensInfo[index];
         const image = await ImageContext.findOne({
           'nft.index': nftInfo.token,
-          collectionOwner: nftInfo.contract
+          collectionOwner: nftInfo.contract,
+          onSale: false
         });
 
         if (image) {
@@ -62,7 +63,8 @@ export default class ImageService extends BaseCRUDService<IImage> {
       const query = Helpers.distinctBy(['token', 'contract'], tokensInfo).map(a => {
         return {
           "nft.index": a.token,
-          "collectionOwner": a.contract
+          "collectionOwner": a.contract,
+          onSale: false
         }
       });
       const count = await ImageContext.find({
