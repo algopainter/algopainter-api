@@ -27,13 +27,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async listImagesIWasOwnerAsync(account: string): Promise<Result<IImage[]>> {
-    let tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
+
+    let tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
+
     const images = <IImage[]>[];
 
-    if (tokensIwasOwner) {
-      tokensIwasOwner = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner);
-      for (let index = 0; index < tokensIwasOwner.length; index++) {
-        const nftInfo = tokensIwasOwner[index];
+    if (tokensInfo) {
+      tokensInfo = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner);
+      for (let index = 0; index < tokensInfo.length; index++) {
+        const nftInfo = tokensInfo[index];
         const image = await ImageContext.findOne({
           'nft.index': nftInfo.token,
           collectionOwner: nftInfo.contract
