@@ -35,7 +35,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const images = <IImage[]>[];
 
     if (tokensInfo) {
-      tokensInfo = Helpers.distinctBy(['token', 'contract'], tokensIwasOwner);
+      tokensInfo = Helpers.distinctBy(['token', 'contract'], tokensInfo);
       for (let index = 0; index < tokensInfo.length; index++) {
         const nftInfo = tokensInfo[index];
         const image = await ImageContext.findOne({
