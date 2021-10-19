@@ -26,7 +26,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
-  async listImagesIWasOwnerAsync(account: string): Promise<Result<IImage[]>> {
+  async listImagesIWasOwnerAsync(account: string, filter: IFilter | null | undefined): Promise<Result<IImage[]>> {
     const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
     const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
 
@@ -41,7 +41,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
         const image = await ImageContext.findOne({
           'nft.index': nftInfo.token,
           collectionOwner: nftInfo.contract,
-          onSale: false
+          ...filter
         });
 
         if (image) {
@@ -53,7 +53,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, images, 200);
   }
 
-  async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number): Promise<Result<Paged<IImage>>> {
+  async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number, filter: IFilter | null | undefined): Promise<Result<Paged<IImage>>> {
     const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
     const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
 
@@ -64,7 +64,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
         return {
           "nft.index": a.token,
           "collectionOwner": a.contract,
-          onSale: false
+          ...filter
         }
       });
       const count = await ImageContext.find({
