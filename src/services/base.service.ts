@@ -25,10 +25,10 @@ export abstract class BaseService {
    * @param order 
    * @returns 
    */
-  translateToMongoOrder(order: IOrderBy | null): unknown {
+  translateToMongoOrder(order: IOrderBy | null, defaultOrder : any = { createdAt: -1 }): unknown {
     if (order)
-      return Object.keys(order).length ? order : { createdAt: -1 };
-    return { createdAt: -1 };
+      return Object.keys(order).length ? order : defaultOrder;
+    return defaultOrder;
   }
 }
 

@@ -26,34 +26,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage[]>(null, data);
   }
 
-  async listImagesIWasOwnerAsync(account: string, filter: IFilter | null | undefined): Promise<Result<IImage[]>> {
-    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
-    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
-
-    let tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
-
-    const images = <IImage[]>[];
-
-    if (tokensInfo) {
-      tokensInfo = Helpers.distinctBy(['token', 'contract'], tokensInfo);
-      for (let index = 0; index < tokensInfo.length; index++) {
-        const nftInfo = tokensInfo[index];
-        const image = await ImageContext.findOne({
-          'nft.index': nftInfo.token,
-          collectionOwner: nftInfo.contract,
-          ...filter
-        });
-
-        if (image) {
-          images.push(image);
-        }
-      }
-    }
-
-    return Result.success<IImage[]>(null, images, 200);
-  }
-
-  async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number, filter: IFilter | null | undefined): Promise<Result<Paged<IImage>>> {
+  async listImagesIWasOwnerAsync(account: string, filter: IFilter | null | undefined, order: IOrderBy | null): Promise<Result<IImage[]>> {
     const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
     const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
 
@@ -67,13 +40,38 @@ export default class ImageService extends BaseCRUDService<IImage> {
           ...filter
         }
       });
+
+      const images = await ImageContext.find({
+        $or: query
+      }).sort(this.translateToMongoOrder(order, { "nft.index": -1 }));
+
+      return Result.success<IImage[]>(null, images, 200);
+    }
+    return Result.success<IImage[]>(null, null, 404);
+  }
+
+  async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number, filter: IFilter | null | undefined, order: IOrderBy | null): Promise<Result<Paged<IImage>>> {
+    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
+    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
+
+    const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
+
+    if (tokensInfo) {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo).map(a => {
+        return {
+          "nft.index": a.token,
+          "collectionOwner": a.contract,
+          ...filter
+        }
+      });
+
       const count = await ImageContext.find({
         $or: query
       }).countDocuments();
 
       const data = await ImageContext.find({
         $or: query
-      }).sort({ "nft.index": -1 })
+      }).sort(this.translateToMongoOrder(order, { "nft.index": -1 }))
         .skip((page - 1) * (perPage))
         .limit(perPage);
 
@@ -171,9 +169,9 @@ export default class ImageService extends BaseCRUDService<IImage> {
       }).sort({ createdAt: -1 });
 
       const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
-      const ownerList : string[] = [];
+      const ownerList: string[] = [];
 
-      if(excludeCurrentOwner)
+      if (excludeCurrentOwner)
         unWantedHashes.push(data.owner);
 
       if (unWantedHashes) {
@@ -187,10 +185,10 @@ export default class ImageService extends BaseCRUDService<IImage> {
       }
 
       const usersFound = await UserContext.find({ account: { $in: ownerList } });
-      const users : IUser[] = [...usersFound];
+      const users: IUser[] = [...usersFound];
 
       ownerList.forEach(owner => {
-        if(!usersFound.some(a => a.account == owner))
+        if (!usersFound.some(a => a.account == owner))
           users.push({
             account: owner.toLowerCase(),
             updatedAt: new Date(),
@@ -222,7 +220,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       const stack = new Stack(undefined);
 
       const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
-      const ownerList : string[] = [];
+      const ownerList: string[] = [];
 
       if (unWantedHashes) {
         histOwners.forEach(hist => {
@@ -235,10 +233,10 @@ export default class ImageService extends BaseCRUDService<IImage> {
       }
 
       const usersFound = await UserContext.find({ account: { $in: ownerList } });
-      const users : IUser[] = [...usersFound];
+      const users: IUser[] = [...usersFound];
 
       ownerList.forEach(owner => {
-        if(!usersFound.some(a => a.account == owner))
+        if (!usersFound.some(a => a.account == owner))
           users.push({
             account: owner.toLowerCase(),
             updatedAt: new Date(),
@@ -278,7 +276,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const dataImagesImOwner = await ImageContext.find({ owner: account.toLowerCase() }, { _id: 1 });
     let dataImagesImSelling = await AuctionContext.find({ owner: account.toLowerCase(), ended: false }, { expirationDt: 1, 'item._id': 1 });
 
-    if(!includeExpiredAuctions) {
+    if (!includeExpiredAuctions) {
       const now = new Date().getTime();
       dataImagesImSelling = dataImagesImSelling.filter(a => now < a.expirationDt.getTime())
     }

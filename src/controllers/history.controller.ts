@@ -23,13 +23,14 @@ class HistoryController extends BaseController {
         const params = this.requestParams(req);
         let result : Result<Paged<IImage>> | Result<IImage[]> | null = null;
         if(params.paging.page === -1 || params.paging.perPage === -1) {
-          result = await this.imgSvc.listImagesIWasOwnerAsync(req.params.account, params.filter);
+          result = await this.imgSvc.listImagesIWasOwnerAsync(req.params.account, params.filter, params.order);
         } else {
           result = await this.imgSvc.pagedImagesIWasOwnerAsync(
             req.params.account,
             params.paging.page, 
             params.paging.perPage,
-            params.filter
+            params.filter,
+            params.order
           );
         }
         this.handleResult(result, res);
