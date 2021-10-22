@@ -5,10 +5,11 @@ import { model, Schema, Model, Document } from 'mongoose';
 export interface ISmartContract {
   name: string;
   address: string;
-  network: string;
-  rpc: string;
-  statingBlock: number;
-  abi: any;
+  network?: string;
+  rpc?: string;
+  statingBlock?: number;
+  abi?: any;
+  inUse: boolean;
 }
 
 export interface SettingsDocument extends Document {

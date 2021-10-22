@@ -108,9 +108,30 @@ class DiagnosticController extends BaseController {
         await SettingsContext.create({
           smartcontracts: [
             {
+              address: '0xb0304455e39bece8efba7b43d3d5d2a728c693aa',
+              name: 'AlgoPainterAuctionSystem',
+              inUse: true
+            },
+            {
+              address: '0xd1acd289f75c8c7dbc67a5081d0319977724843d',
+              name: 'AlgoPainterRewardsSystem',
+              inUse: true
+            },
+            {
+              address: '0xe2290c70361de096bd018f5ec3b8ff4a320fe8ca',
+              name: 'AlgoPainterBidBackPirs',
+              inUse: true
+            },
+            {
               address: '0xc6e1cb3482add6fb7c2f7b011dfc0448accfaac9',
-              name: 'AlgoPainterAuctionSystem'
-            }
+              name: 'AlgoPainterAuctionSystem',
+              inUse: false
+            },
+            {
+              address: '0x659f8063039ece43409f767148216379e7cec9da',
+              name: 'AlgoPainterAuctionSystem',
+              inUse: true
+            },
           ]
         });
 

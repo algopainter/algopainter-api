@@ -10,7 +10,6 @@ import SignService from "./sign.service";
 import { Types } from "mongoose";
 import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
-import Stack from '../shared/stack';
 import { IUser, UserContext } from "../domain/user";
 import { SettingsContext } from "../domain/settings";
 
@@ -216,8 +215,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
         contract: data.collectionOwner.toLowerCase(),
         token: data.nft.index
       }).sort({ createdAt: 1 });
-
-      const stack = new Stack(undefined);
 
       const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
       const ownerList: string[] = [];
