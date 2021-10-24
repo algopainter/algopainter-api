@@ -9,3 +9,7 @@ export default class Helpers {
     return Array.from(map.values());
   }
 }
+
+export interface IKeyPair<TValue> {
+  [name: string]: TValue
+}

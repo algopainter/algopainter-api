@@ -1,4 +1,5 @@
 import { model, Schema, Model, Document } from 'mongoose';
+import { IKeyPair } from '../shared/helpers';
 import { IBid } from './bid';
 import { IUser } from './user';
 
@@ -21,10 +22,6 @@ export interface IAuctionItem {
   likers?: string[] | null
 }
 
-export interface IReturn {
-  [name: string]: number
-}
-
 export interface IAuctionFees {
   bidBack: number;
   address: string;
@@ -40,7 +37,9 @@ export interface AuctionDocument extends Document {
   owner: string;
   users: IUser[];
   bids: IAuctionBidWithUser[];
-  returns: IReturn;
+  returns: IKeyPair<number>;
+  pirs: IKeyPair<number>;
+  bidback: IKeyPair<number>;
   categories: string[];
   minimumBid: IAuctionBid;
   highestBid: IAuctionBidWithUser;
@@ -57,6 +56,8 @@ export interface IAuction {
   owner: AuctionDocument['owner'];
   bids: AuctionDocument['bids'];
   returns: AuctionDocument['returns'];
+  bidback: AuctionDocument['returns'];
+  pirs: AuctionDocument['returns'];
   minimumBid: AuctionDocument['minimumBid'];
   highestBid: AuctionDocument['highestBid'];
   lowestBid: AuctionDocument['lowestBid'];
@@ -86,6 +87,8 @@ export const AuctionSchema: Schema = new Schema({
   owner: { type: String, required: true },
   bids: { type: [Object], required: false },
   returns: { type: Object, required: false },
+  bidback: { type: Object, required: false },
+  pirs: { type: Object, required: false },
   users: { type: [Object], required: false },
   minimumBid: { type: Object, required: false },
   highestBid: { type: Object, required: false },

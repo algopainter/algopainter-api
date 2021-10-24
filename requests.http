@@ -107,3 +107,7 @@ GET http://localhost:3000/api/users/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/i
 ###
 
 GET http://localhost:3000/api/histories/owners/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/images HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions HTTP/1.1
