@@ -71,7 +71,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
     return Result.success<Paged<IAuction>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });
@@ -101,7 +101,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
     return Result.success<Paged<IAuction>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });

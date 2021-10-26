@@ -29,7 +29,7 @@ export default class NFTService extends BaseCRUDService<INFT> {
     return Result.success<Paged<INFT>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });

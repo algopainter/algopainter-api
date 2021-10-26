@@ -35,7 +35,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     return Result.success<Paged<IUser>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data: data as IUser[]
     });
@@ -69,7 +69,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       return Result.success<Paged<IAuction>>(null, {
         count,
         currPage: page,
-        pages: Math.round(count / perPage),
+        pages: Math.ceil(count / perPage),
         perPage,
         data: data as IAuction[]
       });

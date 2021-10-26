@@ -28,7 +28,7 @@ export default class TradeInsService extends BaseCRUDService<ITradeIn> {
     return Result.success<Paged<ITradeIn>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });

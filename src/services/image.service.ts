@@ -77,7 +77,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       return Result.success<Paged<IImage>>(null, {
         count,
         currPage: page,
-        pages: Math.round(count / perPage),
+        pages: Math.ceil(count / perPage),
         perPage,
         data
       });
@@ -128,7 +128,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<Paged<IImage>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });
@@ -147,7 +147,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<Paged<IImage>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });
@@ -302,7 +302,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
       return Result.success<Paged<IImage>>(null, {
         count,
         currPage: page,
-        pages: Math.round(count / perPage),
+        pages: Math.ceil(count / perPage),
         perPage,
         data
       });

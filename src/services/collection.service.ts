@@ -1,7 +1,10 @@
 import Result from "../shared/result";
-import { CollectionContext, ICollection } from "../domain/collection";
+import { CollectionContext, CollectionDocument, ICollection } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
+import { ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
 import Paged from "../shared/paged";
+import SignService from "./sign.service";
+import Exception from "../shared/exception";
 
 /**
  * Collection service class
@@ -27,7 +30,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return Result.success<Paged<ICollection>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });
@@ -38,6 +41,78 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     if(data)
       return Result.success<ICollection>(null, data);
     return Result.fail<ICollection>('Collection not found!', null, 404);
+  }
+
+  async getByTitleAsync(title: string): Promise<Result<ICollection>> {
+    const data = await CollectionContext.findOne({ title: new RegExp(["^", title.toLowerCase(), "$"].join(""), "i") });
+    if(data)
+      return Result.success<ICollection>(null, data);
+    return Result.fail<ICollection>('Collection not found!', null, 404);
+  }
+
+  private validateCollectionData(data: ICollection){
+
+  }
+
+  async createOrUpdateCollectionWithSign(request: ICollectionUpdateCreateRequest): Promise<Result<ICollection>> {
+    let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
+
+    if (!request || !request.data)
+      return responseResult;
+
+    const signService = new SignService();
+    if (!await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation'))
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    if (!(await this._checkUniqueness(request.data))) {
+      const result = await this.getByTitleAsync(request.data.title);
+
+      if (result.success && result.data && result.data.account) {
+        await this.updateAsync((result.data as CollectionDocument)._id, {
+          title: request.data.title,
+          avatar: request.data.avatar,
+          account: result.data.account,
+          description: request.data.description,
+          owner: request.data.owner
+        });
+        responseResult = await this.getByTitleAsync(request.data.title);
+      } else {
+        const createResult = await this.createAsync({
+          title: request.data.title,
+          avatar: request.data.avatar,
+          account: request.data.account,
+          description: request.data.description,
+          owner: request.data.owner
+        });
+        responseResult = createResult;
+      }
+    } else {
+      responseResult = Result.custom<ICollection>(false, "The data sent is not unique!", null, 409, 390);
+    }
+
+    return responseResult;
+  }
+
+  private async _checkUniqueness(collectionInfo: ICollectionUpdateCreateSignData) {
+    const foundCollections = await CollectionContext.find({
+      title: {
+        $ne: collectionInfo.title.toLowerCase()
+      }
+    });
+
+    if (collectionInfo.title || collectionInfo.owner) {
+      const checkTitle = collectionInfo.title ? foundCollections.some(a =>
+        (a.title && a.title?.toLowerCase().trim() == collectionInfo.title?.toLowerCase().trim())
+      ) : false;
+
+      const checkOwner = collectionInfo.owner ? foundCollections.some(a =>
+        (a.owner && a.owner?.toLowerCase().trim() == collectionInfo.owner?.toLowerCase().trim())
+      ) : false;
+
+      return checkTitle || checkOwner;
+    }
+
+    return false;
   }
 
   async createAsync(createdItem: ICollection): Promise<Result<ICollection>> {
