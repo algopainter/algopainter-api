@@ -15,9 +15,11 @@ export interface IAuctionBidWithUser extends IBid, IUser {
 export interface IAuctionItem {
   _id: string;
   likes: number;
+  index: number;
   title: string;
   previewImageUrl: string;
   collectionName: string;
+  collectionOwner: string;
   tags: string[],
   likers?: string[] | null
 }

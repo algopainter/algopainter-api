@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default class Helpers {
-  static distinctBy(keyProps: string[], arr: any[]): any[] {
-    const map = new Map<string, any>();
-    arr.forEach(entry => {
+  static distinctBy<TT>(keyProps: string[], arr: TT[]): TT[] {
+    const map = new Map<string, TT>();
+    (arr as any[]).forEach(entry => {
       const key = keyProps.map(k => entry[k]).join('|');
       map.set(key, entry);
     });

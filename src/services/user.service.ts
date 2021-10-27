@@ -56,14 +56,39 @@ export default class UserService extends BaseCRUDService<IUser> {
     return Result.success<IUser>(null, (data as IUser));
   }
 
-  async getAuctionsThatUserBidAsync(account: string, page: number | undefined, perPage: number | undefined):
+  async getAuctionsThatUserBidAsync(
+    account: string,
+    page: number | undefined,
+    perPage: number | undefined,
+    filter: IFilter | null,
+    order: IOrderBy | null,
+    hasPirs: boolean,
+    hasBidbacks: boolean
+  ):
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
+    const pirsQuery: any = {};
+    const bidbacksQuery: any = {};
+
+    if (hasPirs) {
+      pirsQuery["pirs." + account.toLowerCase()] = { $gte: 0 };
+    }
+
+    if (hasBidbacks) {
+      bidbacksQuery["bidbacks." + account.toLowerCase()] = { $gte: 0 };
+    }
+
     if (page && perPage && page != -1 && perPage != -1) {
       const count = await AuctionContext.find({ "bids.bidder": account.toLowerCase() }).countDocuments();
+
       const data = await AuctionContext
-        .find({ "bids.bidder": account.toLowerCase() })
+        .find({
+          "bids.bidder": account.toLowerCase(),
+          ...pirsQuery,
+          ...bidbacksQuery,
+          ...(filter ? this.translateToMongoQuery(filter) : {})
+        })
         .skip((page - 1) * (perPage))
-        .sort({ expirationDt: 1 })
+        .sort(this.translateToMongoOrder(order))
         .limit(perPage);
 
       return Result.success<Paged<IAuction>>(null, {
@@ -75,8 +100,12 @@ export default class UserService extends BaseCRUDService<IUser> {
       });
     } else {
       const data = await AuctionContext
-        .find({ "bids.bidder": account.toLowerCase() })
-        .sort({ expirationDt: 1 });
+        .find({
+          "bids.bidder": account.toLowerCase(),
+          ...pirsQuery,
+          ...bidbacksQuery,
+          ...(filter ? this.translateToMongoQuery(filter) : {})
+        }).sort(this.translateToMongoOrder(order));
 
       return Result.success<IAuction[]>(null, data);
     }
@@ -235,7 +264,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     }, {
       multi: true
     });
-    
+
     await AuctionContext.updateMany({
       'highestBid.account': account.toLowerCase()
     }, {

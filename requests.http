@@ -82,7 +82,7 @@ GET http://localhost:3000/api/diagnostics HTTP/1.1
 
 ###
 
-GET http://localhost:3000/api/users/0x3249341a70324baf2c92367889335fc560c012ff/auctions/biding HTTP/1.1
+GET http://localhost:3000/api/users/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions/biding?ended=false&page=1&perPage=1 HTTP/1.1
 
 
 ###
@@ -106,7 +106,7 @@ GET http://localhost:3000/api/users/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/i
 
 ###
 
-GET http://localhost:3000/api/histories/owners/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/images HTTP/1.1
+GET http://localhost:3000/api/histories/owners/0xa62ce1f85461d67c874ef625f0e488c57af2335d/images HTTP/1.1
 
 ###
 
@@ -114,7 +114,11 @@ GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/au
 
 ###
 
-GET http://localhost:3000/api/images/617842df14619d001306f03e/owners HTTP/1.1
+GET http://localhost:3000/api/images/617842df14619d001306f03e/owners?includeCurrentOwner=true HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions HTTP/1.1
 
 ###
 

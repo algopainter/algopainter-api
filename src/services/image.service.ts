@@ -5,19 +5,28 @@ import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
 import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
-import { AuctionContext } from "../domain/auction";
+import { AuctionContext, IAuction } from "../domain/auction";
 import SignService from "./sign.service";
 import { Types } from "mongoose";
 import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
 import Helpers from '../shared/helpers';
 import { IUser, UserContext } from "../domain/user";
 import { SettingsContext } from "../domain/settings";
+import AuctionService from "./auction.service";
 
 /**
  * Image service class
  * @class ImageService @extends BaseService<IImage>
  */
 export default class ImageService extends BaseCRUDService<IImage> {
+
+  private auctionService : AuctionService;
+
+  constructor() {
+    super();
+    this.auctionService = new AuctionService();
+  }
+
   async listAsync(filter: IFilter, order: IOrderBy | null): Promise<Result<IImage[]>> {
     const data = await ImageContext
       .find(this.translateToMongoQuery(filter))
@@ -26,26 +35,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async listImagesIWasOwnerAsync(account: string, filter: IFilter | null | undefined, order: IOrderBy | null): Promise<Result<IImage[]>> {
-    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
-    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
-
-    const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
+    const tokensInfo = await this.auctionService.getCompletedAuctionsByAccount(account);
 
     if (tokensInfo) {
       const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
-      .filter(a => {
-        const counting = tokensIwasOwner.filter(z => z.token == a.token && z.contract == a.contract).length;
-        if(counting > 1)
-          return true;
-        return false;
-      })
-      .map(a => {
-        return {
-          "nft.index": a.token,
-          "collectionOwner": a.contract,
-          ...filter
-        }
-      });
+        .map(a => {
+          return {
+            "nft.index": a.token,
+            "collectionOwner": a.contract,
+            ...filter
+          }
+        });
 
       const images = await ImageContext.find({
         $or: query
@@ -57,26 +57,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
   }
 
   async pagedImagesIWasOwnerAsync(account: string, page: number, perPage: number, filter: IFilter | null | undefined, order: IOrderBy | null): Promise<Result<Paged<IImage>>> {
-    const tokensIwasOwner = await HistoricalOwnersContext.find({ owner: account.toLowerCase() });
-    const tokensIwasFrom = await HistoricalOwnersContext.find({ from: account.toLowerCase() });
-
-    const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
+    const tokensInfo = await this.auctionService.getCompletedAuctionsByAccount(account);
 
     if (tokensInfo) {
       const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
-      .filter(a => {
-        const counting = tokensIwasOwner.filter(z => z.token == a.token && z.contract == a.contract).length;
-        if(counting > 1)
-          return true;
-        return false;
-      })
-      .map(a => {
-        return {
-          "nft.index": a.token,
-          "collectionOwner": a.contract,
-          ...filter
-        }
-      });
+        .map(a => {
+          return {
+            "nft.index": a.token,
+            "collectionOwner": a.contract,
+            ...filter
+          }
+        });
 
       const count = await ImageContext.find({
         $or: query
@@ -176,31 +167,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const data = await ImageContext.findById(id);
 
     if (data) {
-      const histOwners = await HistoricalOwnersContext.find({
-        contract: data.collectionOwner.toLowerCase(),
-        token: data.nft.index
-      }).sort({ createdAt: -1 });
+      const auctionSystemAddress = await this.auctionService.getAuctionSmartContract();
 
-      const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
-      const ownerList: string[] = [];
+      const completedAuctions = await AuctionContext.find({
+        address: auctionSystemAddress,
+        ended: true,
+        highestBid: { $exists: true },
+        "item.index": data.nft.index,
+        "item.collectionOwner": data.collectionOwner,
+      });
 
-      if (unWantedHashes) {
-        histOwners.forEach(hist => {
-          if (!unWantedHashes.some(a => a == hist.owner)) {
-            const tokensIwasOwner = histOwners.filter(a => a.owner == hist.owner.toLowerCase());
-            const counting = tokensIwasOwner.filter(z => 
-              z.token == data.nft.index && 
-              z.contract == data.collectionOwner.toLowerCase()
-            ).length;
-
-            if(counting > 1)
-              ownerList.push(hist.owner.toLowerCase());
-          }
-
-          if (!unWantedHashes.some(a => a == hist.from))
-            ownerList.push(hist.from.toLowerCase());
-        });
-      }
+      const ownerList: string[] = Helpers.distinctBy(['owner'], completedAuctions.map(a => a.owner));
 
       if (includeCurrentOwner)
         ownerList.push(data.owner);
