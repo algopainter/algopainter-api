@@ -172,7 +172,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, data);
   }
 
-  async getOwnersOfAsync(id: string, excludeCurrentOwner: boolean): Promise<Result<IUser[]>> {
+  async getOwnersOfAsync(id: string, includeCurrentOwner: boolean): Promise<Result<IUser[]>> {
     const data = await ImageContext.findById(id);
 
     if (data) {
@@ -183,9 +183,6 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
       const unWantedHashes = (await SettingsContext.findOne())?.smartcontracts?.map(a => a.address) || [];
       const ownerList: string[] = [];
-
-      if (excludeCurrentOwner)
-        unWantedHashes.push(data.owner);
 
       if (unWantedHashes) {
         histOwners.forEach(hist => {
@@ -204,6 +201,9 @@ export default class ImageService extends BaseCRUDService<IImage> {
             ownerList.push(hist.from.toLowerCase());
         });
       }
+
+      if (includeCurrentOwner)
+        ownerList.push(data.owner);
 
       const usersFound = await UserContext.find({ account: { $in: ownerList } });
       const users: IUser[] = [...usersFound];
