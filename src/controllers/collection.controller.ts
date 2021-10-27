@@ -6,6 +6,7 @@ import Paged from "../shared/paged";
 import Result from "../shared/result";
 import BaseController from "./base.controller"
 import { IImage } from "../domain/image";
+import { ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
 
 class CollectionController extends BaseController {
   private service: CollectionService;
@@ -24,18 +25,16 @@ class CollectionController extends BaseController {
   intializeRoutes(router: Router): void {
     router.post(`${this.path}`, async (req, res) => {
       try {
-        const params = this.requestParams(req);
-        let result: Result<Paged<ICollection>> | Result<ICollection[]> | null = null;
-        if (params.paging.page === -1 || params.paging.page === -1) {
-          result = await this.service.listAsync(params.filter, params.order);
-        } else {
-          result = await this.service.pagedAsync(
-            params.filter,
-            params.order,
-            params.paging.page,
-            params.paging.perPage
-          );
-        }
+        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:id`, async (req, res) => {
+      try {
+        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

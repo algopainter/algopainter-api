@@ -32,7 +32,14 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
 
     if (tokensInfo) {
-      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo).map(a => {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
+      .filter(a => {
+        const counting = tokensIwasOwner.filter(z => z.token == a.token && z.contract == a.contract).length;
+        if(counting > 1)
+          return true;
+        return false;
+      })
+      .map(a => {
         return {
           "nft.index": a.token,
           "collectionOwner": a.contract,
@@ -56,7 +63,14 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const tokensInfo = (<IHistoricalOwners[]>[]).concat(tokensIwasOwner, tokensIwasFrom);
 
     if (tokensInfo) {
-      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo).map(a => {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
+      .filter(a => {
+        const counting = tokensIwasOwner.filter(z => z.token == a.token && z.contract == a.contract).length;
+        if(counting > 1)
+          return true;
+        return false;
+      })
+      .map(a => {
         return {
           "nft.index": a.token,
           "collectionOwner": a.contract,
@@ -175,8 +189,16 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
       if (unWantedHashes) {
         histOwners.forEach(hist => {
-          if (!unWantedHashes.some(a => a == hist.owner))
-            ownerList.push(hist.owner.toLowerCase());
+          if (!unWantedHashes.some(a => a == hist.owner)) {
+            const tokensIwasOwner = histOwners.filter(a => a.owner == hist.owner.toLowerCase());
+            const counting = tokensIwasOwner.filter(z => 
+              z.token == data.nft.index && 
+              z.contract == data.collectionOwner.toLowerCase()
+            ).length;
+
+            if(counting > 1)
+              ownerList.push(hist.owner.toLowerCase());
+          }
 
           if (!unWantedHashes.some(a => a == hist.from))
             ownerList.push(hist.from.toLowerCase());

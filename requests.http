@@ -111,3 +111,61 @@ GET http://localhost:3000/api/histories/owners/0x2a28593abb56b0f425fed25d4dcc0ff
 ###
 
 GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/images/617842df14619d001306f03e/owners HTTP/1.1
+
+###
+
+POST http://localhost:3000/api/collections HTTP/1.1
+content-type: application/json
+
+{
+    "signature":"0xe32653151f977aabcad03c32f906ff4a93f4da6745a10386b15d595bd06af817769b263185909f3e6984aca5afd03df6527c21ba77819a058095c5614c389c5e1b","account":"0x08a9b7fc864cf87c4a5cc82a7f6450cde32e60a5",
+    "salt":"4lWemRo8EN8Z86lBYws6e",
+    "data": {
+        "salt":"4lWemRo8EN8Z86lBYws6e",
+        "title": "Testing",
+        "description": "Testing Description",
+        "owner": "0xa62ce1f85461d67c874ef625f0e488c57af2335d",
+        "avatar": "avatar",
+        "account": "0xa62ce1f85461d67c874ef625f0e488c57af2335d",
+        "metrics": {
+            "ntfs": 1000,
+            "startDT": "",
+            "endDT": "",
+            "priceType": "variable",
+            "tokenPriceAddress": "0xa62ce1f85461d67c874ef625f0e488c57af2335d",
+            "tokenPriceSymbol": "ALGOP",
+            "priceRange": [
+                {
+                    "from": 100,
+                    "to": 200,
+                    "amount": 600,
+                    "tokenPriceAddress": "0xa62ce1f85461d67c874ef625f0e488c57af2335d",
+                    "tokenPriceSymbol": "ALGOP"
+                },
+                {
+                    "from": 201,
+                    "to": 300,
+                    "amount": 700,
+                    "tokenPriceAddress": "0xa62ce1f85461d67c874ef625f0e488c57af2335d",
+                    "tokenPriceSymbol": "ALGOP"
+                }
+            ],
+            "creatorPercentage": 30,         
+            "walletAddress": "0xa62ce1f85461d67c874ef625f0e488c57af2335d"
+        },
+        "api": {
+            "url": "https://api.test.com/",
+            "parameters": {
+                "title": "test"
+            }
+        }
+    }
+}
+
+###
+
+GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions HTTP/1.1
