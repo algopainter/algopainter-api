@@ -79,8 +79,8 @@ class UserController extends BaseController {
 
     router.get(`${this.path}/:account/auctions/biding`, async (req, res) => {
       try {
-        const hasBidbacks = this.getBoolean(req.query.hasBidbacks);
-        const hasPirs = this.getBoolean(req.query.hasPirs);
+        const hasBidbacks = req.query.hasBidbacks ? this.getBoolean(req.query.hasBidbacks) : null;
+        const hasPirs = req.query.hasPirs ? this.getBoolean(req.query.hasPirs) : null;
         delete req.query.hasBidbacks;
         delete req.query.hasPirs;
         const params = this.requestParams(req);

@@ -62,19 +62,23 @@ export default class UserService extends BaseCRUDService<IUser> {
     perPage: number | undefined,
     filter: IFilter | null,
     order: IOrderBy | null,
-    hasPirs: boolean,
-    hasBidbacks: boolean
+    hasPirs: boolean | null,
+    hasBidbacks: boolean | null
   ):
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
     const pirsQuery: any = {};
     const bidbacksQuery: any = {};
 
-    if (hasPirs) {
+    if (hasPirs === true) {
       pirsQuery["pirs." + account.toLowerCase()] = { $gte: 0 };
+    } else if (hasPirs === false) {
+      pirsQuery["pirs." + account.toLowerCase()] = { $exists: false };
     }
 
-    if (hasBidbacks) {
+    if (hasBidbacks === true) {
       bidbacksQuery["bidbacks." + account.toLowerCase()] = { $gte: 0 };
+    } else if (hasPirs === false) {
+      bidbacksQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
     }
 
     if (page && perPage && page != -1 && perPage != -1) {

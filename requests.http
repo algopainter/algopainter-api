@@ -82,7 +82,7 @@ GET http://localhost:3000/api/diagnostics HTTP/1.1
 
 ###
 
-GET http://localhost:3000/api/users/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions/biding?ended=false&page=1&perPage=1 HTTP/1.1
+GET http://localhost:3000/api/users/0xa62ce1f85461d67c874ef625f0e488c57af2335d/auctions/biding?hasBidbacks=true HTTP/1.1
 
 
 ###
