@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import BaseController from './controllers/base.controller';
 import AuctionController from './controllers/auction.controller';
 import PirsController from './controllers/pirs.controller';
+import BidbacksController from './controllers/bidbacks.controller';
 import CollectionController from './controllers/collection.controller';
 import DiagnosticController from './controllers/diagnostic.controller';
 import ImageController from './controllers/image.controller';
@@ -81,6 +82,7 @@ class Application {
 
 const App: Application = new Application(3000);
 App.initializeControllers([
+  new BidbacksController(),
   new PirsController(),
   new LikeController(),
   new CollectionController(),
