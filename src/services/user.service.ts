@@ -63,11 +63,13 @@ export default class UserService extends BaseCRUDService<IUser> {
     filter: IFilter | null,
     order: IOrderBy | null,
     hasPirs: boolean | null,
-    hasBidbacks: boolean | null
+    hasBidbacks: boolean | null,
+    forBidbacks: boolean | null,
   ):
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
     const pirsQuery: any = {};
     const bidbacksQuery: any = {};
+    let forBidbacksQuery: any = {};
 
     if (hasPirs === true) {
       pirsQuery["pirs." + account.toLowerCase()] = { $gte: 0 };
@@ -77,20 +79,57 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if (hasBidbacks === true) {
       bidbacksQuery["bidbacks." + account.toLowerCase()] = { $gte: 0 };
-    } else if (hasPirs === false) {
+    } else if (hasBidbacks === false) {
       bidbacksQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
     }
 
+    if (forBidbacks === true) {
+      const forBidBackLocalQuery: any = {};
+      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $gte: 0 };
+      const bidbackToHarvest = await AuctionContext.find({
+        "bids.bidder": account.toLowerCase(),
+        ...forBidBackLocalQuery,
+        $or: [
+          {
+            ended: true,
+            expirationDt: { $gt: new Date() }
+          }
+        ]
+      });
+
+      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
+      const bidbackable = await AuctionContext.find({
+        "bids.bidder": account.toLowerCase(),
+        ...forBidBackLocalQuery,
+        $or: [
+          {
+            ended: false,
+            expirationDt: { $lte: new Date() }
+          }
+        ]
+      });
+
+      forBidbacksQuery["index"] = {
+        $in: ([] as number[]).concat(
+          bidbackToHarvest.map(a => a.index),
+          bidbackable.map(a => a.index)
+        )
+      };
+    }
+
+    const queryFilter = {
+      "bids.bidder": account.toLowerCase(),
+      ...pirsQuery,
+      ...bidbacksQuery,
+      ...(filter ? this.translateToMongoQuery(filter) : {}),
+      ...forBidbacksQuery
+    }
+
     if (page && perPage && page != -1 && perPage != -1) {
-      const count = await AuctionContext.find({ "bids.bidder": account.toLowerCase() }).countDocuments();
+      const count = await AuctionContext.find(queryFilter).countDocuments();
 
       const data = await AuctionContext
-        .find({
-          "bids.bidder": account.toLowerCase(),
-          ...pirsQuery,
-          ...bidbacksQuery,
-          ...(filter ? this.translateToMongoQuery(filter) : {})
-        })
+        .find(queryFilter)
         .skip((page - 1) * (perPage))
         .sort(this.translateToMongoOrder(order))
         .limit(perPage);
@@ -104,12 +143,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       });
     } else {
       const data = await AuctionContext
-        .find({
-          "bids.bidder": account.toLowerCase(),
-          ...pirsQuery,
-          ...bidbacksQuery,
-          ...(filter ? this.translateToMongoQuery(filter) : {})
-        }).sort(this.translateToMongoOrder(order));
+        .find(queryFilter).sort(this.translateToMongoOrder(order));
 
       return Result.success<IAuction[]>(null, data);
     }

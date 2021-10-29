@@ -35,6 +35,8 @@ export interface AuctionDocument extends Document {
   createdAt: Date;
   expirationDt: Date;
   fee: IAuctionFees;
+  index: number;
+  address: string;
   isHot: boolean;
   owner: string;
   users: IUser[];
@@ -52,6 +54,8 @@ export interface IAuction {
   expirationDt: AuctionDocument['expirationDt'];
   fee: AuctionDocument['fee'];
   item: AuctionDocument['item'];
+  index: AuctionDocument['index'];
+  address: AuctionDocument['address'];
   users: AuctionDocument['users'];
   createdAt: AuctionDocument['createdAt'];
   isHot: AuctionDocument['isHot'];
@@ -84,6 +88,8 @@ export const AuctionSchema: Schema = new Schema({
   startDt: { type: Date, required: true },
   expirationDt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
+  index: { type: Number, required: true },
+  address: { type: String, required: false },
   isHot: { type: Boolean, required: true },
   ended: { type: Boolean, required: true },
   owner: { type: String, required: true },

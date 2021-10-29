@@ -79,10 +79,12 @@ class UserController extends BaseController {
 
     router.get(`${this.path}/:account/auctions/biding`, async (req, res) => {
       try {
+        const forBidbacks = req.query.forBidbacks ? this.getBoolean(req.query.forBidbacks) : null;
         const hasBidbacks = req.query.hasBidbacks ? this.getBoolean(req.query.hasBidbacks) : null;
         const hasPirs = req.query.hasPirs ? this.getBoolean(req.query.hasPirs) : null;
         delete req.query.hasBidbacks;
         delete req.query.hasPirs;
+        delete req.query.forBidbacks;
         const params = this.requestParams(req);
         const result = await this.service.getAuctionsThatUserBidAsync(
           req.params.account, 
@@ -91,7 +93,8 @@ class UserController extends BaseController {
           params.filter,
           params.order,
           hasPirs,
-          hasBidbacks);
+          hasBidbacks,
+          forBidbacks);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
