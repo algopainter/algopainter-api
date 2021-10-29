@@ -6,13 +6,22 @@ import { IUserUpdateRequest, IUserUpdateSignData } from '../requests/user.update
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
 import { AuctionContext, IAuction } from "../domain/auction";
-import { ImageContext } from "../domain/image";
+import { IImage, ImageContext } from "../domain/image";
+import Helpers from "../shared/helpers";
+import AuctionService from "./auction.service";
 
 /**
  * User service class
  * @class UserService @extends BaseService<IUser>
  */
 export default class UserService extends BaseCRUDService<IUser> {
+  private auctionService : AuctionService;
+
+  constructor() {
+    super();
+    this.auctionService = new AuctionService();
+  }
+
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<IUser[]>> {
 
     const data = await UserContext
@@ -69,7 +78,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
     const pirsQuery: any = {};
     const bidbacksQuery: any = {};
-    let forBidbacksQuery: any = {};
+    const forBidbacksQuery: any = {};
 
     if (hasPirs === true) {
       pirsQuery["pirs." + account.toLowerCase()] = { $gte: 0 };
@@ -109,6 +118,84 @@ export default class UserService extends BaseCRUDService<IUser> {
       ...bidbacksQuery,
       ...(filter ? this.translateToMongoQuery(filter) : {}),
       ...forBidbacksQuery
+    }
+
+    if (page && perPage && page != -1 && perPage != -1) {
+      const count = await AuctionContext.find(queryFilter).countDocuments();
+
+      const data = await AuctionContext
+        .find(queryFilter)
+        .skip((page - 1) * (perPage))
+        .sort(this.translateToMongoOrder(order))
+        .limit(perPage);
+
+      return Result.success<Paged<IAuction>>(null, {
+        count,
+        currPage: page,
+        pages: Math.ceil(count / perPage),
+        perPage,
+        data: data as IAuction[]
+      });
+    } else {
+      const data = await AuctionContext
+        .find(queryFilter).sort(this.translateToMongoOrder(order));
+
+      return Result.success<IAuction[]>(null, data);
+    }
+  }
+
+  async getAuctionsThatUserPIRSAsync(
+    account: string,
+    page: number | undefined,
+    perPage: number | undefined,
+    filter: IFilter | null,
+    order: IOrderBy | null,
+  ) : Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
+    const forPirsQuery: any = {};
+    const tokensInfo = await this.auctionService.getCompletedAuctionsByAccount(account);
+    let images : IImage[] = [];
+
+    if (tokensInfo) {
+      const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
+        .map(a => {
+          return {
+            "nft.index": a.token,
+            "collectionOwner": a.contract,
+            ...filter
+          }
+        });
+
+      images = await ImageContext.find({
+        $or: query
+      }).sort(this.translateToMongoOrder(order, { "nft.index": -1 }));
+    }
+
+    const forPirsLocalQuery: any = {};
+    forPirsLocalQuery["pirs." + account.toLowerCase()] = { $exists: false };
+    const pirsToExclude = await AuctionContext.find({
+      ...forPirsLocalQuery,
+      $or: [
+        {
+          ended: true
+        },{
+          expirationDt: { $lte: new Date() }
+        }
+      ]
+    });
+
+    forPirsQuery["index"] = {
+      $nin: pirsToExclude.map(a => a.index)
+    };
+
+    const queryFilter = {
+      ...(filter ? this.translateToMongoQuery(filter) : {}),
+      ...forPirsQuery,
+      $or: images.map(a => {
+        return {
+          "item.index": a.nft.index,
+          "item.collectionOwner": a.collectionOwner
+        }
+      })
     }
 
     if (page && perPage && page != -1 && perPage != -1) {

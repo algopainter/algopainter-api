@@ -100,6 +100,21 @@ class UserController extends BaseController {
         this.handleException(error, res);
       }
     });
+
+    router.get(`${this.path}/:account/auctions/pirsing`, async (req, res) => {
+      try {
+        const params = this.requestParams(req);
+        const result = await this.service.getAuctionsThatUserPIRSAsync(
+          req.params.account, 
+          params.paging.page, 
+          params.paging.perPage,
+          params.filter,
+          params.order);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
   }
 }
 
