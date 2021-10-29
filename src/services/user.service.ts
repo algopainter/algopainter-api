@@ -85,35 +85,21 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if (forBidbacks === true) {
       const forBidBackLocalQuery: any = {};
-      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $gte: 0 };
-      const bidbackToHarvest = await AuctionContext.find({
+      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
+      const bidbackToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
         ...forBidBackLocalQuery,
         $or: [
           {
-            ended: true,
+            ended: true
+          },{
             expirationDt: { $gt: new Date() }
           }
         ]
       });
 
-      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
-      const bidbackable = await AuctionContext.find({
-        "bids.bidder": account.toLowerCase(),
-        ...forBidBackLocalQuery,
-        $or: [
-          {
-            ended: false,
-            expirationDt: { $lte: new Date() }
-          }
-        ]
-      });
-
       forBidbacksQuery["index"] = {
-        $in: ([] as number[]).concat(
-          bidbackToHarvest.map(a => a.index),
-          bidbackable.map(a => a.index)
-        )
+        $nin: bidbackToExclude.map(a => a.index)
       };
     }
 
