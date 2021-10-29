@@ -177,7 +177,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
         "item.collectionOwner": data.collectionOwner,
       });
 
-      const ownerList: string[] = Helpers.distinctBy(['owner'], completedAuctions.map(a => a.owner));
+      const ownerList: string[] = completedAuctions.map(a => a.owner);
 
       if (includeCurrentOwner)
         ownerList.push(data.owner);
