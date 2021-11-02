@@ -1,4 +1,5 @@
 import { model, Schema, Model, Document } from 'mongoose';
+import { IPIRS } from './nft';
 import { IUser } from './user';
 
 export interface IImageNFTInfo {
@@ -21,6 +22,7 @@ export interface ImageDocument extends Document {
   updatedAt: Date;
   tags: string[];
   nft: IImageNFTInfo;
+  pirs: IPIRS;
   owner: string;
   creator: string;
   users: IUser[];
@@ -39,6 +41,7 @@ export interface IImage {
   description: ImageDocument['description'];
   tags: ImageDocument['tags'];
   nft: ImageDocument['nft'];
+  pirs: ImageDocument['pirs'];
   owner: ImageDocument['owner'];
   creator: ImageDocument['creator'];
   likers?: ImageDocument['likers'];
@@ -56,6 +59,7 @@ export const ImageSchema: Schema = new Schema({
   createAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
   nft: { type: Object, required: true },
+  pirs: { type: Object },
   owner: { type: String, required: true, index: true },
   creator: { type: String, required: true, index: true },
   likers: { type: [String], required: false },

@@ -5,6 +5,11 @@ export interface INFTArtist extends IUser {
   _id: string;
 }
 
+export interface IPIRS {
+  creatorRate?: number;
+  investorRate?: number;
+}
+
 export interface INFTPrice {
   amount: number;
   tokenSymbol: string;
@@ -20,6 +25,7 @@ export interface NFTDocument extends Document {
   mintedBy: string;
   owner: string;
   name: string;
+  pirs: IPIRS;
   collectionName: string;
   descriptor: string;
   description: string;
@@ -39,6 +45,7 @@ export interface INFT {
   mintedBy: NFTDocument['mintedBy'];
   owner: NFTDocument['owner'];
   name: NFTDocument['name'];
+  pirs: NFTDocument['pirs'];
   collectionName: NFTDocument['collectionName'];
   descriptor: NFTDocument['descriptor'];
   description: NFTDocument['description'];
@@ -66,6 +73,9 @@ export const NFTSchema: Schema = new Schema({
   },
   owner: {
     type: String,
+  },
+  pirs: {
+    type: Object
   },
   name: {
     type: String, required: true,
