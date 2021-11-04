@@ -94,15 +94,13 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if (forBidbacks === true) {
       const forBidBackLocalQuery: any = {};
-      forBidBackLocalQuery["bidbacks." + account.toLowerCase()] = { $exists: false };
       const bidbackToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
-        ...forBidBackLocalQuery,
         $or: [
           {
             ended: true
           },{
-            expirationDt: { $gt: new Date() }
+            expirationDt: { $lte: new Date() }
           }
         ]
       });
@@ -170,10 +168,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       }).sort(this.translateToMongoOrder(order, { "nft.index": -1 }));
     }
 
-    const forPirsLocalQuery: any = {};
-    forPirsLocalQuery["pirs." + account.toLowerCase()] = { $exists: false };
     const pirsToExclude = await AuctionContext.find({
-      ...forPirsLocalQuery,
       $or: [
         {
           ended: true
