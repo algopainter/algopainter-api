@@ -94,7 +94,7 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if (forBidbacks === true) {
       const forBidBackLocalQuery: any = {};
-      const bidbackToExclude = await AuctionContext.find({
+      let bidbackToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
         $or: [
           {
@@ -104,6 +104,8 @@ export default class UserService extends BaseCRUDService<IUser> {
           }
         ]
       });
+      
+      bidbackToExclude = bidbackToExclude.filter(a => !a.bidbacks[account.toLowerCase()])
 
       forBidbacksQuery["index"] = {
         $nin: bidbackToExclude.map(a => a.index)
