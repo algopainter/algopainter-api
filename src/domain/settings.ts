@@ -4,10 +4,12 @@ import { model, Schema, Model, Document } from 'mongoose';
 
 export interface ISmartContract {
   name: string;
+  symbol: string;
   address: string;
   network?: string;
   rpc?: string;
   statingBlock?: number;
+  blockExplorer: string;
   abi?: any;
   inUse: boolean;
 }

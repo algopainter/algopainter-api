@@ -14,6 +14,7 @@ import UserController from './controllers/user.controller';
 import LikeController from './controllers/like.controller';
 import HistoryController from './controllers/history.controller';
 import TradeInsController from './controllers/tradeins.controller';
+import SettingsController from './controllers/settings.controller';
 import cors from 'cors';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
@@ -82,6 +83,7 @@ class Application {
 
 const App: Application = new Application(3000);
 App.initializeControllers([
+  new SettingsController(),
   new BidbacksController(),
   new PirsController(),
   new LikeController(),

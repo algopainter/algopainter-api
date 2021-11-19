@@ -185,7 +185,7 @@ GET http://localhost:3000/api/images/617bf6e36b3e40001317c0cf/owners HTTP/1.1
 
 ###
 
-GET http://localhost:3000/api/users/0xA62CE1F85461D67c874ef625F0E488C57Af2335d/auctions/pirsing HTTP/1.1
+GET http://localhost:3000/api/users/0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf/auctions/pirsing HTTP/1.1
 
 ###
 
@@ -194,3 +194,6 @@ GET http://localhost:3000/api/users/0xD804c94c7Ed47b97809394E988E447AC66B78DF3/a
 ###
 
 GET http://localhost:3000/api/users/0x3e20e1efcb1ae11c3db0495af83139d1b9c0d26a/auctions/biding?forBidbacks=true HTTP/1.1
+
+###
+GET http://localhost:3000/api/settings/script.js HTTP/1.1

@@ -3,6 +3,13 @@ import express, { Router } from "express";
 import BaseController from "./base.controller";
 import { routesExtractor } from '../shared/routes';
 import { SettingsContext } from '../domain/settings';
+import AuctionsABI from "../contracts/ABI-AuctionSystem.json";
+import AuctionsRewardsABI from "../contracts/ABI-AuctionsRewardsSystem.json";
+import AuctionsBidBackPIRSABI from "../contracts/ABI-AuctionsBidBackPIRS.json";
+import GweiABI from "../contracts/ABI-GWEI.json";
+import ExpressionsABI from "../contracts/ABI-EXPRESSIONS.json";
+import AlgopABI from "../contracts/ABI-ERC20.json";
+
 class DiagnosticController extends BaseController {
   private app: express.Application;
   private routes: Record<string, string>[] | null = null
@@ -105,33 +112,76 @@ class DiagnosticController extends BaseController {
 
     router.get(`${this.path}/seed/:secret/fix`, async (req, res) => {
       if (req.params.secret === 'AlgoPainter') {
+        await SettingsContext.remove();
+
         await SettingsContext.create({
           smartcontracts: [
             {
-              address: '0xb0304455e39bece8efba7b43d3d5d2a728c693aa',
+              address: '0xb8b87531b1bc7aa0b742bea4ddcd98631ca89498',
               name: 'AlgoPainterAuctionSystem',
+              symbol: 'APAS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsABI,
               inUse: true
             },
             {
-              address: '0xd1acd289f75c8c7dbc67a5081d0319977724843d',
+              address: '0xab06be2da3d164b3622cb116b19488f4a71b3bd1',
               name: 'AlgoPainterRewardsSystem',
+              symbol: 'APRS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsRewardsABI,
               inUse: true
             },
             {
-              address: '0xe2290c70361de096bd018f5ec3b8ff4a320fe8ca',
+              address: '0x47edab2a13482006dde78d68236c423b927a6ca3',
               name: 'AlgoPainterBidBackPirs',
+              symbol: 'APBPS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsBidBackPIRSABI,
               inUse: true
             },
             {
-              address: '0xc6e1cb3482add6fb7c2f7b011dfc0448accfaac9',
-              name: 'AlgoPainterAuctionSystem',
+              address: '0x8cfd89020019ba3da8b13cc2f3e0e5baaf82f578',
+              name: 'AlgoPainterGweiItem',
+              symbol: 'APGI',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 12198014,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: GweiABI,
               inUse: false
             },
             {
-              address: '0x659f8063039ece43409f767148216379e7cec9da',
-              name: 'AlgoPainterAuctionSystem',
+              address: '0xbe9cac059835236da5e91cd72688c43886b63419',
+              name: 'AlgoPainterExpressionsItem',
+              symbol: 'APEXPI',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: ExpressionsABI,
               inUse: true
             },
+            {
+              address: '0x01a9188076f1231df2215f67b6a63231fe5e293e',
+              name: 'AlgoPainterToken',
+              symbol: 'ALGOP',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AlgopABI,
+              inUse: true
+            }
           ]
         });
 
