@@ -30,6 +30,14 @@ export interface IAuctionFees {
   auction: string;
 }
 
+export interface IAuctionCheck {
+  endDT: Date;
+  winner: string;
+  bid: number;
+  fee: number;
+  net: number;
+}
+
 export interface AuctionDocument extends Document {
   item: IAuctionItem;
   createdAt: Date;
@@ -39,6 +47,7 @@ export interface AuctionDocument extends Document {
   address: string;
   isHot: boolean;
   owner: string;
+  check: IAuctionCheck;
   users: IUser[];
   bids: IAuctionBidWithUser[];
   returns: IKeyPair<number>;
@@ -53,6 +62,7 @@ export interface AuctionDocument extends Document {
 export interface IAuction {
   expirationDt: AuctionDocument['expirationDt'];
   fee: AuctionDocument['fee'];
+  check: AuctionDocument['check'];
   item: AuctionDocument['item'];
   index: AuctionDocument['index'];
   address: AuctionDocument['address'];
@@ -85,6 +95,7 @@ export const AuctionSchema: Schema = new Schema({
   likes: { type: Number, required: false },
   item: { type: itemSchema, required: true },
   fee: { type: Object, required: true },
+  check: { type: Object, required: false },
   startDt: { type: Date, required: true },
   expirationDt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },

@@ -1,3 +1,4 @@
+import { AnyAaaaRecord } from "dns";
 import { Router } from "express";
 import { SettingsContext, SettingsDocument } from "../domain/settings";
 import Result from "../shared/result";
@@ -15,7 +16,7 @@ class SettingsController extends BaseController {
   intializeRoutes(router: Router): void {
     router.get(`${this.path}`, async (req, res) => {
       try {
-        const settings = await SettingsContext.findOne();
+        const settings = await SettingsContext.findOne() as any;
         this.handleResult(Result.success<SettingsDocument>(null, settings), res);
       } catch (error) {
         this.handleException(error, res);

@@ -13,6 +13,7 @@ import AlgopABI from "../contracts/ABI-ERC20.json";
 class DiagnosticController extends BaseController {
   private app: express.Application;
   private routes: Record<string, string>[] | null = null
+  private version = 'v1.13.0';
 
   constructor(app: express.Application) {
     super();
@@ -43,7 +44,7 @@ class DiagnosticController extends BaseController {
             <div class="cover-container d-flex h-100 p-3 mx-auto flex-column" style='width: 50%'>
               <header class="mb-auto">
                 <div>
-                  <h3 class="float-md-start mb-0">AlgoPainter - API v1.12.1</h3>
+                  <h3 class="float-md-start mb-0">AlgoPainter - API ${this.version}</h3>
                   <nav class="nav nav-masthead justify-content-center float-md-end">
                     <a class="nav-link active" aria-current="page" href="#">Diagnostics</a>
                   </nav>
