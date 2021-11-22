@@ -45,6 +45,7 @@ window['algop']['getSmartContractByName'] = function(name) {
     return config[0];
   throw new Error('The config with ' + name + ' does not exists.');
 }
+window['algop']['NetworkID'] = window.algop.getSmartContractByName('AlgoPainterAuctionSystem').network;
 window['algop']['AlgoPainterAuctionSystem'] = window.algop.getSmartContractByName('AlgoPainterAuctionSystem').address;
 window['algop']['AlgoPainterRewardsSystem'] = window.algop.getSmartContractByName('AlgoPainterRewardsSystem').address;
 window['algop']['AlgoPainterBidBackPirs'] = window.algop.getSmartContractByName('AlgoPainterBidBackPirs').address;
