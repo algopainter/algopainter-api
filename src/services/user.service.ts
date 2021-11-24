@@ -160,7 +160,7 @@ export default class UserService extends BaseCRUDService<IUser> {
     const tokensInfo = await this.auctionService.getCompletedAuctionsByAccount(account);
     let images : IImage[] = [];
 
-    if (tokensInfo) {
+    if (tokensInfo && tokensInfo.length) {
       const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
         .map(a => {
           return {
@@ -189,15 +189,24 @@ export default class UserService extends BaseCRUDService<IUser> {
       $nin: pirsToExclude.map(a => a.index)
     };
 
-    const queryFilter = {
-      ...(filter ? this.translateToMongoQuery(filter) : {}),
-      ...forPirsQuery,
-      $or: images.map(a => {
-        return {
-          "item.index": a.nft.index,
-          "item.collectionOwner": a.collectionOwner
-        }
-      })
+    let queryFilter = {};
+
+    if(images && images.length) {
+      queryFilter = {
+        ...(filter ? this.translateToMongoQuery(filter) : {}),
+        ...forPirsQuery,
+        $or: images.map(a => {
+          return {
+            "item.index": a.nft.index,
+            "item.collectionOwner": a.collectionOwner
+          }
+        })
+      }
+    } else {
+      queryFilter = {
+        ...(filter ? this.translateToMongoQuery(filter) : {}),
+        ...forPirsQuery
+      }
     }
 
     if (page && perPage && page != -1 && perPage != -1) {
