@@ -189,7 +189,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       $nin: pirsToExclude.map(a => a.index)
     };
 
-    let queryFilter = {};
+    let queryFilter : any = null;
 
     if(images && images.length) {
       queryFilter = {
@@ -202,34 +202,33 @@ export default class UserService extends BaseCRUDService<IUser> {
           }
         })
       }
-    } else {
-      queryFilter = {
-        ...(filter ? this.translateToMongoQuery(filter) : {}),
-        ...forPirsQuery
-      }
     }
 
-    if (page && perPage && page != -1 && perPage != -1) {
-      const count = await AuctionContext.find(queryFilter).countDocuments();
-
-      const data = await AuctionContext
-        .find(queryFilter)
-        .skip((page - 1) * (perPage))
-        .sort(this.translateToMongoOrder(order))
-        .limit(perPage);
-
-      return Result.success<Paged<IAuction>>(null, {
-        count,
-        currPage: page,
-        pages: Math.ceil(count / perPage),
-        perPage,
-        data: data as IAuction[]
-      });
+    if(queryFilter) {
+      if (page && perPage && page != -1 && perPage != -1) {
+        const count = await AuctionContext.find(queryFilter).countDocuments();
+  
+        const data = await AuctionContext
+          .find(queryFilter)
+          .skip((page - 1) * (perPage))
+          .sort(this.translateToMongoOrder(order))
+          .limit(perPage);
+  
+        return Result.success<Paged<IAuction>>(null, {
+          count,
+          currPage: page,
+          pages: Math.ceil(count / perPage),
+          perPage,
+          data: data as IAuction[]
+        });
+      } else {
+        const data = await AuctionContext
+          .find(queryFilter).sort(this.translateToMongoOrder(order));
+  
+        return Result.success<IAuction[]>(null, data);
+      }
     } else {
-      const data = await AuctionContext
-        .find(queryFilter).sort(this.translateToMongoOrder(order));
-
-      return Result.success<IAuction[]>(null, data);
+      return Result.success<IAuction[]>(null, []);
     }
   }
 
