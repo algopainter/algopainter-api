@@ -45,6 +45,10 @@ export default abstract class BaseController {
   }
 
   requestParams(req: Request<any, any, any, any, any>): IRequestParams {
+    try {
+      delete req.query['_t'];
+    } catch { /*ignore*/ }
+
     const paging = this.pageParams(req);
     const order = this.orderParams(req);
     const filter = this.filterParams(req);

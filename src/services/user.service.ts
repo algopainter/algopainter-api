@@ -175,7 +175,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       }).sort(this.translateToMongoOrder(order, { "nft.index": -1 }));
     }
 
-    const pirsToExclude = await AuctionContext.find({
+    let pirsToExclude = await AuctionContext.find({
       $or: [
         {
           ended: true
@@ -183,6 +183,14 @@ export default class UserService extends BaseCRUDService<IUser> {
           expirationDt: { $lte: new Date() }
         }
       ]
+    });
+
+    pirsToExclude = pirsToExclude.filter(a => { 
+      try { 
+        return !a.pirs[account.toLowerCase()] 
+      } catch(e) { 
+        return true;
+      } 
     });
 
     forPirsQuery["index"] = {
