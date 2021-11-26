@@ -176,7 +176,7 @@ GET http://localhost:3000/api/pirs/0xa62ce1f85461d67c874ef625f0e488c57af2335d/au
 
 ###
 
-GET http://localhost:3000/api/users/0xd804c94c7ed47b97809394e988e447ac66b78df3/auctions/biding?forBidbacks=true HTTP/1.1
+GET http://localhost:3000/api/users/0xd804c94c7ed47b97809394e988e447ac66b78df3/auctions/biding HTTP/1.1
 
 ###
 
