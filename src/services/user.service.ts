@@ -15,7 +15,7 @@ import AuctionService from "./auction.service";
  * @class UserService @extends BaseService<IUser>
  */
 export default class UserService extends BaseCRUDService<IUser> {
-  private auctionService : AuctionService;
+  private auctionService: AuctionService;
 
   constructor() {
     super();
@@ -74,8 +74,10 @@ export default class UserService extends BaseCRUDService<IUser> {
     hasPirs: boolean | null,
     hasBidbacks: boolean | null,
     forBidbacks: boolean | null,
+    forBids: boolean | null
   ):
     Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
+    const bidsQuery: any = {};
     const pirsQuery: any = {};
     const bidbacksQuery: any = {};
     const forBidbacksQuery: any = {};
@@ -98,18 +100,18 @@ export default class UserService extends BaseCRUDService<IUser> {
         $or: [
           {
             ended: true
-          },{
+          }, {
             expirationDt: { $lte: new Date() }
           }
         ]
       });
-      
-      bidbackToExclude = bidbackToExclude.filter(a => { 
-        try { 
-          return !a.bidbacks[account.toLowerCase()] 
-        } catch(e) { 
+
+      bidbackToExclude = bidbackToExclude.filter(a => {
+        try {
+          return !a.bidbacks[account.toLowerCase()]
+        } catch (e) {
           return true;
-        } 
+        }
       });
 
       forBidbacksQuery["index"] = {
@@ -117,12 +119,40 @@ export default class UserService extends BaseCRUDService<IUser> {
       };
     }
 
+    if (forBids) {
+      const dubQuery: any = {};
+      dubQuery['return.' + account] = { $exists: false };
+      let auctionToExclude = await AuctionContext.find({
+        "bids.bidder": account.toLowerCase(),
+        ended: true,
+        $or: [
+          {
+            "highestBid.account" : { $ne: account },
+          },
+          ...dubQuery
+        ]
+      });
+
+      auctionToExclude = auctionToExclude.filter(a => {
+        try {
+          return !a.bidbacks[account.toLowerCase()]
+        } catch (e) {
+          return true;
+        }
+      });
+
+      bidsQuery["index"] = {
+        $nin: auctionToExclude.map(a => a.index)
+      };
+    }
+
     const queryFilter = {
       "bids.bidder": account.toLowerCase(),
+      ...(filter ? this.translateToMongoQuery(filter) : {}),
       ...pirsQuery,
       ...bidbacksQuery,
-      ...(filter ? this.translateToMongoQuery(filter) : {}),
-      ...forBidbacksQuery
+      ...forBidbacksQuery,
+      ...bidsQuery
     }
 
     if (page && perPage && page != -1 && perPage != -1) {
@@ -155,10 +185,10 @@ export default class UserService extends BaseCRUDService<IUser> {
     perPage: number | undefined,
     filter: IFilter | null,
     order: IOrderBy | null,
-  ) : Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
+  ): Promise<Result<Paged<IAuction>> | Result<IAuction[]>> {
     const forPirsQuery: any = {};
     const tokensInfo = await this.auctionService.getCompletedAuctionsByAccount(account);
-    let images : IImage[] = [];
+    let images: IImage[] = [];
 
     if (tokensInfo && tokensInfo.length) {
       const query = Helpers.distinctBy(['token', 'contract'], tokensInfo)
@@ -179,27 +209,27 @@ export default class UserService extends BaseCRUDService<IUser> {
       $or: [
         {
           ended: true
-        },{
+        }, {
           expirationDt: { $lte: new Date() }
         }
       ]
     });
 
-    pirsToExclude = pirsToExclude.filter(a => { 
-      try { 
-        return !a.pirs[account.toLowerCase()] 
-      } catch(e) { 
+    pirsToExclude = pirsToExclude.filter(a => {
+      try {
+        return !a.pirs[account.toLowerCase()]
+      } catch (e) {
         return true;
-      } 
+      }
     });
 
     forPirsQuery["index"] = {
       $nin: pirsToExclude.map(a => a.index)
     };
 
-    let queryFilter : any = null;
+    let queryFilter: any = null;
 
-    if(images && images.length) {
+    if (images && images.length) {
       queryFilter = {
         ...(filter ? this.translateToMongoQuery(filter) : {}),
         ...forPirsQuery,
@@ -212,16 +242,16 @@ export default class UserService extends BaseCRUDService<IUser> {
       }
     }
 
-    if(queryFilter) {
+    if (queryFilter) {
       if (page && perPage && page != -1 && perPage != -1) {
         const count = await AuctionContext.find(queryFilter).countDocuments();
-  
+
         const data = await AuctionContext
           .find(queryFilter)
           .skip((page - 1) * (perPage))
           .sort(this.translateToMongoOrder(order))
           .limit(perPage);
-  
+
         return Result.success<Paged<IAuction>>(null, {
           count,
           currPage: page,
@@ -232,7 +262,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       } else {
         const data = await AuctionContext
           .find(queryFilter).sort(this.translateToMongoOrder(order));
-  
+
         return Result.success<IAuction[]>(null, data);
       }
     } else {
