@@ -133,17 +133,19 @@ export default class UserService extends BaseCRUDService<IUser> {
         ]
       });
 
-      auctionToExclude = auctionToExclude.filter(a => {
-        try {
-          return !a.bidbacks[account.toLowerCase()]
-        } catch (e) {
-          return true;
-        }
-      });
-
-      bidsQuery["index"] = {
-        $nin: auctionToExclude.map(a => a.index)
-      };
+      if(auctionToExclude && auctionToExclude.length > 0) {
+        auctionToExclude = auctionToExclude.filter(a => {
+          try {
+            return !a.bidbacks[account.toLowerCase()]
+          } catch (e) {
+            return true;
+          }
+        });
+  
+        bidsQuery["index"] = {
+          $nin: auctionToExclude.map(a => a.index)
+        };
+      }
     }
 
     const queryFilter = {
