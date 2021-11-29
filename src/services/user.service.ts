@@ -128,7 +128,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         ended: true,
         $or: [
           {
-            "highestBid.account" : { $ne: account },
+            "highestBid.account": { $ne: account },
           },
           {
             ...dubQuery
@@ -136,20 +136,21 @@ export default class UserService extends BaseCRUDService<IUser> {
         ]
       });
 
-      if(auctionToExclude && auctionToExclude.length) {
+      if (auctionToExclude && auctionToExclude.length) {
         auctionToExclude.map(a => willExclude.push(a.index));
       }
 
       auctionToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
+        "highestBid.account": { $ne: account },
         ...dubQuery,
       });
 
-      if(auctionToExclude && auctionToExclude.length) {
+      if (auctionToExclude && auctionToExclude.length) {
         auctionToExclude.map(a => willExclude.push(a.index));
       }
-      
-      if(auctionToExclude && auctionToExclude.length > 0) {  
+
+      if (auctionToExclude && auctionToExclude.length > 0) {
         bidsQuery["index"] = {
           $nin: willExclude
         };
