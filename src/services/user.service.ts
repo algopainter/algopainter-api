@@ -136,15 +136,19 @@ export default class UserService extends BaseCRUDService<IUser> {
         ]
       });
 
-      auctionToExclude.map(a => willExclude.push(a.index));
+      if(auctionToExclude && auctionToExclude.length) {
+        auctionToExclude.map(a => willExclude.push(a.index));
+      }
 
       auctionToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
         ...dubQuery,
       });
 
-      auctionToExclude.map(a => willExclude.push(a.index));
-
+      if(auctionToExclude && auctionToExclude.length) {
+        auctionToExclude.map(a => willExclude.push(a.index));
+      }
+      
       if(auctionToExclude && auctionToExclude.length > 0) {  
         bidsQuery["index"] = {
           $nin: willExclude
