@@ -121,8 +121,9 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     if (forBids) {
       const dubQuery: any = {};
+      const willExclude: number[] = [];
       dubQuery["returns." + account] = { $exists: false };
-      const auctionToExclude = await AuctionContext.find({
+      let auctionToExclude = await AuctionContext.find({
         "bids.bidder": account.toLowerCase(),
         ended: true,
         $or: [
@@ -135,9 +136,18 @@ export default class UserService extends BaseCRUDService<IUser> {
         ]
       });
 
+      auctionToExclude.map(a => willExclude.push(a.index));
+
+      auctionToExclude = await AuctionContext.find({
+        "bids.bidder": account.toLowerCase(),
+        ...dubQuery,
+      });
+
+      auctionToExclude.map(a => willExclude.push(a.index));
+
       if(auctionToExclude && auctionToExclude.length > 0) {  
         bidsQuery["index"] = {
-          $nin: auctionToExclude.map(a => a.index)
+          $nin: willExclude
         };
       }
     }
