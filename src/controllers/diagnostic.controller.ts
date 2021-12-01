@@ -112,40 +112,65 @@ class DiagnosticController extends BaseController {
     });
 
     router.get(`${this.path}/seed/:secret/fix`, async (req, res) => {
-      if (req.params.secret === 'AlgoPainter') {
+      if (req.params.secret === 'AlgoPainterTestNet') {
         await SettingsContext.remove();
 
         await SettingsContext.create({
+          tokens: [
+            {
+              value: '1',
+              label: 'BTCB',
+              tokenAddress: '0x6ce8da28e2f864420840cf74474eff5fd80e65b8',
+              decimalPlaces: 18,
+              img: '/images/BTC.svg',
+            },
+            {
+              value: '3',
+              name: 'AlgoPainter Token',
+              tokenAddress: '0x01a9188076f1231df2215f67b6a63231fe5e293e',
+              label: 'ALGOP',
+              decimalPlaces: 18,
+              img: '/images/ALGOP.svg'
+            },
+            {
+              value: '6',
+              name: 'DAI',
+              tokenAddress: '0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867',
+              label: 'DAI',
+              decimalPlaces: 18,
+              img: '/images/DAI.svg'
+            }
+          ],
           smartcontracts: [
             {
-              address: '0xb8b87531b1bc7aa0b742bea4ddcd98631ca89498',
+              address: '0x5c35a85636d691eacd66d3d2c8a0f57f3ea13530',
               name: 'AlgoPainterAuctionSystem',
               symbol: 'APAS',
               network: '97',
               rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-              startingBlock: 13420884,
+              startingBlock: 14569098,
               blockExplorer: 'https://testnet.bscscan.com/',
               abi: AuctionsABI,
               inUse: true
             },
             {
-              address: '0xab06be2da3d164b3622cb116b19488f4a71b3bd1',
+              address: '0x7279c3c7b02c7ea2d458114f60df8e5d1a57de29',
               name: 'AlgoPainterRewardsSystem',
               symbol: 'APRS',
               network: '97',
               rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-              startingBlock: 13420884,
+              startingBlock: 14569118,
               blockExplorer: 'https://testnet.bscscan.com/',
               abi: AuctionsRewardsABI,
               inUse: true
             },
             {
-              address: '0x47edab2a13482006dde78d68236c423b927a6ca3',
+              address: '0x355528b5a623f9bd7e7c19d2fd883de78158e765',
               name: 'AlgoPainterBidBackPirs',
               symbol: 'APBPS',
               network: '97',
               rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-              startingBlock: 13420884,
+              startingBlock: 14569107,
               blockExplorer: 'https://testnet.bscscan.com/',
               abi: AuctionsBidBackPIRSABI,
               inUse: true
@@ -170,17 +195,6 @@ class DiagnosticController extends BaseController {
               startingBlock: 13420884,
               blockExplorer: 'https://testnet.bscscan.com/',
               abi: ExpressionsABI,
-              inUse: true
-            },
-            {
-              address: '0x01a9188076f1231df2215f67b6a63231fe5e293e',
-              name: 'AlgoPainterToken',
-              symbol: 'ALGOP',
-              network: '97',
-              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-              startingBlock: 13420884,
-              blockExplorer: 'https://testnet.bscscan.com/',
-              abi: AlgopABI,
               inUse: true
             }
           ]

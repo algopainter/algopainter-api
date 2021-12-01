@@ -185,6 +185,12 @@
         "internalType": "uint256",
         "name": "netAmount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isOverriden",
+        "type": "bool"
       }
     ],
     "name": "HighestBidIncreased",

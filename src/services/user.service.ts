@@ -102,6 +102,10 @@ export default class UserService extends BaseCRUDService<IUser> {
             ended: true
           }, {
             expirationDt: { $lte: new Date() }
+          }, {
+            'fee.bidbackRate': { $lte: 0 }
+          }, {
+            'fee.bidbackRate': { $exists: false }
           }
         ]
       });
