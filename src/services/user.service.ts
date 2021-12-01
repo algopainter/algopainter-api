@@ -160,7 +160,14 @@ export default class UserService extends BaseCRUDService<IUser> {
       });
 
       if (auctionToExclude && auctionToExclude.length) {
-        auctionToExclude.map(a => willExclude.push(a.index));
+        auctionToExclude.map(a => { 
+          willExclude.push(a.index);
+          
+          //Even when a the user is not elegible to check bids if he has something to return must show.
+          if(a.returns && a.returns[account] > 0) {
+            delete willExclude[willExclude.length - 1];
+          }
+        });
       }
 
       if (auctionToExclude && auctionToExclude.length > 0) {
