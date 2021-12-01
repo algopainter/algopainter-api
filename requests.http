@@ -196,4 +196,4 @@ GET http://localhost:3000/api/users/0xD804c94c7Ed47b97809394E988E447AC66B78DF3/a
 GET http://localhost:3000/api/users/0x3e20e1efcb1ae11c3db0495af83139d1b9c0d26a/auctions/biding?forBidbacks=true HTTP/1.1
 
 ###
-GET http://localhost:3000/api/users/0xbd5e30c35aa71bcf7f4372821492b113d77b9126/auctions/biding?_t=1638220231435&forBids=true HTTP/1.1
+GET http://localhost:3000/api/users/0x14e54274feb05ade648ff5d30f448d7ab162fc2c/auctions/biding?_t=1638220231435&forBids=true HTTP/1.1

@@ -119,31 +119,29 @@ export default class UserService extends BaseCRUDService<IUser> {
       };
     }
 
+    //TODO refactor the auction exclude everytime
     if (forBids) {
       const dubQuery: any = {};
       const willExclude: number[] = [];
       dubQuery["returns." + account] = { $exists: false };
-      let auctionToExclude = await AuctionContext.find({
-        "bids.bidder": account.toLowerCase(),
-        ended: true,
+      const auctionToExclude = await AuctionContext.find({
         $or: [
           {
+            "bids.bidder": account.toLowerCase(),
+            ended: true,
             "highestBid.account": { $ne: account },
           },
           {
+            "bids.bidder": account.toLowerCase(),
+            ended: true,
             ...dubQuery
+          }, 
+          {
+            "bids.bidder": account.toLowerCase(),
+            "highestBid.account": account,
+            ended: true,
           }
         ]
-      });
-
-      if (auctionToExclude && auctionToExclude.length) {
-        auctionToExclude.map(a => willExclude.push(a.index));
-      }
-
-      auctionToExclude = await AuctionContext.find({
-        "bids.bidder": account.toLowerCase(),
-        "highestBid.account": { $ne: account },
-        ...dubQuery,
       });
 
       if (auctionToExclude && auctionToExclude.length) {
