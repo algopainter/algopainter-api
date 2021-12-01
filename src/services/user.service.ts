@@ -125,20 +125,21 @@ export default class UserService extends BaseCRUDService<IUser> {
 
     //TODO refactor the auction exclude everytime
     if (forBids) {
-      const dubQuery: any = {};
+      const doNotHaveReturns: any = {};
       const willExclude: number[] = [];
-      dubQuery["returns." + account] = { $exists: false };
+      doNotHaveReturns["returns." + account] = { $exists: false };
       const auctionToExclude = await AuctionContext.find({
         $or: [
           {
             "bids.bidder": account.toLowerCase(),
             ended: true,
-            ...dubQuery
+            ...doNotHaveReturns
           },
           {
             "bids.bidder": account.toLowerCase(),
             expirationDt: { $lte: new Date() },
-            ...dubQuery
+            "highestBid.account": { $ne: account },
+            ...doNotHaveReturns
           }, 
           {
             "bids.bidder": account.toLowerCase(),
@@ -148,7 +149,7 @@ export default class UserService extends BaseCRUDService<IUser> {
           {
             "bids.bidder": account.toLowerCase(),
             "highestBid.account": { $ne: account },
-            ...dubQuery
+            ...doNotHaveReturns
           }, 
         ]
       });
