@@ -140,6 +140,21 @@ export default class UserService extends BaseCRUDService<IUser> {
             "bids.bidder": account.toLowerCase(),
             "highestBid.account": account,
             ended: true,
+          },
+          {
+            "bids.bidder": account.toLowerCase(),
+            expirationDt: { $lte: new Date() },
+            "highestBid.account": { $ne: account },
+          },
+          {
+            "bids.bidder": account.toLowerCase(),
+            expirationDt: { $lte: new Date() },
+            ...dubQuery
+          }, 
+          {
+            "bids.bidder": account.toLowerCase(),
+            "highestBid.account": account,
+            expirationDt: { $lte: new Date() },
           }
         ]
       });
