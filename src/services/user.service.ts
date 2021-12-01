@@ -129,11 +129,11 @@ export default class UserService extends BaseCRUDService<IUser> {
           {
             "bids.bidder": account.toLowerCase(),
             ended: true,
-            "highestBid.account": { $ne: account },
+            ...dubQuery
           },
           {
             "bids.bidder": account.toLowerCase(),
-            ended: true,
+            expirationDt: { $lte: new Date() },
             ...dubQuery
           }, 
           {
@@ -143,19 +143,9 @@ export default class UserService extends BaseCRUDService<IUser> {
           },
           {
             "bids.bidder": account.toLowerCase(),
-            expirationDt: { $lte: new Date() },
             "highestBid.account": { $ne: account },
-          },
-          {
-            "bids.bidder": account.toLowerCase(),
-            expirationDt: { $lte: new Date() },
             ...dubQuery
           }, 
-          {
-            "bids.bidder": account.toLowerCase(),
-            "highestBid.account": account,
-            expirationDt: { $lte: new Date() },
-          }
         ]
       });
 
@@ -163,7 +153,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         auctionToExclude.map(a => { 
           willExclude.push(a.index);
           
-          //Even when a the user is not elegible to check bids if he has something to return must show.
+          //Even when a the user is not eligible to check bids if he has something to return must show.
           if(a.returns && a.returns[account] > 0) {
             delete willExclude[willExclude.length - 1];
           }
