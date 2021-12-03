@@ -52,7 +52,9 @@ export interface AuctionDocument extends Document {
   bids: IAuctionBidWithUser[];
   returns: IKeyPair<number>;
   pirs: IKeyPair<number>;
+  pirshare: IKeyPair<number>;
   bidbacks: IKeyPair<number>;
+  bidbackshare: IKeyPair<number>;
   categories: string[];
   minimumBid: IAuctionBid;
   highestBid: IAuctionBidWithUser;
@@ -72,8 +74,10 @@ export interface IAuction {
   owner: AuctionDocument['owner'];
   bids: AuctionDocument['bids'];
   returns: AuctionDocument['returns'];
-  bidbacks: AuctionDocument['returns'];
-  pirs: AuctionDocument['returns'];
+  bidbacks: AuctionDocument['bidbacks'];
+  bidbackshare: AuctionDocument['bidbackshare'];
+  pirs: AuctionDocument['pirs'];
+  pirshare: AuctionDocument['pirshare'];
   minimumBid: AuctionDocument['minimumBid'];
   highestBid: AuctionDocument['highestBid'];
   lowestBid: AuctionDocument['lowestBid'];
@@ -107,7 +111,9 @@ export const AuctionSchema: Schema = new Schema({
   bids: { type: [Object], required: false },
   returns: { type: Object, required: false },
   bidbacks: { type: Object, required: false },
+  bidbackshare: { type: Object, required: false },
   pirs: { type: Object, required: false },
+  pirshare: { type: Object, required: false },
   users: { type: [Object], required: false },
   minimumBid: { type: Object, required: false },
   highestBid: { type: Object, required: false },

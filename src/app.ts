@@ -45,8 +45,12 @@ class Application {
         useCreateIndex: true,
       });
 
-      res.on('finish', async () => await disconnect());
-      res.on('close', async () => await disconnect());
+      res.on('finish', async () => {
+        await disconnect()
+      });
+      res.on('close', async () => {
+        await disconnect()
+      });
 
       // const signService = new SignService();
       // const result = await signService.validatePreRequest(req.body);
