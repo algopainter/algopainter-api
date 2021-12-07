@@ -221,8 +221,7 @@ export default class UserService extends BaseCRUDService<IUser> {
         .map(a => {
           return {
             "nft.index": a.token,
-            "collectionOwner": a.contract,
-            ...filter
+            "collectionOwner": a.contract
           }
         });
 
