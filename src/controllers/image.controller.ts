@@ -65,6 +65,15 @@ class ImageController extends BaseController {
       }
     });
 
+    router.post(`${this.path}/mint`, async (req, res) => {
+      try {
+        const result = await this.service.obtainMintImageData(req.body);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
     router.delete(`${this.path}/:id/likes`, async (req, res) => {
       try {
         const result = await this.service.dislikeAsync(req.params.id, req.query.payload != null ? JSON.parse(req.query.payload.toString()) : null);

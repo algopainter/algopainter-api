@@ -13,6 +13,7 @@ import Helpers from '../shared/helpers';
 import { IUser, UserContext } from "../domain/user";
 import { SettingsContext } from "../domain/settings";
 import AuctionService from "./auction.service";
+import { IMintDataRequest, MintTokenURIResponse } from '../requests/mint.data.request';
 
 /**
  * Image service class
@@ -391,5 +392,9 @@ export default class ImageService extends BaseCRUDService<IImage> {
     });
 
     return Result.success<IImage>(null, null);
+  }
+
+  async obtainMintImageData(request : IMintDataRequest) {
+    return Result.success<MintTokenURIResponse>(null, null);
   }
 }
