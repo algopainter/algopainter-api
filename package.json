@@ -25,6 +25,7 @@
   "homepage": "https://github.com/algopainter/algopainter-api#readme",
   "dependencies": {
     "@netlify/functions": "^0.7.2",
+    "@pinata/sdk": "^1.1.23",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",

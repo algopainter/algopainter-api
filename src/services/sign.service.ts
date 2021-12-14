@@ -27,7 +27,6 @@ export default class SignService extends BaseService {
         account: sign.account,
         createdAt: new Date(),
         data: sign.data,
-        hash: desiredSignedHash,
         salt: sign.salt,
         signature: sign.signature,
         action

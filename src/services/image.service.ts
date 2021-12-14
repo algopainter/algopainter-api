@@ -5,7 +5,7 @@ import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
 import Paged from "../shared/paged";
 import { ILikeRequest, ILikeSignData } from '../requests/like.request';
 import Exception from "../shared/exception";
-import { AuctionContext, IAuction } from "../domain/auction";
+import { AuctionContext } from "../domain/auction";
 import SignService from "./sign.service";
 import { Types } from "mongoose";
 import { HistoricalOwnersContext, IHistoricalOwners } from "../domain/historical.owners";
@@ -13,7 +13,12 @@ import Helpers from '../shared/helpers';
 import { IUser, UserContext } from "../domain/user";
 import { SettingsContext } from "../domain/settings";
 import AuctionService from "./auction.service";
-import { IMintDataRequest, MintTokenURIResponse } from '../requests/mint.data.request';
+import { IMintData, IMintDataRequest, MintTokenURI, MintTokenURIResponse } from '../requests/mint.data.request';
+import Settings from "../shared/settings";
+import Jimp from 'jimp';
+import Pinata, { PinataClient, PinataOptions, PinataPinOptions } from '@pinata/sdk';
+import { Readable } from "stream";
+import Web3 from "web3";
 
 /**
  * Image service class
@@ -21,7 +26,7 @@ import { IMintDataRequest, MintTokenURIResponse } from '../requests/mint.data.re
  */
 export default class ImageService extends BaseCRUDService<IImage> {
 
-  private auctionService : AuctionService;
+  private auctionService: AuctionService;
 
   constructor() {
     super();
@@ -394,7 +399,127 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, null);
   }
 
-  async obtainMintImageData(request : IMintDataRequest) {
-    return Result.success<MintTokenURIResponse>(null, null);
+  async obtainMintImageData(request: IMintDataRequest): Promise<Result<MintTokenURIResponse>> {
+    if (!request)
+      return Result.fail<MintTokenURIResponse>("The payload to validade the sign is empty.", null);
+
+    // const signService = new SignService();
+    // if (!await signService.validate<IMintData>(request, request.data, 'mint'))
+    //   throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    const rawImage64 = request.data.image;
+    const rawImageBytes = rawImage64.split(',')[1];
+    const rawImageHash = Web3.utils.keccak256(rawImageBytes);
+
+    const rawImage = await this.pinFileToIPFS(rawImage64, request.data.fileName, { 
+      name: request.data.name, 
+      description: request.data.description, 
+      mintedBy: request.data.mintedBy,
+      rawImageHash
+    });
+
+    const resizedImage = await this.resizeImage(rawImage64, 2000, 2000);
+
+    const image = await this.pinFileToIPFS(resizedImage, request.data.fileName, { 
+      name: request.data.name, 
+      description: request.data.description, 
+      mintedBy: request.data.mintedBy,
+      rawImageHash
+    });
+
+    const resizedPreviewImage = await this.resizeImage(rawImage64, 300, 300);
+
+    const previewImage = await this.pinFileToIPFS(resizedPreviewImage, request.data.fileName, { 
+      name: request.data.name, 
+      description: request.data.description, 
+      mintedBy: request.data.mintedBy,
+      rawImageHash
+    });
+
+    const tokenUriToPin : MintTokenURI = {
+      name: request.data.name,
+      description: request.data.description,
+      fileName: request.data.fileName,
+      creatorRoyalty: request.data.creatorRoyalty,
+      mintedBy: request.data.mintedBy,
+      rawImage: 'https://ipfs.io/ipfs/' + rawImage,
+      image: 'https://ipfs.io/ipfs/' + image,
+      previewImage: 'https://ipfs.io/ipfs/' + previewImage,
+      rawImageHash
+    };
+
+    const tokenUriHash = await this.pinJsonToIPFS(tokenUriToPin);
+
+    return Result.success<MintTokenURIResponse>(null, {
+      tokenURI: 'https://ipfs.io/ipfs/' + tokenUriHash,
+      data: tokenUriToPin
+    });
+  }
+
+  async resizeImage(bytes: string, width: number, height: number) : Promise<string> {
+    const buffer = Buffer.from(bytes.split(',')[1], 'base64');
+    const image = await Jimp.read(buffer);
+    let didResize = false;
+
+    if(image.getWidth() > width) {
+      image.resize(width, Jimp.AUTO);
+      didResize = true;
+    }
+
+    if(image.getHeight() > height) {
+      image.resize(Jimp.AUTO, height);
+      didResize = true;
+    }
+
+    if(didResize) {
+      const mime = bytes.split(',')[0].split(':')[1].split(';')[0];
+      return await image.getBase64Async(mime);
+    } else {
+      return bytes;
+    }
+  }
+
+  private getPinClient() : PinataClient {
+    const pinKey = Settings.pinataInfo();
+    return Pinata(pinKey.key, pinKey.secret);
+  }
+
+  async pinFileToIPFS(bytes: string, filename: string, metadata: Record<string, string> = {}) : Promise<string> {
+    const pinClient = this.getPinClient();
+    const readable = new Readable({
+      read() {
+        this.push(Buffer.from(bytes.split(',')[1], 'base64'));
+        this.push(null);
+      },
+    });
+
+    (readable as any).path = filename;
+
+    const options : PinataPinOptions = {
+      pinataMetadata: {
+        filename,
+        ...metadata
+      },
+      pinataOptions: {
+        cidVersion: 0,
+      },
+    };
+
+    const result = await pinClient.pinFileToIPFS(readable, options);
+
+    return result.IpfsHash;
+  }
+
+  async pinJsonToIPFS(json: any) : Promise<string> {
+    const pinClient = this.getPinClient();
+    const options : PinataPinOptions = {
+      pinataOptions: {
+        cidVersion: 0,
+      },
+    };
+
+    const result = await pinClient.pinJSONToIPFS(json, options);
+
+    return result.IpfsHash;
   }
 }

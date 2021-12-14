@@ -1,8 +1,15 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 export default class Settings {
-  static pinataInfo() : string {
-    return process.env.PINATA_INFO || ''
+  static pinataInfo() : { key: string, secret: string } {
+    const info = process.env.PINATA_INFO?.split('|');
+    return info ? {
+      key: info[0],
+      secret: info[1]
+    } : {
+      key: '', 
+      secret: ''
+    }
   }
 
   static mongoURL() : string { 
