@@ -4,6 +4,7 @@ import v8n from "v8n";
 export interface CollectionDocument extends Document {
   title: string;
   description: string;
+  show: boolean;
   owner: string;
   avatar: string | null | undefined;
   account: string;
@@ -49,6 +50,7 @@ export interface ICollection {
 export const CollectionSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
+  show: { type: Boolean, required: false },
   owner: { type: String, required: true, index: true },
   avatar: { type: String, required: false },
   account: { type: String, required: true },
