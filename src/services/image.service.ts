@@ -451,7 +451,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
     const tokenUriHash = await this.pinJsonToIPFS(tokenUriToPin);
 
     return Result.success<MintTokenURIResponse>(null, {
-      tokenURI: 'https://ipfs.io/ipfs/' + tokenUriHash,
+      tokenURI: tokenUriHash,
       data: tokenUriToPin
     });
   }
