@@ -33,7 +33,8 @@ class Application {
   }
 
   private initializeMiddlewares() {
-    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.json( { limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded( { limit: '50mb', extended: true } ));
     this.app.use(cors({
       exposedHeaders: [ 'x-total-items' ]
     }));
