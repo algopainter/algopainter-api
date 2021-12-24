@@ -13,7 +13,7 @@ import AlgopABI from "../contracts/ABI-ERC20.json";
 class DiagnosticController extends BaseController {
   private app: express.Application;
   private routes: Record<string, string>[] | null = null
-  private version = 'v1.13.0';
+  private version = 'v1.14.1';
 
   constructor(app: express.Application) {
     super();

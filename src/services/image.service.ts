@@ -399,6 +399,38 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, null);
   }
 
+  async pinToIPFS(body: Record<string, any>, type: string) : Promise<Result<Record<string, string>>> {
+    if (!body)
+      return Result.fail<Record<string, string>>("The payload is empty.", null);
+    
+    if(type == 'FILE') {
+      const rawImage64 = body.image;
+      const rawImageBytes = rawImage64.split(',')[1];
+      const rawImageHash = Web3.utils.keccak256(rawImageBytes);
+
+      const rawImageIPFS = await this.pinFileToIPFS(rawImage64, body.fileName, { 
+        name: body.name, 
+        description: body.description, 
+        mintedBy: body.mintedBy,
+        rawImageHash
+      });
+
+      return Result.success<Record<string, string>>('', {
+        ipfsHash: rawImageIPFS
+      }, null, null);
+    }
+
+    if(type == 'JSON') {
+      const ipfsHash = await this.pinJsonToIPFS(body);
+
+      return Result.success<Record<string, string>>('', {
+        ipfsHash: ipfsHash
+      }, null, null);
+    }
+
+    return Result.fail<Record<string, string>>("The payload type is unknown.", null);
+  }
+
   async obtainMintImageData(request: IMintDataRequest): Promise<Result<MintTokenURIResponse>> {
     if (!request)
       return Result.fail<MintTokenURIResponse>("The payload to validade the sign is empty.", null);
