@@ -27,7 +27,7 @@ export default class AuctionService extends BaseCRUDService<IAuction> {
       address: auctionSystemAddress,
       ended: true,
       highestBid: { $exists: true }
-    });
+    }, { "item.index": 1, "item.collectionOwner" : 1});
 
     return auctionsCompleted.map(a => {
       return {

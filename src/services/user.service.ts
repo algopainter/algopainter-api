@@ -238,7 +238,7 @@ export default class UserService extends BaseCRUDService<IUser> {
           expirationDt: { $lte: new Date() }
         }
       ]
-    });
+    }, { "index": 1, "pirs": 1 });
 
     pirsToExclude = pirsToExclude.filter(a => {
       try {

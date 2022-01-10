@@ -44,6 +44,7 @@ class Application {
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true,
+        poolSize: 100
       });
 
       res.on('finish', async () => {
