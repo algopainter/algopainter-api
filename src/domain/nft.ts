@@ -5,6 +5,11 @@ export interface INFTArtist extends IUser {
   _id: string;
 }
 
+export interface IPIRS {
+  creatorRate?: number;
+  investorRate?: number;
+}
+
 export interface INFTPrice {
   amount: number;
   tokenSymbol: string;
@@ -14,10 +19,13 @@ export interface INFTPrice {
 export interface NFTDocument extends Document {
   artist: INFTArtist;
   isRecovered: boolean;
+  onSale: boolean;
   supplyIndex: number;
   contractAddress: string;
   mintedBy: string;
+  owner: string;
   name: string;
+  pirs: IPIRS;
   collectionName: string;
   descriptor: string;
   description: string;
@@ -31,10 +39,13 @@ export interface NFTDocument extends Document {
 export interface INFT {
   artist: NFTDocument['artist'];
   isRecovered: NFTDocument['isRecovered'];
+  onSale: NFTDocument['onSale'];
   supplyIndex: NFTDocument['supplyIndex'];
   contractAddress: NFTDocument['contractAddress'];
   mintedBy: NFTDocument['mintedBy'];
+  owner: NFTDocument['owner'];
   name: NFTDocument['name'];
+  pirs: NFTDocument['pirs'];
   collectionName: NFTDocument['collectionName'];
   descriptor: NFTDocument['descriptor'];
   description: NFTDocument['description'];
@@ -50,6 +61,7 @@ export const NFTSchema: Schema = new Schema({
   isRecovered: {
     type: Boolean, required: true,
   },
+  onSale: { type: Boolean, default: false },
   supplyIndex: {
     type: Number, required: true,
   },
@@ -58,6 +70,12 @@ export const NFTSchema: Schema = new Schema({
   },
   mintedBy: {
     type: String, required: true,
+  },
+  owner: {
+    type: String,
+  },
+  pirs: {
+    type: Object
   },
   name: {
     type: String, required: true,

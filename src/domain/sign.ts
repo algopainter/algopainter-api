@@ -4,7 +4,6 @@ export interface SignDocument extends Document {
   data: unknown;
   createdAt: Date;
   account: string;
-  hash: string;
   salt?: string | null;
   signature: string;
   action: string;
@@ -14,7 +13,6 @@ export interface ISign<T> {
   data: T;
   createdAt: SignDocument['createdAt'];
   account: SignDocument['account'];
-  hash: SignDocument['hash'];
   salt: SignDocument['salt'];
   action: SignDocument['action'];
   signature: SignDocument['signature'];
@@ -25,7 +23,6 @@ export const SignSchema: Schema = new Schema({
   createdAt: { type: Date, required: true },
   account: { type: String, required: true, index: true },
   salt: { type: String, required: true, index: true },
-  hash: { type: String, required: true },
   action: { type: String, required: true },
   signature: { type: String, required: true },
 });

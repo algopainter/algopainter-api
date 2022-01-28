@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "importHelpers": true,
+    "resolveJsonModule": true,
     "target": "es2017",
     "module": "commonjs",
     "lib": [

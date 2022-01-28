@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Router } from "express";
-import BaseController from "./base.controller"
-import { routesExtractor } from '../shared/routes'
-import AuctionService from "../services/auction.service";
-import CollectionService from "../services/collection.service";
-import BidService from "../services/bid.service";
-import ImageService from "../services/image.service";
-import { auctionData, bidsData } from '../reference'
-import { IImage, ImageContext } from "../domain/image";
-import { AuctionDocument } from "../domain/auction";
-import { Types } from "mongoose";
+import BaseController from "./base.controller";
+import { routesExtractor } from '../shared/routes';
+import { SettingsContext } from '../domain/settings';
+import AuctionsABI from "../contracts/ABI-AuctionSystem.json";
+import AuctionsRewardsABI from "../contracts/ABI-AuctionsRewardsSystem.json";
+import AuctionsBidBackPIRSABI from "../contracts/ABI-AuctionsBidBackPIRS.json";
+import GweiABI from "../contracts/ABI-GWEI.json";
+import ExpressionsABI from "../contracts/ABI-EXPRESSIONS.json";
+import AlgopABI from "../contracts/ABI-ERC20.json";
 
 class DiagnosticController extends BaseController {
   private app: express.Application;
   private routes: Record<string, string>[] | null = null
+  private version = 'v1.14.1';
 
   constructor(app: express.Application) {
     super();
@@ -38,98 +38,171 @@ class DiagnosticController extends BaseController {
           <!DOCTYPE html>
           <html>
           <head>
+            <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css' />	
           </head>
-          <body style='font-family: Consolas'>
-            <h1>AlgoPainter - Diagnostics</h1>
-            <h2>API v0.0.20 - Endpoints</h2>
-            <ul>
-              ${this.routes?.map((item) => `<li><b>${item.method}</b> /api${item.path}</li>`)?.join('')}
-            </ul>
-            </body>
+          <body class="d-flex h-100">
+            <div class="cover-container d-flex h-100 p-3 mx-auto flex-column" style='width: 50%'>
+              <header class="mb-auto">
+                <div>
+                  <h3 class="float-md-start mb-0">AlgoPainter - API ${this.version}</h3>
+                  <nav class="nav nav-masthead justify-content-center float-md-end">
+                    <a class="nav-link active" aria-current="page" href="#">Diagnostics</a>
+                  </nav>
+                </div>
+              </header>
+
+              <main class="">
+                <h5>GETs</h5>
+                <table class='table table-striped'>
+                  <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                  </tr>
+                  ${this.routes?.filter(a => a.method == 'GET').map((item) => `
+                    <tr>
+                      <td>${item.method}</td>
+                      <td><a href='#' onClick="window.open(location.origin + '/api${item.path}', '_blank').focus();">/api${item.path}<a></td>
+                    </tr>`)?.join('')}
+                </table>
+                <h5>POSTs</h5>
+                <table class='table table-striped'>
+                  <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                  </tr>
+                  ${this.routes?.filter(a => a.method == 'POST').map((item) => `
+                    <tr>
+                      <td>${item.method}</td>
+                      <td>/api${item.path}</td>
+                    </tr>`)?.join('')}
+                  </table>
+                <h5>PUTs</h5>
+                <table class='table table-striped'>
+                  <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                  </tr>
+                  ${this.routes?.filter(a => a.method == 'PUT').map((item) => `
+                    <tr>
+                      <td>${item.method}</td>
+                      <td>/api${item.path}</td>
+                    </tr>`)?.join('')}
+                </table>
+                <h5>DELETEs</h5>
+                <table class='table table-striped'>
+                  <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                  </tr>
+                  ${this.routes?.filter(a => a.method == 'DELETE').map((item) => `
+                    <tr>
+                      <td>${item.method}</td>
+                      <td>/api${item.path}</td>
+                    </tr>`)?.join('')}
+                </table>
+              </main>
+
+              <footer class="mt-auto">
+                <p>AlgoPainter, by <a href="https://www.criptonomia.com/">Criptonomia</a>.</p>
+              </footer>
+            </div>
+            <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js'></script>
+          </body>
           </html>`)
     });
 
     router.get(`${this.path}/seed/:secret/fix`, async (req, res) => {
-      if (req.params.secret === 'AlgoPainter') {        
+      if (req.params.secret === 'AlgoPainterTestNet') {
+        await SettingsContext.remove();
+
+        await SettingsContext.create({
+          tokens: [
+            {
+              value: '1',
+              label: 'BTCB',
+              tokenAddress: '0x6ce8da28e2f864420840cf74474eff5fd80e65b8',
+              decimalPlaces: 18,
+              img: '/images/BTC.svg',
+            },
+            {
+              value: '3',
+              name: 'AlgoPainter Token',
+              tokenAddress: '0x01a9188076f1231df2215f67b6a63231fe5e293e',
+              label: 'ALGOP',
+              decimalPlaces: 18,
+              img: '/images/ALGOP.svg'
+            },
+            {
+              value: '6',
+              name: 'DAI',
+              tokenAddress: '0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867',
+              label: 'DAI',
+              decimalPlaces: 18,
+              img: '/images/DAI.svg'
+            }
+          ],
+          smartcontracts: [
+            {
+              address: '0x5c35a85636d691eacd66d3d2c8a0f57f3ea13530',
+              name: 'AlgoPainterAuctionSystem',
+              symbol: 'APAS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 14569098,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsABI,
+              inUse: true
+            },
+            {
+              address: '0x7279c3c7b02c7ea2d458114f60df8e5d1a57de29',
+              name: 'AlgoPainterRewardsSystem',
+              symbol: 'APRS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 14569118,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsRewardsABI,
+              inUse: true
+            },
+            {
+              address: '0x355528b5a623f9bd7e7c19d2fd883de78158e765',
+              name: 'AlgoPainterBidBackPirs',
+              symbol: 'APBPS',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 14569107,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: AuctionsBidBackPIRSABI,
+              inUse: true
+            },
+            {
+              address: '0x8cfd89020019ba3da8b13cc2f3e0e5baaf82f578',
+              name: 'AlgoPainterGweiItem',
+              symbol: 'APGI',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 12198014,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: GweiABI,
+              inUse: false
+            },
+            {
+              address: '0xbe9cac059835236da5e91cd72688c43886b63419',
+              name: 'AlgoPainterExpressionsItem',
+              symbol: 'APEXPI',
+              network: '97',
+              rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+              startingBlock: 13420884,
+              blockExplorer: 'https://testnet.bscscan.com/',
+              abi: ExpressionsABI,
+              inUse: true
+            }
+          ]
+        });
+
         res.status(200).send('Data fixed!');
       }
       res.status(404).send();
-    });
-
-    router.get(`${this.path}/seed/:secret`, async (req, res) => {
-      if (req.params.secret === 'AlgoPainter') {
-        const auctionService = new AuctionService();
-        const collectionService = new CollectionService();
-        const imageService = new ImageService();
-        const bidService = new BidService();
-
-        const rndAcc = function() {
-          const accounts = [
-            '0x72CF9eAb1A629bddA03a93fA422795fFC8cc2660'.toLowerCase(),
-            '0x08a9b7Fc864CF87c4A5Cc82a7F6450CDe32e60A5'.toLowerCase(),
-            '0x2a28593abB56B0F425FED25d4Dcc0ff7DDDedABf'.toLowerCase(),
-            '0xCAbea325744D9524Fe3CaC533996c144B0FC275c'.toLowerCase(),
-            '0x4E9F8B25Ea6007ef3E7e1d195d4216C6dC04a5d2'.toLowerCase(),
-            '0xD804c94c7Ed47b97809394E988E447AC66B78DF3'.toLowerCase(),
-          ];
-
-          return accounts[Math.floor(Math.random() * accounts.length)].toLowerCase();
-        }
-
-        const gweiCollection = '0x4b7ef899cbb24689a47a66d3864f57ec13e01b35'.toLowerCase();
-        const gweiImages = (await imageService.getByCollectionOwnerAsync(gweiCollection)).data as IImage[];
-
-        for (let index = 0; index < 15; index++) {
-          const acc = rndAcc();
-          const newImage: IImage = gweiImages[Math.floor(Math.random() * gweiImages.length)];
-          const auction = await auctionService.createAsync(auctionData(
-            (newImage as any)._id, 
-            newImage.likes, 
-            index % 2 == 0, 
-            "Gwei", 
-            acc, rndAcc(),
-            newImage.nft.previewImage,
-            newImage.title
-          ));
-          await this.sleep(500);
-          await bidService.createAsync(bidsData(
-            acc, 
-            (newImage as any)._id, 
-            newImage.title, 
-            newImage.nft.previewImage, 
-            (auction.data as AuctionDocument)._id));
-          await this.sleep(500);
-        }
-
-        const expressionsCollection = '0xb413ccfd8e7d75d8642c81ab012235fedd946eeb'.toLowerCase();
-        const expressionsImages = (await imageService.getByCollectionOwnerAsync(expressionsCollection)).data as IImage[];
-
-        for (let index = 0; index < 15; index++) {
-          const acc = rndAcc();
-          const newImage: IImage = expressionsImages[Math.floor(Math.random() * expressionsImages.length)];
-          const auction = await auctionService.createAsync(auctionData(
-            (newImage as any)._id, 
-            newImage.likes, 
-            index % 2 == 0, 
-            "Expressions", 
-            acc, rndAcc(),
-            newImage.nft.previewImage,
-            newImage.title
-          ));
-          await this.sleep(500);
-          await bidService.createAsync(bidsData(
-            acc, 
-            (newImage as any)._id, 
-            newImage.title, 
-            newImage.nft.previewImage, 
-            (auction.data as AuctionDocument)._id));
-          await this.sleep(500);
-        }
-
-        res.status(200).send('Data created!');
-      } else {
-        res.status(404).send();
-      }
     });
   }
 }

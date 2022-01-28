@@ -5,7 +5,7 @@ import Result from "../shared/result";
 import AuctionService from "../services/auction.service";
 import BaseController from "./base.controller"
 
-class AuctionController extends BaseController {
+class PirsController extends BaseController {
   private service: AuctionService;
 
   constructor() {
@@ -14,18 +14,19 @@ class AuctionController extends BaseController {
   }
 
   get path() : string {
-    return "/auctions"
+    return "/pirs"
   }
 
   intializeRoutes(router : Router) : void {
-    router.get(`${this.path}`, async (req, res) => {
+    router.get(`${this.path}/:account/auctions`, async (req, res) => {
       try {
         const params = this.requestParams(req);
         let result : Result<Paged<IAuction>> | Result<IAuction[]> | null = null;
         if(params.paging.page === -1 || params.paging.perPage === -1) {
-          result = await this.service.listAsync(params.filter, params.order);
+          result = await this.service.listPirsAsync(req.params.account, params.filter, params.order);
         } else {
-          result = await this.service.pagedAsync(
+          result = await this.service.pagedPirsAsync(
+            req.params.account,
             params.filter, 
             params.order, 
             params.paging.page, 
@@ -37,25 +38,7 @@ class AuctionController extends BaseController {
         this.handleException(error, res);
       }
     });
-
-    router.get(`${this.path}/:id`, async (req, res) => {
-      try {
-        const result = await this.service.getAsync(req.params.id);
-        this.handleResult(result, res);
-      } catch (error) {
-        this.handleException(error, res);
-      }
-    });
-
-    router.get(`${this.path}/:id/bids`, async (req, res) => {
-      try {
-        const result = await this.service.getAsync(req.params.id);
-        this.handleResult(Result.success(null, result.data?.bids), res);
-      } catch (error) {
-        this.handleException(error, res);
-      }
-    });
   }
 }
 
-export default AuctionController;
+export default PirsController;

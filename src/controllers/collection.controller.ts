@@ -6,6 +6,7 @@ import Paged from "../shared/paged";
 import Result from "../shared/result";
 import BaseController from "./base.controller"
 import { IImage } from "../domain/image";
+import { ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
 
 class CollectionController extends BaseController {
   private service: CollectionService;
@@ -22,6 +23,24 @@ class CollectionController extends BaseController {
   }
 
   intializeRoutes(router: Router): void {
+    router.post(`${this.path}`, async (req, res) => {
+      try {
+        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:id`, async (req, res) => {
+      try {
+        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
     router.get(`${this.path}`, async (req, res) => {
       try {
         const params = this.requestParams(req);

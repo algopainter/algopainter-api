@@ -1,4 +1,5 @@
 import { Router } from "express";
+import Exception from "../shared/exception";
 import { INFT } from "../domain/nft";
 import NFTService from "../services/nft.service";
 import Paged from "../shared/paged";
@@ -34,7 +35,7 @@ class NFTController extends BaseController {
         }
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error as Error | Exception, res);
       }
     });
 
@@ -43,7 +44,25 @@ class NFTController extends BaseController {
         const result = await this.service.getAsync(req.params.id);
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error as Error | Exception, res);
+      }
+    });
+
+    router.get(`${this.path}/:contract/:tokenId`, async (req, res) => {
+      try {
+        const result = await this.service.getByTokenIdAsync(parseInt(req.params.tokenId), req.params.contract);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error as Error | Exception, res);
+      }
+    });
+
+    router.get(`${this.path}/:contract/owners/:tokenId`, async (req, res) => {
+      try {
+        const result = await this.service.getOwnersByTokenIdAsync(parseInt(req.params.tokenId), req.params.contract);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error as Error | Exception, res);
       }
     });
   }

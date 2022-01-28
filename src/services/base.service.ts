@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Paged from "../shared/paged";
 import Result from "../shared/result";
 /// <reference types="../../typings/mongo-querystring" />
@@ -24,10 +25,10 @@ export abstract class BaseService {
    * @param order 
    * @returns 
    */
-  translateToMongoOrder(order: IOrderBy | null): unknown {
+  translateToMongoOrder(order: IOrderBy | null, defaultOrder : any = { createdAt: -1 }): unknown {
     if (order)
-      return Object.keys(order).length ? order : { createdAt: -1 };
-    return { createdAt: -1 };
+      return Object.keys(order).length ? order : defaultOrder;
+    return defaultOrder;
   }
 }
 
@@ -52,7 +53,7 @@ export abstract class BaseCRUDService<T> extends BaseService {
 }
 
 export interface IFilter {
-  [name: string]: string | undefined
+  [name: string]: string | any | undefined
 }
 
 export interface IOrderBy {

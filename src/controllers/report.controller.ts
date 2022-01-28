@@ -20,7 +20,7 @@ class ReportController extends BaseController {
         const result = await this.service.topSellers();
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
 
@@ -29,7 +29,7 @@ class ReportController extends BaseController {
         const result = await this.service.topBuyers();
         this.handleResult(result, res);
       } catch (error) {
-        this.handleResult(error, res);
+        this.handleException(error, res);
       }
     });
   }

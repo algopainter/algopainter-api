@@ -47,9 +47,36 @@ class ImageController extends BaseController {
       }
     });
 
+    router.get(`${this.path}/:id/owners`, async (req, res) => {
+      try {
+        const result = await this.service.getOwnersOfAsync(req.params.id, this.getBoolean(req.query.includeCurrentOwner));
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
     router.post(`${this.path}/:id/likes`, async (req, res) => {
       try {
         const result = await this.service.likeAsync(req.params.id, req.body);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.post(`${this.path}/mint`, async (req, res) => {
+      try {
+        const result = await this.service.obtainMintImageData(req.body);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.post(`${this.path}/pinToIPFS/:type`, async (req, res) => {
+      try {
+        const result = await this.service.pinToIPFS(req.body, req.params.type);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { IImage } from "../domain/image";
-import { IUser } from "../domain/user";
 import Paged from "../shared/paged";
 import Result from "../shared/result";
 import { IUserUpdateRequest } from "../requests/user.update.request";
@@ -18,11 +17,11 @@ class UserController extends BaseController {
     this.imageService = new ImageService();
   }
 
-  get path() : string {
+  get path(): string {
     return "/users"
   }
 
-  intializeRoutes(router : Router) : void {
+  intializeRoutes(router: Router): void {
     router.get(`${this.path}/:account`, async (req, res) => {
       try {
         const result = await this.service.getAsync(req.params.account.toLowerCase());
@@ -35,21 +34,22 @@ class UserController extends BaseController {
     router.get(`${this.path}/:account/images`, async (req, res) => {
       try {
         if (req.params.account) {
-          req.query.owner = req.params.account.toLowerCase();
           delete req.query.id;
           delete req.query.account;
+
+          const includeExpiredAuctions = this.getBoolean(req.query.includeExpired);
+          delete req.query.includeExpired;
           const params = this.requestParams(req);
-          let result: Result<Paged<IImage>> | Result<IImage[]> | null = null;
-          if (params.paging.page === -1 || params.paging.page === -1) {
-            result = await this.imageService.listAsync(params.filter, params.order);
-          } else {
-            result = await this.imageService.pagedAsync(
-              params.filter,
-              params.order,
-              params.paging.page,
-              params.paging.perPage
-            );
-          }
+
+          const result = await this.imageService.getByOwnerCountingAuctions(
+            req.params.account,
+            params.filter,
+            params.order,
+            params.paging.page,
+            params.paging.perPage,
+            includeExpiredAuctions
+          )
+
           this.handleResult(result, res);
         } else {
           this.handleResult(Result.failure(null, null, 404), res);
@@ -71,6 +71,48 @@ class UserController extends BaseController {
     router.get(`${this.path}/:customProfile/account`, async (req, res) => {
       try {
         const result = await this.service.getAccountByCustomUrl(req.params.customProfile);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.get(`${this.path}/:account/auctions/biding`, async (req, res) => {
+      try {
+        const forBidbacks = req.query.forBidbacks ? this.getBoolean(req.query.forBidbacks) : null;
+        const forBids = req.query.forBids ? this.getBoolean(req.query.forBids) : null;
+        const hasBidbacks = req.query.hasBidbacks ? this.getBoolean(req.query.hasBidbacks) : null;
+        const hasPirs = req.query.hasPirs ? this.getBoolean(req.query.hasPirs) : null;
+        delete req.query.hasBidbacks;
+        delete req.query.hasPirs;
+        delete req.query.forBidbacks;
+        delete req.query.forBids;
+        const params = this.requestParams(req);
+        const result = await this.service.getAuctionsThatUserBidAsync(
+          req.params.account, 
+          params.paging.page, 
+          params.paging.perPage,
+          params.filter,
+          params.order,
+          hasPirs,
+          hasBidbacks,
+          forBidbacks,
+          forBids);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.get(`${this.path}/:account/auctions/pirsing`, async (req, res) => {
+      try {
+        const params = this.requestParams(req);
+        const result = await this.service.getAuctionsThatUserPIRSAsync(
+          req.params.account, 
+          params.paging.page, 
+          params.paging.perPage,
+          params.filter,
+          params.order);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

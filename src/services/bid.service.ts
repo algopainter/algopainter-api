@@ -28,7 +28,7 @@ export default class BidService extends BaseCRUDService<IBid> {
     return Result.success<Paged<IBid>>(null, {
       count,
       currPage: page,
-      pages: Math.round(count / perPage),
+      pages: Math.ceil(count / perPage),
       perPage,
       data
     });

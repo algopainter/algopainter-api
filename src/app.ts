@@ -1,15 +1,20 @@
 import express, { Router } from 'express';
 import bodyParser from 'body-parser';
-import BaseController from './controllers/base.controller'
-import AuctionController from './controllers/auction.controller'
-import CollectionController from './controllers/collection.controller'
-import DiagnosticController from './controllers/diagnostic.controller'
-import ImageController from './controllers/image.controller'
-import BidController from './controllers/bid.controller'
-import NFTController from './controllers/nft.controller'
-import ReportController from './controllers/report.controller'
-import UserController from './controllers/user.controller'
-import LikeController from './controllers/like.controller'
+import BaseController from './controllers/base.controller';
+import AuctionController from './controllers/auction.controller';
+import PirsController from './controllers/pirs.controller';
+import BidbacksController from './controllers/bidbacks.controller';
+import CollectionController from './controllers/collection.controller';
+import DiagnosticController from './controllers/diagnostic.controller';
+import ImageController from './controllers/image.controller';
+import BidController from './controllers/bid.controller';
+import NFTController from './controllers/nft.controller';
+import ReportController from './controllers/report.controller';
+import UserController from './controllers/user.controller';
+import LikeController from './controllers/like.controller';
+import HistoryController from './controllers/history.controller';
+import TradeInsController from './controllers/tradeins.controller';
+import SettingsController from './controllers/settings.controller';
 import cors from 'cors';
 import { connect, disconnect } from 'mongoose';
 import Settings from './shared/settings';
@@ -28,7 +33,8 @@ class Application {
   }
 
   private initializeMiddlewares() {
-    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.json( { limit: '50mb' }));
+    this.app.use(bodyParser.urlencoded( { limit: '50mb', extended: true } ));
     this.app.use(cors({
       exposedHeaders: [ 'x-total-items' ]
     }));
@@ -38,10 +44,15 @@ class Application {
         useUnifiedTopology: true,
         useFindAndModify: false,
         useCreateIndex: true,
+        poolSize: 100
       });
 
-      res.on('finish', async () => await disconnect());
-      res.on('close', async () => await disconnect());
+      res.on('finish', async () => {
+        await disconnect()
+      });
+      res.on('close', async () => {
+        await disconnect()
+      });
 
       // const signService = new SignService();
       // const result = await signService.validatePreRequest(req.body);
@@ -78,6 +89,9 @@ class Application {
 
 const App: Application = new Application(3000);
 App.initializeControllers([
+  new SettingsController(),
+  new BidbacksController(),
+  new PirsController(),
   new LikeController(),
   new CollectionController(),
   new ImageController(),
@@ -86,6 +100,8 @@ App.initializeControllers([
   new UserController(),
   new AuctionController(),
   new BidController(),
+  new HistoryController(),
+  new TradeInsController(),
   new DiagnosticController(App.expressApp),
 ]);
 

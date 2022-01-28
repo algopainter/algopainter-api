@@ -1,10 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema, Model, Document } from 'mongoose';
-
-export interface IBidItem {
-  _id: string;
-  title: string;
-  previewImageUrl: string;
-}
 
 export interface BidDocument extends Document {
   bidder: string;
@@ -12,8 +7,9 @@ export interface BidDocument extends Document {
   amount: number;
   tokenSymbol: string;
   createdAt: Date;
-  bidBack: number;
-  item: IBidItem;
+  feeAmount: number;
+  netAmount: number;
+  item: any;
 }
 
 export interface IBid {
@@ -22,23 +18,20 @@ export interface IBid {
   amount: BidDocument['amount'];
   tokenSymbol: BidDocument['tokenSymbol'];
   createdAt: BidDocument['createdAt'];
-  bidBack: BidDocument['bidBack'];
+  feeAmount: BidDocument['feeAmount'];
+  netAmount: BidDocument['netAmount'];
   item: BidDocument['item'];
 }
 
-const bidItemSchema: Schema = new Schema({
-  title: { type: String, required: true },
-  previewImageUrl: { type: String, required: true }
-});
-
-export const CollectionSchema: Schema = new Schema({
+export const BidsSchema: Schema = new Schema({
   bidder: { type: String, required: true },
   auctionId: { type: String, required: true },
   amount: { type: Number, required: true },
   tokenSymbol: { type: String, required: true },
   createdAt: { type: Date, required: true },
-  bidBack: { type: Number, required: true },
-  item: { type: bidItemSchema, required: true }
+  feeAmount: { type: Number, required: true },
+  netAmount: { type: Number, required: true },
+  item: { type: Object, required: true }
 });
 
-export const BidContext: Model<BidDocument> = model('bids', CollectionSchema);
+export const BidContext: Model<BidDocument> = model('bids', BidsSchema);
