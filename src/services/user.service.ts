@@ -407,6 +407,21 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
+    await AuctionContext.updateMany({
+      "users.account": account.toLowerCase()
+    }, {
+      "$set": {
+        'users.$[elem].name': userInfo.name,
+        'users.$[elem].avatar': userInfo.avatar,
+        'users.$[elem].customProfile': userInfo.customProfile,
+      }
+    }, {
+      "arrayFilters": [{
+        "elem.account": account.toLowerCase()
+      }],
+      multi: true
+    });
+
     await ImageContext.updateMany({
       "users.account": account.toLowerCase()
     }, {
