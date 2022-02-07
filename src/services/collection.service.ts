@@ -51,8 +51,9 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
   }
 
   private validateCollectionData(data: ICollection) : any {
-    CollectionValidator.check(data);
-    return CollectionValidator.test(data);
+    var invalid = CollectionValidator(data);
+    if(invalid)
+      throw new Error(invalid);
   }
 
   async createOrUpdateCollectionWithSign(request: ICollectionUpdateCreateRequest, id: string | undefined = undefined): Promise<Result<ICollection>> {
@@ -89,6 +90,8 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       } else {
         const createResult = await this.createAsync({
           title: request.data.title,
+          show: true,
+          isCustom: true,
           avatar: request.data.avatar,
           account: request.data.account,
           description: request.data.description,
@@ -132,7 +135,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return Result.success<ICollection>(null, input);
   }
 
-  async updateAsync(id: string, updatedItem: ICollection): Promise<Result<ICollection>> {
+  async updateAsync(id: string, updatedItem: Partial<ICollection>): Promise<Result<ICollection>> {
     const input = await CollectionContext.findByIdAndUpdate(id, updatedItem);
     return Result.success<ICollection>(null, (input as ICollection));
   }
