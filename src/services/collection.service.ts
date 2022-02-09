@@ -90,6 +90,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       } else {
         const createResult = await this.createAsync({
           title: request.data.title,
+          namelc: request.data.title.toLowerCase(),
           show: true,
           isCustom: true,
           avatar: request.data.avatar,

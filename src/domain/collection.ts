@@ -3,6 +3,7 @@ import v8n from "v8n";
 
 export interface CollectionDocument extends Document {
   title: string;
+  namelc: string;
   description: string;
   show: boolean;
   isCustom: boolean;
@@ -40,6 +41,7 @@ export interface ICollectionNFTCreationAPI {
 
 export interface ICollection {
   title: CollectionDocument['title'];
+  namelc: CollectionDocument['namelc'];
   description: CollectionDocument['description'];
   owner: CollectionDocument['owner'];
   show: CollectionDocument['show'];
@@ -52,6 +54,7 @@ export interface ICollection {
 
 export const CollectionSchema: Schema = new Schema({
   title: { type: String, required: true },
+  namelc: { type: String, required: true },
   description: { type: String, required: true },
   show: { type: Boolean, required: false },
   owner: { type: String, required: true, index: true },
