@@ -2,6 +2,7 @@ import { model, Schema, Model, Document } from 'mongoose';
 import v8n from "v8n";
 
 export interface CollectionDocument extends Document {
+  blockchainId: number,
   title: string;
   namelc: string;
   description: string;
@@ -21,6 +22,7 @@ export interface ICollectionMetrics {
   priceType: 'fixed' | 'variable';
   tokenPriceAddress: string | null | undefined;
   tokenPriceSymbol: string | null | undefined; // ETH ALGOP 
+  startingPrice: string;
   priceRange: ICollectionMetricsPriceRange[] | null | undefined;
   creatorPercentage: number;
   walletAddress: string;
@@ -30,8 +32,6 @@ export interface ICollectionMetricsPriceRange {
   from: number;
   to: number;
   amount: number;
-  tokenPriceAddress: string;
-  tokenPriceSymbol: string;
 }
 
 export interface ICollectionNFTCreationAPI {
@@ -40,6 +40,7 @@ export interface ICollectionNFTCreationAPI {
 }
 
 export interface ICollection {
+  blockchainId: CollectionDocument['blockchainId'];
   title: CollectionDocument['title'];
   namelc: CollectionDocument['namelc'];
   description: CollectionDocument['description'];
@@ -53,6 +54,7 @@ export interface ICollection {
 }
 
 export const CollectionSchema: Schema = new Schema({
+  blockchainId: { type: Number, required: false },
   title: { type: String, required: true },
   namelc: { type: String, required: true },
   description: { type: String, required: true },

@@ -1,7 +1,7 @@
 import Result from "../shared/result";
 import { CollectionContext, CollectionDocument, ICollection, CollectionValidator } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
-import { ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
+import { ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
 import Paged from "../shared/paged";
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
@@ -56,6 +56,31 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       throw new Error(invalid);
   }
 
+  async patchCollection(request: ICollectionPatchRequest, id: number) {
+    let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
+
+    if (!request || !request.data)
+      return responseResult;
+
+    const signService = new SignService();
+    if (!await signService.validate<ICollectionPatchRequestSignData>(request, request.data, 'collection_patch'))
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    const result = await CollectionContext.findOne({
+      blockchainId: id
+    });
+
+    if(result) {
+      return await this.updateAsync((result as CollectionDocument)._id, {
+        avatar: request.data.avatar,
+        description: request.data.description,
+        api: request.data.api
+      });
+    }
+
+    return responseResult;    
+  }
+
   async createOrUpdateCollectionWithSign(request: ICollectionUpdateCreateRequest, id: string | undefined = undefined): Promise<Result<ICollection>> {
     let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
 
@@ -87,20 +112,6 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
           api: request.data.api
         });
         responseResult = await this.getByTitleAsync(request.data.title);
-      } else {
-        const createResult = await this.createAsync({
-          title: request.data.title,
-          namelc: request.data.title.toLowerCase(),
-          show: true,
-          isCustom: true,
-          avatar: request.data.avatar,
-          account: request.data.account,
-          description: request.data.description,
-          owner: request.data.owner,
-          metrics: request.data.metrics,
-          api: request.data.api
-        });
-        responseResult = createResult;
       }
     } else {
       responseResult = Result.custom<ICollection>(false, "The data sent is not unique!", null, 409, 390);

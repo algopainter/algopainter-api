@@ -6,3 +6,13 @@ export type ICollectionUpdateCreateRequest = ISign<ICollectionUpdateCreateSignDa
 export interface ICollectionUpdateCreateSignData extends ICollection {
     salt: string | undefined | null;
 }
+
+
+export type ICollectionPatchRequest = ISign<ICollectionPatchRequestSignData>
+
+export interface ICollectionPatchRequestSignData {
+    avatar: string;
+    description: string;
+    api: any;
+    salt: string | undefined | null;
+}
