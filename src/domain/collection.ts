@@ -11,6 +11,7 @@ export interface CollectionDocument extends Document {
   owner: string;
   avatar: string | null | undefined;
   account: string;
+  approvedBy: string;
   metrics: ICollectionMetrics | null | undefined;
   api: ICollectionNFTCreationAPI | null | undefined;
 }
@@ -49,6 +50,7 @@ export interface ICollection {
   isCustom: CollectionDocument['isCustom'];
   avatar: CollectionDocument['avatar'];
   account: CollectionDocument['account'];
+  approvedBy: CollectionDocument['approvedBy'];
   metrics: CollectionDocument['metrics'];
   api: CollectionDocument['api'];
 }
@@ -63,6 +65,7 @@ export const CollectionSchema: Schema = new Schema({
   avatar: { type: String, required: false },
   account: { type: String, required: true, index: true },
   metrics: { type: Object, required: false },
+  approvedBy: { type: String, required: false },
   api: { type: Object, required: false },
 });
 

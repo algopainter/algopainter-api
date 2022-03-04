@@ -1,7 +1,7 @@
 import Result from "../shared/result";
 import { CollectionContext, CollectionDocument, ICollection, CollectionValidator } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
-import { ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
+import { ICollectionApproveRequest, ICollectionApproveRequestSignData, ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
 import Paged from "../shared/paged";
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
@@ -75,6 +75,30 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
         avatar: request.data.avatar,
         description: request.data.description,
         api: request.data.api
+      });
+    }
+
+    return responseResult;    
+  }
+
+  async approveCollection(request: ICollectionApproveRequest, id: number) {
+    let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
+
+    if (!request || !request.data)
+      return responseResult;
+
+    const signService = new SignService();
+    if (!await signService.validate<ICollectionApproveRequestSignData>(request, request.data, 'approve_collection'))
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    const result = await CollectionContext.findOne({
+      blockchainId: id
+    });
+
+    if(result) {
+      return await this.updateAsync((result as CollectionDocument)._id, {
+        show: true,
+        approvedBy: request.data.approvedBy
       });
     }
 

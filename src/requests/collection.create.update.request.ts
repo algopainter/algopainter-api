@@ -16,3 +16,12 @@ export interface ICollectionPatchRequestSignData {
     api: any;
     salt: string | undefined | null;
 }
+
+export interface ICollectionApproveRequestSignData 
+{ 
+    collectionId: string;
+    approvedBy: string;
+    salt: string | undefined | null;
+}
+
+export type ICollectionApproveRequest = ISign<ICollectionApproveRequestSignData>

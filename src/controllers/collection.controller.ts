@@ -6,7 +6,7 @@ import Paged from "../shared/paged";
 import Result from "../shared/result";
 import BaseController from "./base.controller"
 import { IImage } from "../domain/image";
-import { ICollectionPatchRequest, ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
+import { ICollectionApproveRequest, ICollectionPatchRequest, ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
 
 class CollectionController extends BaseController {
   private service: CollectionService;
@@ -26,6 +26,15 @@ class CollectionController extends BaseController {
     router.patch(`${this.path}/:collectionId`, async (req, res) => {
       try {
         const result = await this.service.patchCollection(req.body as ICollectionPatchRequest, parseInt(req.params.collectionId));
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:collectionId/approve`, async (req, res) => {
+      try {
+        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId));
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
