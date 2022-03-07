@@ -76,7 +76,7 @@ class ImageController extends BaseController {
 
     router.post(`${this.path}/pinToIPFS/:type`, async (req, res) => {
       try {
-        const result = await this.service.pinToIPFS(req.body, req.params.type);
+        const result = await this.service.pinToIPFS(req.body, req.params.type, parseInt(req.query.resize as string) == 1);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

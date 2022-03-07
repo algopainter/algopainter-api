@@ -208,6 +208,13 @@ GET http://localhost:3000/api/users/0xa62ce1f85461d67c874ef625f0e488c57af2335d/a
 
 ###
 
+PUT http://localhost:3000/api/collections/12/approve HTTP/1.1
+content-type: application/json
+
+{"data":{"collectionId":12,"approvedBy":"0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf","salt":"j3f-dkXRZJWr0GO5lZLOz"},"signature":"0x32e127e1fa6c61d998be8bf2d030005cfec0f5eae9aaff87a61cbe6641c7094f3a75a81a22e0ada78185857655957b2a7040c047efe6465fd8901f8cc0b9428a1c","account":"0x2a28593abb56b0f425fed25d4dcc0ff7dddedabf","salt":"j3f-dkXRZJWr0GO5lZLOz"}
+
+###
+
 POST http://localhost:3000/api/collections HTTP/1.1
 content-type: application/json
 

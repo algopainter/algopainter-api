@@ -34,7 +34,16 @@ class CollectionController extends BaseController {
 
     router.put(`${this.path}/:collectionId/approve`, async (req, res) => {
       try {
-        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId));
+        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId), false);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:collectionId/disapprove`, async (req, res) => {
+      try {
+        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId), true);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

@@ -74,14 +74,15 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       return await this.updateAsync((result as CollectionDocument)._id, {
         avatar: request.data.avatar,
         description: request.data.description,
-        api: request.data.api
+        api: request.data.api,
+        webSite: request.data.webSite,
       });
     }
 
     return responseResult;    
   }
 
-  async approveCollection(request: ICollectionApproveRequest, id: number) {
+  async approveCollection(request: ICollectionApproveRequest, id: number, disapprove: boolean) {
     let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
 
     if (!request || !request.data)
@@ -95,9 +96,9 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       blockchainId: id
     });
 
-    if(result) {
+    if(result && id.toString() === request.data.collectionId) {
       return await this.updateAsync((result as CollectionDocument)._id, {
-        show: true,
+        show: !disapprove,
         approvedBy: request.data.approvedBy
       });
     }

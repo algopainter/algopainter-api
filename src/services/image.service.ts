@@ -399,14 +399,18 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, null);
   }
 
-  async pinToIPFS(body: Record<string, any>, type: string) : Promise<Result<Record<string, string>>> {
+  async pinToIPFS(body: Record<string, any>, type: string, doResize: boolean = false) : Promise<Result<Record<string, string>>> {
     if (!body)
       return Result.fail<Record<string, string>>("The payload is empty.", null);
     
     if(type == 'FILE') {
-      const rawImage64 = body.image;
+      let rawImage64 = body.image;
       const rawImageBytes = rawImage64.split(',')[1];
       const rawImageHash = Web3.utils.keccak256(rawImageBytes);
+
+      if(doResize) {
+        rawImage64 = await this.resizeImage(rawImage64, 400, 400);
+      }
 
       const rawImageIPFS = await this.pinFileToIPFS(rawImage64, body.fileName, { 
         name: body.name, 
