@@ -96,7 +96,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       blockchainId: id
     });
 
-    if(result && id.toString() === request.data.collectionId) {
+    if(result && id.toString() === request.data.collectionId.toString()) {
       return await this.updateAsync((result as CollectionDocument)._id, {
         show: !disapprove,
         approvedBy: request.data.approvedBy
