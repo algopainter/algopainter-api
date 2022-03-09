@@ -21,7 +21,9 @@ class ImageController extends BaseController {
   intializeRoutes(router : Router) : void {
     router.get(`${this.path}/random/dog`, async (req, res) => {
       const response = await Axios.get(`https://dog.ceo/api/breed/${req.query.breed}/images/random`);
+      console.log(response);
       const imageResponse = await Axios.get(response.data.message, {  responseType: 'arraybuffer' });
+      console.log(imageResponse);
       res.set('Content-Type', 'image/png')
          .send(imageResponse.data);
     });
