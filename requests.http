@@ -208,6 +208,15 @@ GET http://localhost:3000/api/users/0xa62ce1f85461d67c874ef625f0e488c57af2335d/a
 
 ###
 
+GET http://localhost:3000/api/collections?metrics.endDT=<9998-01-01T00:00:01.000Z
+content-type: application/json
+
+###
+
+GET http://localhost:3000/api/images/random/dog?breed=hound
+
+###
+
 PUT http://localhost:3000/api/collections/19/approve HTTP/1.1
 content-type: application/json
 

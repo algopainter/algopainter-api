@@ -1,3 +1,4 @@
+import Axios from "axios";
 import { Router } from "express";
 import { IImage } from "../domain/image";
 import ImageService from "../services/image.service";
@@ -18,6 +19,13 @@ class ImageController extends BaseController {
   }
 
   intializeRoutes(router : Router) : void {
+    router.get(`${this.path}/random/dog`, async (req, res) => {
+      const response = await Axios.get(`https://dog.ceo/api/breed/${req.query.breed}/images/random`);
+      const imageResponse = await Axios.get(response.data.message, {  responseType: 'arraybuffer' });
+      res.set('Content-Type', 'image/png')
+         .send(imageResponse.data);
+    });
+
     router.get(`${this.path}`, async (req, res) => {
       try {
         const params = this.requestParams(req);
