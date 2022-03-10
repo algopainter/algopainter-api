@@ -5,6 +5,12 @@ import Result from "../shared/result";
 import { BaseService } from "./base.service";
 
 export default class ReportService extends BaseService {
+  async artistSales(artist: string) : Promise<Result<Record<string, any>[]>> {
+    let data : Record<string, any>[] = [];
+    
+    return Result.success<Record<string, any>[]>(null, data);
+  }
+
   async topSellers() : Promise<Result<ISeller[]>> {
     const users = await UserContext.find({ type: { $ne: 'algop' } });
     const reportTopSellers: ISeller[] = [];

@@ -11,7 +11,7 @@ export interface CollectionDocument extends Document {
   owner: string;
   avatar: string | null | undefined;
   account: string;
-  webSite: string;
+  website: string;
   approvedBy: string;
   metrics: ICollectionMetrics | null | undefined;
   api: ICollectionNFTCreationAPI | null | undefined;
@@ -53,7 +53,7 @@ export interface ICollection {
   account: CollectionDocument['account'];
   approvedBy: CollectionDocument['approvedBy'];
   metrics: CollectionDocument['metrics'];
-  webSite: CollectionDocument['webSite'];
+  website: CollectionDocument['website'];
   api: CollectionDocument['api'];
 }
 

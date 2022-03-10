@@ -97,11 +97,13 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       return responseResult;
 
     const signService = new SignService();
-    if (!await signService.validate<ICollectionPatchRequestSignData>(request, request.data, 'collection_patch'))
+    const sign = await signService.validate<ICollectionPatchRequestSignData>(request, request.data, 'collection_patch');
+    if (!sign.isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
     const result = await CollectionContext.findOne({
-      blockchainId: id
+      blockchainId: id,
+      account: sign.account
     });
 
     if(result) {
@@ -109,7 +111,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
         avatar: request.data.avatar,
         description: request.data.description,
         api: request.data.api,
-        webSite: request.data.webSite,
+        website: request.data.website,
       });
     }
 
@@ -123,7 +125,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       return responseResult;
 
     const signService = new SignService();
-    if (!await signService.validate<ICollectionApproveRequestSignData>(request, request.data, 'approve_collection'))
+    if (!(await signService.validate<ICollectionApproveRequestSignData>(request, request.data, 'approve_collection')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
     const result = await CollectionContext.findOne({
@@ -147,7 +149,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       return responseResult;
 
     const signService = new SignService();
-    if (!await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation'))
+    if (!(await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
     if (!(await this._checkUniqueness(request.data)) && this.validateCollectionData(request.data)) {

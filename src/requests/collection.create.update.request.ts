@@ -14,7 +14,7 @@ export interface ICollectionPatchRequestSignData {
     avatar: string;
     description: string;
     api: any;
-    webSite: string;
+    website: string;
     salt: string | undefined | null;
 }
 

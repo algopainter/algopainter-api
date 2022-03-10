@@ -346,7 +346,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
   private async _validateLikeSign(request: ILikeRequest, id: string) {
     const signService = new SignService();
-    if (!await signService.validate<ILikeSignData>(request, { imageId: id, salt: request.salt }, 'like'))
+    if (!(await signService.validate<ILikeSignData>(request, { imageId: id, salt: request.salt }, 'like')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
   }
 
