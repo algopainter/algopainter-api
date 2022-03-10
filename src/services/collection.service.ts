@@ -13,16 +13,50 @@ import Exception from "../shared/exception";
 export default class CollectionService extends BaseCRUDService<ICollection> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
     const data = await CollectionContext
+      .find({
+        ...this.translateToMongoQuery(filter),
+        "metrics.endDT": { $gt: new Date() }
+      })
+      .sort(this.translateToMongoOrder(order));
+    return Result.success<ICollection[]>(null, data);
+  }
+
+  async listAsync2(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
+    const data = await CollectionContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
     return Result.success<ICollection[]>(null, data);
   }
 
-  async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
+  async pagedAsync2(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
     const query = this.translateToMongoQuery(filter);
     const count = await CollectionContext.find(query).countDocuments();
     const data = await CollectionContext
       .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    return Result.success<Paged<ICollection>>(null, {
+      count,
+      currPage: page,
+      pages: Math.ceil(count / perPage),
+      perPage,
+      data
+    });
+  }
+
+  async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
+    const query = this.translateToMongoQuery(filter);
+    const count = await CollectionContext.find({
+      ...query,
+      "metrics.endDT": { $gt: new Date() }
+    }).countDocuments();
+    const data = await CollectionContext
+      .find({
+        ...query,
+        "metrics.endDT": { $gt: new Date() }
+      })
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);

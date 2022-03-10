@@ -24,6 +24,26 @@ class CollectionController extends BaseController {
   }
 
   intializeRoutes(router: Router): void {
+    router.get(`${this.path}/custom/all`, async (req, res) => {
+      try {
+        const params = this.requestParams(req);
+        let result: Result<Paged<ICollection>> | Result<ICollection[]> | null = null;
+        if (params.paging.page === -1 || params.paging.page === -1) {
+          result = await this.service.listAsync2(params.filter, params.order);
+        } else {
+          result = await this.service.pagedAsync2(
+            params.filter,
+            params.order,
+            params.paging.page,
+            params.paging.perPage
+          );
+        }
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
     router.patch(`${this.path}/:collectionId`, async (req, res) => {
       try {
         const result = await this.service.patchCollection(req.body as ICollectionPatchRequest, parseInt(req.params.collectionId));
@@ -71,7 +91,7 @@ class CollectionController extends BaseController {
       }
     });
 
-    router.get(`${this.path}/:id`, async (req, res) => {
+    router.get(`${this.path}/db/:id`, async (req, res) => {
       try {
         const result = await this.service.getAsync(req.params.id);
         this.handleResult(result, res);
