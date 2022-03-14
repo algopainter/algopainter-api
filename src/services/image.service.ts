@@ -405,12 +405,13 @@ export default class ImageService extends BaseCRUDService<IImage> {
     
     if(type == 'FILE') {
       let rawImage64 = body.image;
-      const rawImageBytes = rawImage64.split(',')[1];
-      const rawImageHash = Web3.utils.keccak256(rawImageBytes);
 
       if(doResize) {
         rawImage64 = await this.resizeImage(rawImage64, 400, 400);
       }
+
+      const rawImageBytes = rawImage64.split(',')[1];
+      const rawImageHash = Web3.utils.keccak256(rawImageBytes);
 
       const rawImageIPFS = await this.pinFileToIPFS(rawImage64, body.fileName, { 
         name: body.name, 
