@@ -105,7 +105,10 @@ class CollectionController extends BaseController {
         const resultCollection = await this.service.getAsync(req.params.id);
         if (resultCollection && resultCollection.data) {
           delete req.query.id;
-          req.query.collectionOwner = (resultCollection.data as ICollection).owner;
+          if(resultCollection.data.blockchainId)
+            req.query.collectionId = '|NO_PARSE|' + (resultCollection.data as ICollection).blockchainId.toString();
+          else
+            req.query.collectionOwner = (resultCollection.data as ICollection).owner;
           const params = this.requestParams(req);
           let result: Result<Paged<IImage>> | Result<IImage[]> | null = null;
           if (params.paging.page === -1 || params.paging.page === -1) {
