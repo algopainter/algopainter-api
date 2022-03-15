@@ -1,12 +1,16 @@
-export default interface Deals {
-  auctionEndDT: Date;
-  nftId: string;
-  collectionId: string;
-  nftName: string;
-  collectionName: string;
-  artist: string;
-  value: string;
-  bidback: string;
-  pirs: string;
-  claimed: string;
+export interface MintReport {
+  nft: string;
+  collection: string;
+  amount: string;
+  creator: string;
+  onSale: boolean;
+}
+
+export interface AuctionReport {
+  nft: string;
+  collection: string;
+  amount: string;
+  creator: string;
+  sellDT: Date;
+  toClaim: boolean;
 }

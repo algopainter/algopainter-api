@@ -1,6 +1,12 @@
-GET http://localhost:3000/api/collections/622f3ca4d6112314f676fad6/images
+GET http://localhost:3000/api/collections/622f3ca4d6112314f676fad6/auctions
 
-##
+###
+
+
+GET http://localhost:3000/api/reports/artist/0xbD5e30c35aA71BCF7f4372821492B113D77b9126/auctions
+
+
+###
 
 POST http://localhost:3000/api/images/pintoipfs/FILE?resize=1
 content-type: application/json

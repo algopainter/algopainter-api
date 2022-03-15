@@ -33,9 +33,18 @@ class ReportController extends BaseController {
       }
     });
 
-    router.get(`${this.path}/artist/:artist/sales`, async (req, res) => {
+    router.get(`${this.path}/artist/:artist/mints`, async (req, res) => {
       try {
-        const result = await this.service.artistSales(req.params.artist);
+        const result = await this.service.artistMints(req.params.artist);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.get(`${this.path}/artist/:artist/auctions`, async (req, res) => {
+      try {
+        const result = await this.service.artistAuctions(req.params.artist);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

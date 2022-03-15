@@ -3,12 +3,104 @@ import { IBuyer } from "../reporting/buyers";
 import { ISeller } from "../reporting/sellers";
 import Result from "../shared/result";
 import { BaseService } from "./base.service";
+import { AuctionReport, MintReport } from "../reporting/deals"
+import { ImageContext } from "../domain/image";
+import { CollectionContext } from "../domain/collection";
+import { AuctionContext } from "../domain/auction";
 
 export default class ReportService extends BaseService {
-  async artistSales(artist: string) : Promise<Result<Record<string, any>[]>> {
-    let data : Record<string, any>[] = [];
+  async artistMints(artist: string) : Promise<Result<MintReport[]>> {
+    let data : MintReport[] = [];
     
-    return Result.success<Record<string, any>[]>(null, data);
+    const artistCollections = (await CollectionContext.find({
+      owner: artist.toLowerCase()
+    }, {
+      blockchainId: 1
+    })).map(a => a.blockchainId.toString());
+
+    const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
+    
+    const nfts = await ImageContext.find({
+      createdAt: { $gt: minus90Days },
+      collectionId: { $in: artistCollections }
+    }, {
+      nft: 1,
+      collectionName: 1,
+      pirs: 1,
+      initialPrice: 1,
+      title: 1,
+      onSale: 1
+    });
+
+    if(nfts && nfts.length > 0) {
+      data = nfts.map(a => {
+        return <MintReport>{
+          collection: a.collectionName,
+          creator: ((a.pirs.creatorRate || 0)/100).toString() + '%',
+          amount: `${a.initialPrice?.amount.toString()} ${a.initialPrice?.tokenSymbol}`,
+          nft: "#" + a.nft.index + ' ' + a.title,
+          onSale: a.onSale
+        }
+      });
+    }
+    
+    return Result.success<MintReport[]>(null, data);
+  }
+
+  async artistAuctions(artist: string) : Promise<Result<AuctionReport[]>> {
+    let data : AuctionReport[] = [];
+    
+    const artistCollections = (await CollectionContext.find({
+      owner: artist.toLowerCase()
+    }, {
+      blockchainId: 1,
+      title: 1
+    }));
+
+    if(!artistCollections)
+      return Result.success<AuctionReport[]>(null, data);
+
+    const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
+    
+    const nfts = await ImageContext.find({
+      collectionId: { $in: artistCollections.map(a => a.blockchainId.toString()) }
+    }, {
+      nft: 1,
+      collectionId: 1,
+      collectionOwner: 1,
+    });
+
+    if(nfts && nfts.length > 0) {
+      const auctions = await AuctionContext.find({
+        "item.collectionOwner": nfts[0].collectionOwner,
+        "item.index": { $in: nfts.map(a => a.nft.index) },
+        startDt: { $gt: minus90Days }
+      }, {
+        item: 1,
+        updatedAt: 1,
+        check: 1,
+        minimumBid: 1,
+        ended: 1,
+        expirationDt: 1
+      })
+
+      if(auctions && auctions.length > 0) {
+        data = auctions.map(a => {
+          return <AuctionReport>{
+            amount: `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}`,
+            collection: artistCollections.find(
+              z => z.blockchainId.toString() == nfts.find(
+                s => s.nft.index == a.item.index)?.collectionId)?.title,
+            creator: (a.check?.creator || 0).toString() + ' ' + a.minimumBid?.tokenSymbol,
+            nft: "#" + a.item.index + ' ' + a.item.title,
+            sellDT: a.updatedAt,
+            toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime()
+          }
+        });
+      }
+    }
+    
+    return Result.success<AuctionReport[]>(null, data);
   }
 
   async topSellers() : Promise<Result<ISeller[]>> {

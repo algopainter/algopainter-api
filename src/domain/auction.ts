@@ -36,6 +36,7 @@ export interface IAuctionCheck {
   bid: number;
   fee: number;
   net: number;
+  creator: number;
 }
 
 export interface AuctionDocument extends Document {
@@ -46,9 +47,11 @@ export interface AuctionDocument extends Document {
   index: number;
   address: string;
   isHot: boolean;
+  ended: boolean;
   owner: string;
   check: IAuctionCheck;
   users: IUser[];
+  updatedAt: Date;
   bids: IAuctionBidWithUser[];
   returns: IKeyPair<number>;
   pirs: IKeyPair<number>;
@@ -70,6 +73,8 @@ export interface IAuction {
   address: AuctionDocument['address'];
   users: AuctionDocument['users'];
   createdAt: AuctionDocument['createdAt'];
+  updatedAt: Date;
+  ended: boolean;
   isHot: AuctionDocument['isHot'];
   owner: AuctionDocument['owner'];
   bids: AuctionDocument['bids'];
