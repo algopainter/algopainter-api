@@ -93,7 +93,7 @@ export default class ReportService extends BaseService {
                 s => s.nft.index == a.item.index)?.collectionId)?.title,
             creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
             nft: a.item.index + ' ' + a.item.title,
-            sellDT: a.updatedAt,
+            sellDT: a.ended ? a.updatedAt : undefined,
             toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime()
           }
         });

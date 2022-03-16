@@ -11,6 +11,6 @@ export interface AuctionReport {
   collection: string;
   amount: string;
   creator: string;
-  sellDT: Date;
+  sellDT?: Date;
   toClaim: boolean;
 }
