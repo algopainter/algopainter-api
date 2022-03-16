@@ -37,7 +37,7 @@ export default class ReportService extends BaseService {
         return <MintReport>{
           collection: a.collectionName,
           creator: ((a.pirs.creatorRate || 0)/100).toString() + '%',
-          amount: `${a.initialPrice?.amount.toString()} ${a.initialPrice?.tokenSymbol}`,
+          amount: a.initialPrice?.amount ? `${a.initialPrice?.amount.toString()} ${a.initialPrice?.tokenSymbol}` : '',
           nft: "#" + a.nft.index + ' ' + a.title,
           onSale: a.onSale
         }
@@ -87,18 +87,57 @@ export default class ReportService extends BaseService {
       if(auctions && auctions.length > 0) {
         data = auctions.map(a => {
           return <AuctionReport>{
-            amount: `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}`,
+            amount: a.check?.net ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
             collection: artistCollections.find(
               z => z.blockchainId.toString() == nfts.find(
                 s => s.nft.index == a.item.index)?.collectionId)?.title,
-            creator: (a.check?.creator || 0).toString() + ' ' + a.minimumBid?.tokenSymbol,
-            nft: "#" + a.item.index + ' ' + a.item.title,
+            creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
+            nft: a.item.index + ' ' + a.item.title,
             sellDT: a.updatedAt,
             toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime()
           }
         });
       }
     }
+    
+    return Result.success<AuctionReport[]>(null, data);
+  }
+
+  async userAuctions(user: string) : Promise<Result<AuctionReport[]>> {
+    let data : AuctionReport[] = [];
+
+    // const artistCollections = (await CollectionContext.find({  }, {
+    //   blockchainId: 1,
+    //   title: 1
+    // }));
+
+    // const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
+    // const auctions = await AuctionContext.find({
+    //   startDt: { $gt: minus90Days },
+    //   owner: user.toLowerCase()
+    // }, {
+    //   item: 1,
+    //   updatedAt: 1,
+    //   check: 1,
+    //   minimumBid: 1,
+    //   ended: 1,
+    //   expirationDt: 1
+    // })
+
+    // if(auctions && auctions.length > 0) {
+    //   data = auctions.map(a => {
+    //     return <AuctionReport>{
+    //       amount: a.check?.net ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
+    //       collection: artistCollections.find(
+    //         z => z.blockchainId.toString() == nfts.find(
+    //           s => s.nft.index == a.item.index)?.collectionId)?.title,
+    //       creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
+    //       nft: a.item.index + ' ' + a.item.title,
+    //       sellDT: a.updatedAt,
+    //       toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime()
+    //     }
+    //   });
+    // }
     
     return Result.success<AuctionReport[]>(null, data);
   }
