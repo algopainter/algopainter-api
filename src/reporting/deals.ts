@@ -13,4 +13,5 @@ export interface AuctionReport {
   creator: string;
   sellDT?: Date;
   toClaim: boolean;
+  lastBid?: string;
 }

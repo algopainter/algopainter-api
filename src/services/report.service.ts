@@ -109,14 +109,16 @@ export default class ReportService extends BaseService {
     const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
 
     const auctions = await AuctionContext.find({
-      startDt: { $gt: minus90Days }
+      startDt: { $gt: minus90Days },
+      owner: user.toLowerCase()
     }, {
       item: 1,
       updatedAt: 1,
       check: 1,
       minimumBid: 1,
       ended: 1,
-      expirationDt: 1
+      expirationDt: 1,
+      highestBid: 1
     });
 
     if(auctions && auctions.length > 0) {
@@ -127,7 +129,8 @@ export default class ReportService extends BaseService {
           creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
-          toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime()
+          toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
+          lastBid: a.highestBid?.amount ? a.highestBid?.amount + ' ' + a.minimumBid?.tokenSymbol : ''
         }
       });
     }
