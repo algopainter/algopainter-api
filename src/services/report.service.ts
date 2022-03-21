@@ -3,7 +3,7 @@ import { IBuyer } from "../reporting/buyers";
 import { ISeller } from "../reporting/sellers";
 import Result from "../shared/result";
 import { BaseService } from "./base.service";
-import { AuctionReport, MintReport } from "../reporting/deals"
+import { AuctionReport, AuctionUserReport, MintReport } from "../reporting/deals"
 import { ImageContext } from "../domain/image";
 import { CollectionContext } from "../domain/collection";
 import { AuctionContext } from "../domain/auction";
@@ -108,9 +108,21 @@ export default class ReportService extends BaseService {
 
     const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
 
+    const pirsQuery: any = {};
+    const bidbacksQuery: any = {};
+
+    pirsQuery["pirshare." + user.toLowerCase()] = { $gte: 0 };
+    bidbacksQuery["bidbackshare." + user.toLowerCase()] = { $gte: 0 };
+
     const auctions = await AuctionContext.find({
       startDt: { $gt: minus90Days },
-      owner: user.toLowerCase()
+      $or: [
+        { owner: user.toLowerCase() },
+        { "bids.bidder": user.toLowerCase() },
+        { "highestBid.account": user },
+        { ...pirsQuery },
+        { ...bidbacksQuery }
+      ]
     }, {
       item: 1,
       updatedAt: 1,
@@ -118,19 +130,23 @@ export default class ReportService extends BaseService {
       minimumBid: 1,
       ended: 1,
       expirationDt: 1,
-      highestBid: 1
+      highestBid: 1,
+      pirshare: 1,
+      bidbackshare: 1
     });
 
     if(auctions && auctions.length > 0) {
       data = auctions.map(a => {
-        return <AuctionReport>{
-          amount: a.check?.net ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
+        return <AuctionUserReport>{
+          amount: (a.check?.net && a.owner == user) ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
           collection: a.item.collectionName,
           creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
-          lastBid: a.highestBid?.amount ? a.highestBid?.amount + ' ' + a.minimumBid?.tokenSymbol : ''
+          lastBid: a.highestBid?.amount ? a.highestBid?.amount + ' ' + a.minimumBid?.tokenSymbol : '',
+          pirs: a.pirshare && a.pirshare[user] ? a.pirshare[user].toLocaleString().replaceAll(',', '') : '',
+          bidback: a.bidbackshare && a.bidbackshare[user] ? a.bidbackshare[user].toLocaleString().replaceAll(',', '') : ''
         }
       });
     }

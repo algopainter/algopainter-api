@@ -15,3 +15,8 @@ export interface AuctionReport {
   toClaim: boolean;
   lastBid?: string;
 }
+
+export interface AuctionUserReport extends AuctionReport {
+  pirs: string;
+  bidback: string;
+}

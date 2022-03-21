@@ -21,7 +21,8 @@
     "module": "commonjs",
     "lib": [
       "es2018",
-      "dom"
+      "dom",
+      "ES2021.String"
     ],
     "typeRoots": [
       "./node_modules/@types",
