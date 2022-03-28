@@ -16,6 +16,7 @@ export interface IAuctionItem {
   _id: string;
   likes: number;
   index: number;
+  sequentialNumber?: number;
   title: string;
   previewImageUrl: string;
   collectionName: string;
@@ -93,6 +94,7 @@ const itemSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   index: { type: Number, required: true },
+  sequentialNumber: { type: Number, required: false },
   image: { type: String, required: true },
   previewImage: { type: String, required: true },
   rawImage: { type: String, required: true },
