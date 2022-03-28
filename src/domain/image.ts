@@ -8,6 +8,7 @@ export interface IImageNFTInfo {
   image: string;
   previewImage: string;
   rawImage: string;
+  sequentialNumber: number;
   parameters: Record<string, unknown>;
 }
 export interface IInitialPrice {
