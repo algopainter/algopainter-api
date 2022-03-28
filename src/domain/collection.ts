@@ -2,23 +2,29 @@ import { model, Schema, Model, Document } from 'mongoose';
 import v8n from "v8n";
 
 export interface CollectionDocument extends Document {
+  blockchainId: number,
   title: string;
+  namelc: string;
   description: string;
   show: boolean;
+  isCustom: boolean;
   owner: string;
   avatar: string | null | undefined;
   account: string;
+  website: string;
+  approvedBy: string;
   metrics: ICollectionMetrics | null | undefined;
   api: ICollectionNFTCreationAPI | null | undefined;
 }
 
 export interface ICollectionMetrics {
-  ntfs: number;
+  nfts: number;
   startDT: Date;
   endDT: Date;
   priceType: 'fixed' | 'variable';
   tokenPriceAddress: string | null | undefined;
   tokenPriceSymbol: string | null | undefined; // ETH ALGOP 
+  startingPrice: string;
   priceRange: ICollectionMetricsPriceRange[] | null | undefined;
   creatorPercentage: number;
   walletAddress: string;
@@ -28,8 +34,6 @@ export interface ICollectionMetricsPriceRange {
   from: number;
   to: number;
   amount: number;
-  tokenPriceAddress: string;
-  tokenPriceSymbol: string;
 }
 
 export interface ICollectionNFTCreationAPI {
@@ -38,23 +42,33 @@ export interface ICollectionNFTCreationAPI {
 }
 
 export interface ICollection {
+  blockchainId: CollectionDocument['blockchainId'];
   title: CollectionDocument['title'];
+  namelc: CollectionDocument['namelc'];
   description: CollectionDocument['description'];
   owner: CollectionDocument['owner'];
+  show: CollectionDocument['show'];
+  isCustom: CollectionDocument['isCustom'];
   avatar: CollectionDocument['avatar'];
   account: CollectionDocument['account'];
+  approvedBy: CollectionDocument['approvedBy'];
   metrics: CollectionDocument['metrics'];
+  website: CollectionDocument['website'];
   api: CollectionDocument['api'];
 }
 
 export const CollectionSchema: Schema = new Schema({
+  blockchainId: { type: Number, required: false },
   title: { type: String, required: true },
+  namelc: { type: String, required: true },
   description: { type: String, required: true },
   show: { type: Boolean, required: false },
   owner: { type: String, required: true, index: true },
   avatar: { type: String, required: false },
-  account: { type: String, required: true },
+  account: { type: String, required: true, index: true },
   metrics: { type: Object, required: false },
+  webSite: { type: String, required: false },
+  approvedBy: { type: String, required: false },
   api: { type: Object, required: false },
 });
 
@@ -66,7 +80,43 @@ function priceTypeValidation() {
 
 v8n.extend({ priceTypeValidation });
 
-export const CollectionValidator = v8n().schema({
+export const CollectionValidator = function(data: ICollection) {
+  if(!data.title || data.title.length <= 6 || data.title.length > 30) {
+    return '[title] is invalid.'
+  }
+
+  if(!data.description || data.description.length > 500) {
+    return '[description] is invalid.'
+  }
+
+  if(!data.account || data.account.length != 42) {
+    return '[account] is invalid.'
+  }
+
+  if(!data.metrics) {
+    return '[metrics] is invalid.'
+  } else {
+    if(!data.metrics.nfts || data.metrics.nfts > 1000 || data.metrics.nfts <= 0) {
+      return '[metrics.nfts] is invalid.'
+    }
+
+    if(!data.metrics.priceType || !['fixed', 'variable'].includes(data.metrics.priceType)) {
+      return '[metrics.priceType] is invalid.'
+    }
+
+    if(!data.metrics.creatorPercentage || data.metrics.creatorPercentage < 0 || data.metrics.creatorPercentage > 3000) {
+      return '[metrics.creatorPercentage] is invalid.'
+    }
+
+    if(!data.metrics.walletAddress || data.metrics.walletAddress.length != 42) {
+      return '[metrics.walletAddress] is invalid.'
+    }
+  }
+
+  return null;
+};
+
+export const x = v8n().schema({
   title: v8n().string().minLength(6).maxLength(30),
   description: v8n().string().maxLength(500),
   avatar: v8n().string(),

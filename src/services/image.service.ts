@@ -346,7 +346,7 @@ export default class ImageService extends BaseCRUDService<IImage> {
 
   private async _validateLikeSign(request: ILikeRequest, id: string) {
     const signService = new SignService();
-    if (!await signService.validate<ILikeSignData>(request, { imageId: id, salt: request.salt }, 'like'))
+    if (!(await signService.validate<ILikeSignData>(request, { imageId: id, salt: request.salt }, 'like')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
   }
 
@@ -399,12 +399,17 @@ export default class ImageService extends BaseCRUDService<IImage> {
     return Result.success<IImage>(null, null);
   }
 
-  async pinToIPFS(body: Record<string, any>, type: string) : Promise<Result<Record<string, string>>> {
+  async pinToIPFS(body: Record<string, any>, type: string, doResize: boolean = false) : Promise<Result<Record<string, string>>> {
     if (!body)
       return Result.fail<Record<string, string>>("The payload is empty.", null);
     
     if(type == 'FILE') {
-      const rawImage64 = body.image;
+      let rawImage64 = body.image;
+
+      if(doResize) {
+        rawImage64 = await this.resizeImage(rawImage64, 400, 400);
+      }
+
       const rawImageBytes = rawImage64.split(',')[1];
       const rawImageHash = Web3.utils.keccak256(rawImageBytes);
 

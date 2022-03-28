@@ -1,7 +1,7 @@
 import Result from "../shared/result";
 import { CollectionContext, CollectionDocument, ICollection, CollectionValidator } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
-import { ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
+import { ICollectionApproveRequest, ICollectionApproveRequestSignData, ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
 import Paged from "../shared/paged";
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
@@ -13,16 +13,50 @@ import Exception from "../shared/exception";
 export default class CollectionService extends BaseCRUDService<ICollection> {
   async listAsync(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
     const data = await CollectionContext
+      .find({
+        ...this.translateToMongoQuery(filter),
+        "metrics.endDT": { $gt: new Date() }
+      })
+      .sort(this.translateToMongoOrder(order));
+    return Result.success<ICollection[]>(null, data);
+  }
+
+  async listAsync2(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
+    const data = await CollectionContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
     return Result.success<ICollection[]>(null, data);
   }
 
-  async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
+  async pagedAsync2(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
     const query = this.translateToMongoQuery(filter);
     const count = await CollectionContext.find(query).countDocuments();
     const data = await CollectionContext
       .find(query)
+      .sort(this.translateToMongoOrder(order))
+      .skip((page - 1) * (perPage))
+      .limit(perPage);
+
+    return Result.success<Paged<ICollection>>(null, {
+      count,
+      currPage: page,
+      pages: Math.ceil(count / perPage),
+      perPage,
+      data
+    });
+  }
+
+  async pagedAsync(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
+    const query = this.translateToMongoQuery(filter);
+    const count = await CollectionContext.find({
+      ...query,
+      "metrics.endDT": { $gt: new Date() }
+    }).countDocuments();
+    const data = await CollectionContext
+      .find({
+        ...query,
+        "metrics.endDT": { $gt: new Date() }
+      })
       .sort(this.translateToMongoOrder(order))
       .skip((page - 1) * (perPage))
       .limit(perPage);
@@ -51,8 +85,61 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
   }
 
   private validateCollectionData(data: ICollection) : any {
-    CollectionValidator.check(data);
-    return CollectionValidator.test(data);
+    var invalid = CollectionValidator(data);
+    if(invalid)
+      throw new Error(invalid);
+  }
+
+  async patchCollection(request: ICollectionPatchRequest, id: number) {
+    let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
+
+    if (!request || !request.data)
+      return responseResult;
+
+    const signService = new SignService();
+    const sign = await signService.validate<ICollectionPatchRequestSignData>(request, request.data, 'collection_patch');
+    if (!sign.isValid)
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    const result = await CollectionContext.findOne({
+      blockchainId: id,
+      account: sign.account
+    });
+
+    if(result) {
+      return await this.updateAsync((result as CollectionDocument)._id, {
+        avatar: request.data.avatar,
+        description: request.data.description,
+        api: request.data.api,
+        website: request.data.website,
+      });
+    }
+
+    return responseResult;    
+  }
+
+  async approveCollection(request: ICollectionApproveRequest, id: number, disapprove: boolean) {
+    let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
+
+    if (!request || !request.data)
+      return responseResult;
+
+    const signService = new SignService();
+    if (!(await signService.validate<ICollectionApproveRequestSignData>(request, request.data, 'approve_collection')).isValid)
+      throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
+
+    const result = await CollectionContext.findOne({
+      blockchainId: id
+    });
+
+    if(result && id.toString() === request.data.collectionId.toString()) {
+      return await this.updateAsync((result as CollectionDocument)._id, {
+        show: !disapprove,
+        approvedBy: request.data.approvedBy
+      });
+    }
+
+    return responseResult;    
   }
 
   async createOrUpdateCollectionWithSign(request: ICollectionUpdateCreateRequest, id: string | undefined = undefined): Promise<Result<ICollection>> {
@@ -62,7 +149,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       return responseResult;
 
     const signService = new SignService();
-    if (!await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation'))
+    if (!(await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
     if (!(await this._checkUniqueness(request.data)) && this.validateCollectionData(request.data)) {
@@ -86,17 +173,6 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
           api: request.data.api
         });
         responseResult = await this.getByTitleAsync(request.data.title);
-      } else {
-        const createResult = await this.createAsync({
-          title: request.data.title,
-          avatar: request.data.avatar,
-          account: request.data.account,
-          description: request.data.description,
-          owner: request.data.owner,
-          metrics: request.data.metrics,
-          api: request.data.api
-        });
-        responseResult = createResult;
       }
     } else {
       responseResult = Result.custom<ICollection>(false, "The data sent is not unique!", null, 409, 390);
@@ -132,7 +208,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return Result.success<ICollection>(null, input);
   }
 
-  async updateAsync(id: string, updatedItem: ICollection): Promise<Result<ICollection>> {
+  async updateAsync(id: string, updatedItem: Partial<ICollection>): Promise<Result<ICollection>> {
     const input = await CollectionContext.findByIdAndUpdate(id, updatedItem);
     return Result.success<ICollection>(null, (input as ICollection));
   }

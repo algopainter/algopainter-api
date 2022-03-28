@@ -1,3 +1,4 @@
+import Axios from "axios";
 import { Router } from "express";
 import { IImage } from "../domain/image";
 import ImageService from "../services/image.service";
@@ -18,6 +19,16 @@ class ImageController extends BaseController {
   }
 
   intializeRoutes(router : Router) : void {
+    router.get(`${this.path}/random/dog`, async (req, res) => {
+      Axios.get(`https://dog.ceo/api/breed/${req.query.breed}/images/random`).then(response => {
+        Axios.get(response.data.message, {  responseType: 'arraybuffer' }).then(imageResponse => {
+          res.set('Content-Type', 'image/png')
+             .set('Content-Length', imageResponse.data.length)
+             .send(imageResponse.data);
+        });
+      });
+    });
+
     router.get(`${this.path}`, async (req, res) => {
       try {
         const params = this.requestParams(req);
@@ -76,7 +87,7 @@ class ImageController extends BaseController {
 
     router.post(`${this.path}/pinToIPFS/:type`, async (req, res) => {
       try {
-        const result = await this.service.pinToIPFS(req.body, req.params.type);
+        const result = await this.service.pinToIPFS(req.body, req.params.type, parseInt(req.query.resize as string) == 1);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);

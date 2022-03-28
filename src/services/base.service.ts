@@ -16,6 +16,10 @@ export abstract class BaseService {
       if(filter[Object.keys(filter)[index]]?.startsWith('0x')) { //is a Hash
         query[Object.keys(filter)[index]] = filter[Object.keys(filter)[index]];
       }
+
+      if(filter[Object.keys(filter)[index]]?.startsWith('|NO_PARSE|')) { //is a Hash
+        query[Object.keys(filter)[index]] = filter[Object.keys(filter)[index]].replace('|NO_PARSE|', '');
+      }
     }
     return query;
   }

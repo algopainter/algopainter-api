@@ -16,6 +16,7 @@ export interface IAuctionItem {
   _id: string;
   likes: number;
   index: number;
+  sequentialNumber?: number;
   title: string;
   previewImageUrl: string;
   collectionName: string;
@@ -36,6 +37,7 @@ export interface IAuctionCheck {
   bid: number;
   fee: number;
   net: number;
+  creator: number;
 }
 
 export interface AuctionDocument extends Document {
@@ -46,9 +48,11 @@ export interface AuctionDocument extends Document {
   index: number;
   address: string;
   isHot: boolean;
+  ended: boolean;
   owner: string;
   check: IAuctionCheck;
   users: IUser[];
+  updatedAt: Date;
   bids: IAuctionBidWithUser[];
   returns: IKeyPair<number>;
   pirs: IKeyPair<number>;
@@ -70,6 +74,8 @@ export interface IAuction {
   address: AuctionDocument['address'];
   users: AuctionDocument['users'];
   createdAt: AuctionDocument['createdAt'];
+  updatedAt: Date;
+  ended: boolean;
   isHot: AuctionDocument['isHot'];
   owner: AuctionDocument['owner'];
   bids: AuctionDocument['bids'];
@@ -88,6 +94,7 @@ const itemSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   index: { type: Number, required: true },
+  sequentialNumber: { type: Number, required: false },
   image: { type: String, required: true },
   previewImage: { type: String, required: true },
   rawImage: { type: String, required: true },

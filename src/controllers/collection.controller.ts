@@ -6,7 +6,8 @@ import Paged from "../shared/paged";
 import Result from "../shared/result";
 import BaseController from "./base.controller"
 import { IImage } from "../domain/image";
-import { ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
+import { ICollectionApproveRequest, ICollectionPatchRequest, ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
+
 
 class CollectionController extends BaseController {
   private service: CollectionService;
@@ -23,18 +24,47 @@ class CollectionController extends BaseController {
   }
 
   intializeRoutes(router: Router): void {
-    router.post(`${this.path}`, async (req, res) => {
+    router.get(`${this.path}/custom/all`, async (req, res) => {
       try {
-        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
+        const params = this.requestParams(req);
+        let result: Result<Paged<ICollection>> | Result<ICollection[]> | null = null;
+        if (params.paging.page === -1 || params.paging.page === -1) {
+          result = await this.service.listAsync2(params.filter, params.order);
+        } else {
+          result = await this.service.pagedAsync2(
+            params.filter,
+            params.order,
+            params.paging.page,
+            params.paging.perPage
+          );
+        }
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
       }
     });
 
-    router.put(`${this.path}/:id`, async (req, res) => {
+    router.patch(`${this.path}/:collectionId`, async (req, res) => {
       try {
-        const result = await this.service.createOrUpdateCollectionWithSign(req.body as ICollectionUpdateCreateRequest);
+        const result = await this.service.patchCollection(req.body as ICollectionPatchRequest, parseInt(req.params.collectionId));
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:collectionId/approve`, async (req, res) => {
+      try {
+        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId), false);
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.put(`${this.path}/:collectionId/disapprove`, async (req, res) => {
+      try {
+        const result = await this.service.approveCollection(req.body as ICollectionApproveRequest, parseInt(req.params.collectionId), true);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
@@ -61,7 +91,7 @@ class CollectionController extends BaseController {
       }
     });
 
-    router.get(`${this.path}/:id`, async (req, res) => {
+    router.get(`${this.path}/db/:id`, async (req, res) => {
       try {
         const result = await this.service.getAsync(req.params.id);
         this.handleResult(result, res);
@@ -75,7 +105,10 @@ class CollectionController extends BaseController {
         const resultCollection = await this.service.getAsync(req.params.id);
         if (resultCollection && resultCollection.data) {
           delete req.query.id;
-          req.query.collectionOwner = (resultCollection.data as ICollection).owner;
+          if(resultCollection.data.blockchainId)
+            req.query.collectionId = '|NO_PARSE|' + (resultCollection.data as ICollection).blockchainId.toString();
+          else
+            req.query.collectionOwner = (resultCollection.data as ICollection).owner;
           const params = this.requestParams(req);
           let result: Result<Paged<IImage>> | Result<IImage[]> | null = null;
           if (params.paging.page === -1 || params.paging.page === -1) {

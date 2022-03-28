@@ -8,10 +8,10 @@ export default class SignService extends BaseService {
   /**
    * Validates the signature
    */
-  async validate<T>(sign: ISign<T>, desired: T, action: string): Promise<boolean> {
+  async validate<T>(sign: ISign<T>, desired: T, action: string): Promise<{isValid: boolean, account: string}> {
     if (Object.prototype.hasOwnProperty.call(sign.data, 'salt')) {
       if (sign.salt != (<any>sign.data).salt)
-        return false;
+        return { isValid: false, account: '' };
     }
 
     const web3 = new Web3();
@@ -33,7 +33,7 @@ export default class SignService extends BaseService {
       });
     }
 
-    return isValid;
+    return { isValid, account: signerLocal.toLowerCase() };
   }
 
   async validatePreRequest(metadata: Record<string, any>): Promise<boolean | null> {

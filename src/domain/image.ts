@@ -8,9 +8,14 @@ export interface IImageNFTInfo {
   image: string;
   previewImage: string;
   rawImage: string;
+  sequentialNumber: number;
   parameters: Record<string, unknown>;
 }
-
+export interface IInitialPrice {
+  amount: string;
+  tokenSymbol: string;
+  tokenAddress: string;
+}
 export interface ImageDocument extends Document {
   title: string;
   onSale: boolean;
@@ -18,6 +23,7 @@ export interface ImageDocument extends Document {
   description: string;
   collectionName: string;
   collectionOwner: string;
+  collectionId: string;
   createdAt: Date;
   updatedAt: Date;
   tags: string[];
@@ -27,6 +33,7 @@ export interface ImageDocument extends Document {
   creator: string;
   users: IUser[];
   likers?: string[] | null;
+  initialPrice?: IInitialPrice;
 }
 
 export interface IImage {
@@ -34,6 +41,7 @@ export interface IImage {
   likes: ImageDocument['likes'];
   users: ImageDocument['users'];
   onSale: ImageDocument['onSale'];
+  collectionId: string;
   collectionName: ImageDocument['collectionName'];
   collectionOwner: ImageDocument['collectionOwner'];
   createdAt: ImageDocument['createdAt'];
@@ -45,6 +53,7 @@ export interface IImage {
   owner: ImageDocument['owner'];
   creator: ImageDocument['creator'];
   likers?: ImageDocument['likers'];
+  initialPrice?: ImageDocument['initialPrice'];
 }
 
 export const ImageSchema: Schema = new Schema({
@@ -52,6 +61,7 @@ export const ImageSchema: Schema = new Schema({
   likes: { type: Number, required: true },
   users: { type: [Object], required: true },
   description: { type: String, required: true },
+  collectionId: { type: String, required: false },
   collectionName: { type: String, required: true },
   collectionOwner: { type: String, required: true },
   onSale: { type: Boolean, default: false },
@@ -63,6 +73,7 @@ export const ImageSchema: Schema = new Schema({
   owner: { type: String, required: true, index: true },
   creator: { type: String, required: true, index: true },
   likers: { type: [String], required: false },
+  initialPrice: { type: Object, required: false },
 });
 
 export const ImageContext: Model<ImageDocument> = model('images', ImageSchema);

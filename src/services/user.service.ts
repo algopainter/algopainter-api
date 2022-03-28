@@ -312,7 +312,7 @@ export default class UserService extends BaseCRUDService<IUser> {
       return responseResult;
 
     const signService = new SignService();
-    if (!await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update'))
+    if (!(await signService.validate<IUserUpdateSignData>(request, request.data, 'user_update')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
     if (request.data.customProfile !== null &&
