@@ -51,7 +51,10 @@ export default class ReportService extends BaseService {
     let data : AuctionReport[] = [];
     
     const artistCollections = (await CollectionContext.find({
-      owner: artist.toLowerCase()
+      $or: [
+        { owner: artist.toLowerCase() },
+        { owner: artist }
+      ]
     }, {
       blockchainId: 1,
       title: 1
@@ -132,22 +135,26 @@ export default class ReportService extends BaseService {
       expirationDt: 1,
       highestBid: 1,
       pirshare: 1,
-      bidbackshare: 1
+      bidbackshare: 1,
+      owner: 1
     });
 
     if(auctions && auctions.length > 0) {
       data = auctions.map(a => {
-        return <AuctionUserReport>{
-          amount: (a.check?.net && a.owner == user) ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
+        
+        const value = <AuctionUserReport>{
+          amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
           collection: a.item.collectionName,
           creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
-          lastBid: a.highestBid?.amount ? a.highestBid?.amount + ' ' + a.minimumBid?.tokenSymbol : '',
+          lastBid: a.highestBid?.amount ? (a.highestBid?.amount / Math.pow(10, 18)) + ' ' + a.minimumBid?.tokenSymbol : '',
           pirs: a.pirshare && a.pirshare[user] ? a.pirshare[user].toLocaleString().replaceAll(',', '') : '',
           bidback: a.bidbackshare && a.bidbackshare[user] ? a.bidbackshare[user].toLocaleString().replaceAll(',', '') : ''
-        }
+        };
+
+        return value;
       });
     }
     
