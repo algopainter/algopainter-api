@@ -127,6 +127,7 @@ export default class ReportService extends BaseService {
         { ...bidbacksQuery }
       ]
     }, {
+      index: 1,
       item: 1,
       updatedAt: 1,
       check: 1,
@@ -136,22 +137,24 @@ export default class ReportService extends BaseService {
       highestBid: 1,
       pirshare: 1,
       bidbackshare: 1,
-      owner: 1
+      owner: 1,
+      fee: 1
     });
 
     if(auctions && auctions.length > 0) {
       data = auctions.map(a => {
         
         const value = <AuctionUserReport>{
-          amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
+          index: a.index,
+          amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net.toFixed(2)} ${a.minimumBid?.tokenSymbol}` : '',
           collection: a.item.collectionName,
-          creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
+          creator: a.check?.creator ? (a.check.creator.toFixed(2) + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
-          lastBid: a.highestBid?.amount ? (a.highestBid?.amount / Math.pow(10, 18)) + ' ' + a.minimumBid?.tokenSymbol : '',
-          pirs: a.pirshare && a.pirshare[user] ? a.pirshare[user].toLocaleString().replaceAll(',', '') : '',
-          bidback: a.bidbackshare && a.bidbackshare[user] ? a.bidbackshare[user].toLocaleString().replaceAll(',', '') : ''
+          lastBid: a.highestBid?.amount ? (a.highestBid?.amount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
+          stakePirs: a.pirshare && a.pirshare[user.toLowerCase()] ? a.pirshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : '',
+          stakeBidback: a.bidbackshare && a.bidbackshare[user.toLowerCase()] ? a.bidbackshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : ''
         };
 
         return value;

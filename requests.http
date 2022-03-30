@@ -1,1 +1,1 @@
-GET http://localhost:3000/api/reports/artist/0x2a28593abB56B0F425FED25d4Dcc0ff7DDDedABf/mints
+GET http://localhost:3000/api/reports/user/0x0B27e014311eD64E095e55c0e23DFE186e5926BD/auctions
