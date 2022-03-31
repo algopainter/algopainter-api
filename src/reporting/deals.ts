@@ -19,6 +19,6 @@ export interface AuctionReport {
 
 export interface AuctionUserReport extends AuctionReport {
   bidBackRate: number;
-  stakePirs: string;
-  stakeBidback: string;
+  stakePirs: number;
+  stakeBidback: number;
 }

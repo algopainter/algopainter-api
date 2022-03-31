@@ -156,8 +156,8 @@ export default class ReportService extends BaseService {
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
           lastBid: a.highestBid?.netAmount ? (a.highestBid?.netAmount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
-          stakePirs: a.pirshare && a.pirshare[user.toLowerCase()] ? a.pirshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : '',
-          stakeBidback: a.bidbackshare && a.bidbackshare[user.toLowerCase()] ? a.bidbackshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : ''
+          stakePirs: a.pirshare && a.pirshare[user.toLowerCase()] ? a.pirshare[user.toLowerCase()] : 0,
+          stakeBidback: a.bidbackshare && a.bidbackshare[user.toLowerCase()] ? a.bidbackshare[user.toLowerCase()] : 0
         };
 
         return value;
