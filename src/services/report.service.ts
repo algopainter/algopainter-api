@@ -79,6 +79,7 @@ export default class ReportService extends BaseService {
         "item.index": { $in: nfts.map(a => a.nft.index) },
         startDt: { $gt: minus90Days }
       }, {
+        index: 1,
         item: 1,
         updatedAt: 1,
         check: 1,
@@ -90,6 +91,7 @@ export default class ReportService extends BaseService {
       if(auctions && auctions.length > 0) {
         data = auctions.map(a => {
           return <AuctionReport>{
+            index: a.index,
             amount: a.check?.net ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
             collection: artistCollections.find(
               z => z.blockchainId.toString() == nfts.find(
@@ -146,13 +148,14 @@ export default class ReportService extends BaseService {
         
         const value = <AuctionUserReport>{
           index: a.index,
+          bidBackRate: a.fee.bidbackRate / 100,
           amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net.toFixed(2)} ${a.minimumBid?.tokenSymbol}` : '',
           collection: a.item.collectionName,
           creator: a.check?.creator ? (a.check.creator.toFixed(2) + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
-          lastBid: a.highestBid?.amount ? (a.highestBid?.amount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
+          lastBid: a.highestBid?.netAmount ? (a.highestBid?.netAmount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
           stakePirs: a.pirshare && a.pirshare[user.toLowerCase()] ? a.pirshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : '',
           stakeBidback: a.bidbackshare && a.bidbackshare[user.toLowerCase()] ? a.bidbackshare[user.toLowerCase()].toLocaleString().replaceAll(',', '') : ''
         };
