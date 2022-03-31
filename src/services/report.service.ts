@@ -7,6 +7,7 @@ import { AuctionReport, AuctionUserReport, MintReport } from "../reporting/deals
 import { ImageContext } from "../domain/image";
 import { CollectionContext } from "../domain/collection";
 import { AuctionContext } from "../domain/auction";
+import { GLContext } from "../domain/gl";
 
 export default class ReportService extends BaseService {
   async artistMints(artist: string) : Promise<Result<MintReport[]>> {
@@ -137,11 +138,69 @@ export default class ReportService extends BaseService {
       ended: 1,
       expirationDt: 1,
       highestBid: 1,
-      pirshare: 1,
-      bidbackshare: 1,
+      pirs: 1,
+      bidbacks: 1,
       owner: 1,
       fee: 1
     });
+
+    const claimedBidbacks = (await GLContext.find({
+      account : user.toLowerCase(),
+      type : 'bidbackclaimed',
+      $or: [
+        ...auctions.map(a => { return { auction: a.index } } )
+      ]
+    }, {
+      amount: 1,
+      account: 1,
+      auction: 1
+    })).map(a => {
+      return {
+        auction: a.auction,
+        account: a.account,
+        amount: a.amount,
+      };
+    });
+
+    const claimedPirs = (await GLContext.find({
+      account : user.toLowerCase(),
+      type : 'pirclaimed',
+      $or: [
+        ...auctions.map(a => { return { auction: a.index } } )
+      ]
+    }, {
+      amount: 1,
+      account: 1,
+      auction: 1
+    })).map(a => {
+      return {
+        auction: a.auction,
+        account: a.account,
+        amount: a.amount,
+      };
+    });
+
+    const findBidback = (auction: number, symbol?: string) => {
+      if(claimedBidbacks && claimedBidbacks.length > 0) {
+        for (let i = 0; i < claimedBidbacks.length; i++) {
+          const element = claimedBidbacks[i];
+          if(element.account === user.toLowerCase() && element.auction === auction)
+            return (element.amount / Math.pow(10, 18)).toFixed(2) + ' ' + symbol;
+        }
+      }
+      return '';
+    };
+
+    const findPirs = (auction: number, symbol?: string) => {
+      if(claimedPirs && claimedPirs.length > 0) {
+        for (let i = 0; i < claimedPirs.length; i++) {
+          const element = claimedPirs[i];
+          if(element.account === user.toLowerCase() && element.auction === auction)
+            return (element.amount / Math.pow(10, 18)).toFixed(2) + ' ' + symbol;
+        }
+      }
+      return '';
+    };
 
     if(auctions && auctions.length > 0) {
       data = auctions.map(a => {
@@ -156,8 +215,8 @@ export default class ReportService extends BaseService {
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
           lastBid: a.highestBid?.netAmount ? (a.highestBid?.netAmount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
-          stakePirs: a.pirshare && a.pirshare[user.toLowerCase()] ? a.pirshare[user.toLowerCase()] : 0,
-          stakeBidback: a.bidbackshare && a.bidbackshare[user.toLowerCase()] ? a.bidbackshare[user.toLowerCase()] : 0
+          bidback: findBidback(a.index, a.minimumBid?.tokenSymbol),
+          pirs: findPirs(a.index, a.minimumBid?.tokenSymbol)
         };
 
         return value;
