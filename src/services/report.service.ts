@@ -185,7 +185,7 @@ export default class ReportService extends BaseService {
         for (let i = 0; i < claimedBidbacks.length; i++) {
           const element = claimedBidbacks[i];
           if(element.account === user.toLowerCase() && element.auction === auction)
-            return (element.amount / Math.pow(10, 18)).toFixed(2) + ' ' + symbol;
+            return (element.amount / Math.pow(10, 18)) + ' ' + symbol;
         }
       }
       return '';
@@ -196,7 +196,7 @@ export default class ReportService extends BaseService {
         for (let i = 0; i < claimedPirs.length; i++) {
           const element = claimedPirs[i];
           if(element.account === user.toLowerCase() && element.auction === auction)
-            return (element.amount / Math.pow(10, 18)).toFixed(2) + ' ' + symbol;
+            return (element.amount / Math.pow(10, 18)) + ' ' + symbol;
         }
       }
       return '';
@@ -208,13 +208,13 @@ export default class ReportService extends BaseService {
         const value = <AuctionUserReport>{
           index: a.index,
           bidBackRate: a.fee.bidbackRate / 100,
-          amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net.toFixed(2)} ${a.minimumBid?.tokenSymbol}` : '',
+          amount: (a.check?.net && a.owner == user.toLowerCase()) ? `${a.check?.net} ${a.minimumBid?.tokenSymbol}` : '',
           collection: a.item.collectionName,
-          creator: a.check?.creator ? (a.check.creator.toFixed(2) + ' ' + a.minimumBid?.tokenSymbol) : '',
+          creator: a.check?.creator ? (a.check.creator + ' ' + a.minimumBid?.tokenSymbol) : '',
           nft: a.item.index + ' ' + a.item.title,
           sellDT: a.ended ? a.updatedAt : undefined,
           toClaim: !a.ended && a.expirationDt.getTime() <= new Date().getTime(),
-          lastBid: a.highestBid?.netAmount ? (a.highestBid?.netAmount / Math.pow(10, 18)).toFixed(2) + ' ' + a.minimumBid?.tokenSymbol : '',
+          lastBid: a.highestBid?.netAmount ? (a.highestBid?.netAmount / Math.pow(10, 18)) + ' ' + a.minimumBid?.tokenSymbol : '',
           bidback: findBidback(a.index, a.minimumBid?.tokenSymbol),
           pirs: findPirs(a.index, a.minimumBid?.tokenSymbol)
         };
