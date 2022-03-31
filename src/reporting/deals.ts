@@ -7,6 +7,7 @@ export interface MintReport {
 }
 
 export interface AuctionReport {
+  index: number;
   nft: string;
   collection: string;
   amount: string;
@@ -17,6 +18,7 @@ export interface AuctionReport {
 }
 
 export interface AuctionUserReport extends AuctionReport {
+  bidBackRate: number;
   pirs: string;
   bidback: string;
 }

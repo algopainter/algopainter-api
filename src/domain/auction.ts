@@ -26,7 +26,7 @@ export interface IAuctionItem {
 }
 
 export interface IAuctionFees {
-  bidBack: number;
+  bidbackRate: number;
   address: string;
   auction: string;
 }
