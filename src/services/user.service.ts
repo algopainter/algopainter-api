@@ -140,7 +140,7 @@ export default class UserService extends BaseCRUDService<IUser> {
             expirationDt: { $lte: new Date() },
             "highestBid.account": { $ne: account },
             ...doNotHaveReturns
-          }, 
+          },
           {
             "bids.bidder": account.toLowerCase(),
             "highestBid.account": account,
@@ -150,16 +150,16 @@ export default class UserService extends BaseCRUDService<IUser> {
             "bids.bidder": account.toLowerCase(),
             "highestBid.account": { $ne: account },
             ...doNotHaveReturns
-          }, 
+          },
         ]
       });
 
       if (auctionToExclude && auctionToExclude.length) {
-        auctionToExclude.map(a => { 
+        auctionToExclude.map(a => {
           willExclude.push(a.index);
-          
+
           //Even when a the user is not eligible to check bids if he has something to return must show.
-          if(a.returns && a.returns[account] > 0) {
+          if (a.returns && a.returns[account] > 0) {
             delete willExclude[willExclude.length - 1];
           }
         });
@@ -407,45 +407,62 @@ export default class UserService extends BaseCRUDService<IUser> {
   }
 
   private async _propagateUserChanges(account: string, userInfo: IUserUpdateSignData) {
-    await ImageContext.updateMany({
-      users: {
-        $elemMatch: {
-          account: account.toLowerCase()
-        }
+    await AuctionContext.updateMany({
+      "users.account": account.toLowerCase()
+    }, {
+      "$set": {
+        'users.$[elem].name': userInfo.name,
+        'users.$[elem].avatar': userInfo.avatar,
+        'users.$[elem].customProfile': userInfo.customProfile,
       }
     }, {
-      'users.$[].name': userInfo.name,
-      'users.$[].avatar': userInfo.avatar,
-      'users.$[].customProfile': userInfo.customProfile,
-      'users.$[].webSite': userInfo.webSite,
-      'users.$[].email': userInfo.email,
-      'users.$[].facebook': userInfo.facebook,
-      'users.$[].instagram': userInfo.instagram,
-      'users.$[].twitter': userInfo.twitter,
-      'users.$[].telegram': userInfo.telegram,
-      'users.$[].gmail': userInfo.gmail
+      "arrayFilters": [{
+        "elem.account": account.toLowerCase()
+      }],
+      multi: true
+    });
+
+    await ImageContext.updateMany({
+      "users.account": account.toLowerCase()
     }, {
+      "$set": {
+        'users.$[elem].name': userInfo.name,
+        'users.$[elem].avatar': userInfo.avatar,
+        'users.$[elem].customProfile': userInfo.customProfile,
+        'users.$[elem].webSite': userInfo.webSite,
+        'users.$[elem].email': userInfo.email,
+        'users.$[elem].facebook': userInfo.facebook,
+        'users.$[elem].instagram': userInfo.instagram,
+        'users.$[elem].twitter': userInfo.twitter,
+        'users.$[elem].telegram': userInfo.telegram,
+        'users.$[elem].gmail': userInfo.gmail
+      }
+    }, {
+      "arrayFilters": [{
+        "elem.account": account.toLowerCase()
+      }],
       multi: true
     });
 
     await AuctionContext.updateMany({
-      bids: {
-        $elemMatch: {
-          account: account.toLowerCase()
-        }
+      "bids.bidder": account.toLowerCase()
+    }, {
+      "$set": {
+        'bids.$[elem].name': userInfo.name,
+        'bids.$[elem].avatar': userInfo.avatar,
+        'bids.$[elem].customProfile': userInfo.customProfile,
+        'bids.$[elem].webSite': userInfo.webSite,
+        'bids.$[elem].email': userInfo.email,
+        'bids.$[elem].facebook': userInfo.facebook,
+        'bids.$[elem].instagram': userInfo.instagram,
+        'bids.$[elem].twitter': userInfo.twitter,
+        'bids.$[elem].telegram': userInfo.telegram,
+        'bids.$[elem].gmail': userInfo.gmail
       }
     }, {
-      'bids.$[].name': userInfo.name,
-      'bids.$[].avatar': userInfo.avatar,
-      'bids.$[].customProfile': userInfo.customProfile,
-      'bids.$[].webSite': userInfo.webSite,
-      'bids.$[].email': userInfo.email,
-      'bids.$[].facebook': userInfo.facebook,
-      'bids.$[].instagram': userInfo.instagram,
-      'bids.$[].twitter': userInfo.twitter,
-      'bids.$[].telegram': userInfo.telegram,
-      'bids.$[].gmail': userInfo.gmail
-    }, {
+      "arrayFilters": [{
+        "elem.bidder": account.toLowerCase()
+      }],
       multi: true
     });
 

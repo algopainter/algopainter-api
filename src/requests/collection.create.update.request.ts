@@ -26,3 +26,15 @@ export interface ICollectionApproveRequestSignData
 }
 
 export type ICollectionApproveRequest = ISign<ICollectionApproveRequestSignData>
+
+export interface ICollectionExternalNFTRequestSignData 
+{ 
+    address: string;
+    name: string;
+    account: string;
+    nfts: any[],
+    salt: string | undefined | null;
+}
+
+export type ICollectionExternalNFTRequest = ISign<ICollectionExternalNFTRequestSignData>
+

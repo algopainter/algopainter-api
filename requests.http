@@ -1,1 +1,32 @@
-GET http://localhost:3000/api/reports/user/0x0B27e014311eD64E095e55c0e23DFE186e5926BD/auctions
+POST http://localhost:3000/api/collections
+content-type: application/json
+
+{
+  "data": {
+    "address":"0xbe9cac059835236da5e91cd72688c43886b63419",
+    "name":"Algo Painter Expressions Item (APEXPI)",
+    "account":"0xbd5e30c35aa71bcf7f4372821492b113d77b9126",
+    "nfts": [
+      { 
+        "id":"33",
+        "name":"KD MEU PIRS",
+        "description":"KD MEU PIRS",
+        "image":"https://ipfs.io/ipfs/QmdV1L1foTBMxEpuCvpkoZ4XgcnELQoCjP4s1bX7EoYm9E"
+      },{
+        "id":"40",
+        "name":"Refresh",
+        "description":"This is going to be big!",
+        "image":"https://ipfs.io/ipfs/QmTA72uFU7ekgpEkP38pg1e4HjiNj8wVZw4mCin8iP7pNp"
+      },{
+        "id":"47",
+        "name":"aaaa",
+        "description":"aaaaa",
+        "image":"https://ipfs.io/ipfs/QmXdtrHF14o9iKPrLjCBC8yhu2oLKppYs3tijSek2fEgrv"
+      }
+    ],
+    "salt":"__p1uhp92IvYGjPU105A2"
+  },
+  "salt":"__p1uhp92IvYGjPU105A2",
+  "signature":"0x6291862cfb75292c439fbba1d9374cd11fb00a9673a5a86f4d9e5158ff446f8954c982d0aca6915e065332e8e1fb68e68fcddd389616f4517313932b34bfd5a51c",
+  "account":"0xbd5e30c35aa71bcf7f4372821492b113d77b9126"
+}
