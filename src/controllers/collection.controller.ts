@@ -6,7 +6,7 @@ import Paged from "../shared/paged";
 import Result from "../shared/result";
 import BaseController from "./base.controller"
 import { IImage } from "../domain/image";
-import { ICollectionApproveRequest, ICollectionPatchRequest, ICollectionUpdateCreateRequest } from "src/requests/collection.create.update.request";
+import { ICollectionApproveRequest, ICollectionExternalNFTRequest, ICollectionPatchRequest, ICollectionUpdateCreateRequest } from "../requests/collection.create.update.request";
 
 
 class CollectionController extends BaseController {
@@ -38,6 +38,15 @@ class CollectionController extends BaseController {
             params.paging.perPage
           );
         }
+        this.handleResult(result, res);
+      } catch (error) {
+        this.handleException(error, res);
+      }
+    });
+
+    router.post(`${this.path}`, async (req, res) => {
+      try {
+        const result = await this.service.createExternalNFTCollectionWithSign(req.body as ICollectionExternalNFTRequest);
         this.handleResult(result, res);
       } catch (error) {
         this.handleException(error, res);
@@ -106,7 +115,7 @@ class CollectionController extends BaseController {
         if (resultCollection && resultCollection.data) {
           delete req.query.id;
           if(resultCollection.data.blockchainId)
-            req.query.collectionId = '|NO_PARSE|' + (resultCollection.data as ICollection).blockchainId.toString();
+            req.query.collectionId = '|NO_PARSE|' + (resultCollection.data as ICollection)?.blockchainId?.toString();
           else
             req.query.collectionOwner = (resultCollection.data as ICollection).owner;
           const params = this.requestParams(req);

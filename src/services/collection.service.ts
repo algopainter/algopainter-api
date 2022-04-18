@@ -1,10 +1,13 @@
 import Result from "../shared/result";
 import { CollectionContext, CollectionDocument, ICollection, CollectionValidator } from "../domain/collection";
 import { IFilter, IOrderBy, BaseCRUDService } from "./base.service";
-import { ICollectionApproveRequest, ICollectionApproveRequestSignData, ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionUpdateCreateRequest, ICollectionUpdateCreateSignData } from '../requests/collection.create.update.request';
+import { ICollectionApproveRequest, ICollectionApproveRequestSignData, ICollectionPatchRequest, ICollectionPatchRequestSignData, ICollectionExternalNFTRequest, ICollectionExternalNFTRequestSignData } from '../requests/collection.create.update.request';
 import Paged from "../shared/paged";
 import SignService from "./sign.service";
 import Exception from "../shared/exception";
+import { UserContext } from "../domain/user";
+import { NFTContext } from "../domain/nft";
+import { ImageContext } from "../domain/image";
 
 /**
  * Collection service class
@@ -18,14 +21,14 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
         "metrics.endDT": { $gt: new Date() }
       })
       .sort(this.translateToMongoOrder(order));
-    return Result.success<ICollection[]>(null, data);
+    return Result.success<ICollection[]>(null, data as ICollection[]);
   }
 
   async listAsync2(filter: IFilter, order: IOrderBy): Promise<Result<ICollection[]>> {
     const data = await CollectionContext
       .find(this.translateToMongoQuery(filter))
       .sort(this.translateToMongoOrder(order));
-    return Result.success<ICollection[]>(null, data);
+    return Result.success<ICollection[]>(null, data as ICollection[]);
   }
 
   async pagedAsync2(filter: IFilter, order: IOrderBy, page: number, perPage: number): Promise<Result<Paged<ICollection>>> {
@@ -42,7 +45,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       currPage: page,
       pages: Math.ceil(count / perPage),
       perPage,
-      data
+      data: data as ICollection[]
     });
   }
 
@@ -66,28 +69,22 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
       currPage: page,
       pages: Math.ceil(count / perPage),
       perPage,
-      data
+      data: data as ICollection[]
     });
   }
 
   async getAsync(id: string): Promise<Result<ICollection>> {
     const data = await CollectionContext.findById(id);
     if(data)
-      return Result.success<ICollection>(null, data);
+      return Result.success<ICollection>(null, data as ICollection);
     return Result.fail<ICollection>('Collection not found!', null, 404);
   }
 
-  async getByTitleAsync(title: string): Promise<Result<ICollection>> {
-    const data = await CollectionContext.findOne({ title: new RegExp(["^", title.toLowerCase(), "$"].join(""), "i") });
+  async getByAddressAsync(title: string): Promise<Result<ICollection>> {
+    const data = await CollectionContext.findOne({ owner: title.toLowerCase() });
     if(data)
-      return Result.success<ICollection>(null, data);
+      return Result.success<ICollection>(null, data as ICollection);
     return Result.fail<ICollection>('Collection not found!', null, 404);
-  }
-
-  private validateCollectionData(data: ICollection) : any {
-    var invalid = CollectionValidator(data);
-    if(invalid)
-      throw new Error(invalid);
   }
 
   async patchCollection(request: ICollectionPatchRequest, id: number) {
@@ -142,37 +139,161 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return responseResult;    
   }
 
-  async createOrUpdateCollectionWithSign(request: ICollectionUpdateCreateRequest, id: string | undefined = undefined): Promise<Result<ICollection>> {
+  async _fillUser(user: any, account: string, role: string) {
+    const existingAccount = await UserContext.findOne({ account: account.toLowerCase() });
+
+    user.role = role;
+
+    if(existingAccount) {
+      user.name = existingAccount.name || account;
+      user.avatar = existingAccount.avatar;
+      user.email = existingAccount.email;
+      user.webSite = existingAccount.webSite;
+      user.twitter = existingAccount.twitter;
+      user.customProfile = existingAccount.customProfile;
+      user.instagram = existingAccount.instagram;
+    }
+  }
+
+  async createExternalNFTCollectionWithSign(request: ICollectionExternalNFTRequest): Promise<Result<ICollection>> {
     let responseResult: Result<ICollection> = Result.fail<ICollection>("The request is invalid.", null, 400);
 
     if (!request || !request.data)
       return responseResult;
 
     const signService = new SignService();
-    if (!(await signService.validate<ICollectionUpdateCreateSignData>(request, request.data, 'collection_creation')).isValid)
+    if (!(await signService.validate<ICollectionExternalNFTRequestSignData>(request, request.data, 'collection_creation')).isValid)
       throw new Exception(400, "INVALID_SIGN", "The sent data is not valid!", null);
 
-    if (!(await this._checkUniqueness(request.data)) && this.validateCollectionData(request.data)) {
-      let result : Result<ICollection> | null = await this.getByTitleAsync(request.data.title);
-
-      if(id) {
-        result = await this.getAsync(id);
-        if (!(result.success && result.data && result.data.account)) {
-          return Result.custom<ICollection>(false, "The collection has not been found!", null, 404);
-        }
-      }
+    if (!(await this._checkUniqueness(request.data))) {
+      let result : Result<ICollection> | null = await this.getByAddressAsync(request.data.address);
       
-      if (result.success && result.data && result.data.account) {
-        await this.updateAsync((result.data as CollectionDocument)._id, {
-          title: request.data.title,
-          avatar: request.data.avatar,
-          account: result.data.account,
-          description: request.data.description,
-          owner: request.data.owner,
-          metrics: request.data.metrics,
-          api: request.data.api
+      if (result.success && result.data && result.data.owner) {
+        responseResult = result;
+      } else {
+        const collectionCreated = await this.createAsync(<ICollection>{
+          title: request.data.name,
+          namelc: request.data.name.toLowerCase(),
+          show: false,
+          description: request.data.name,
+          isCustom: true,
+          owner: request.data.address,
+          account: request.data.account
         });
-        responseResult = await this.getByTitleAsync(request.data.title);
+
+        if(collectionCreated.success) {
+          const nftsAndImages = await Promise.all(request.data.nfts.map(async a => {
+            const newNFT = {
+              //HARD CODED ARTIST
+              artist: {
+                name: "Custom",
+                address: request.data.address.toLowerCase(),
+                website: "https://www.algopainter.art",
+                twitter: "https://www.twitter.com/algopainter",
+                github: "https://github.com/algopainter",
+                instagram: "https://www.instagram.com/algopainter",
+                avatar: "",
+              },
+              collectionHash: request.data.address.toLowerCase(),
+              pirs: { creatorRate: null, investorRate: null },
+              isRecovered: false,
+              supplyIndex: a.id,
+              contractAddress: request.data.address.toLowerCase(),
+              description: a.description,
+              mintedBy: request.data.account.toLowerCase(),
+              owner: request.data.account.toLowerCase(),
+              name: a.name || "N/A",
+              collectionName: request.data.name,
+              image: a.image,
+              previewImage: a.image,
+              rawImage: a.image,
+              initialPrice: {
+                amount: 0,
+                tokenSymbol: "",
+                tokenAddress: "",
+              },
+              parameters: a.params,
+              descriptor: a.descriptor,
+            };
+
+            const createdNFT = await NFTContext.create(newNFT);
+
+            const newImg = {
+              title: newNFT.name,
+              likes: 0,
+              users: [] as any[],
+              pirs: 0,
+              creator: (newNFT.mintedBy || newNFT.artist.address).toLowerCase(),
+              owner: (newNFT.mintedBy || newNFT.artist.address).toLowerCase(),
+              description: newNFT.description,
+              collectionName: newNFT.collectionName,
+              collectionOwner: newNFT.contractAddress.toLowerCase(),
+              collectionHash: newNFT.collectionHash.toLowerCase(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              nft: {
+                _id: createdNFT._id.valueOf(),
+                index: newNFT.supplyIndex,
+                previewImage: newNFT.image,
+                image: newNFT.image,
+                rawImage: newNFT.image,
+                parameters: newNFT.parameters
+              },
+              tags: [],
+              likers: [],
+              initialPrice: newNFT.initialPrice
+            };
+
+            let imgOwner = {
+              name: newImg.owner.toLowerCase(),
+              email: '',
+              avatar: '',
+              account: newImg.owner.toLowerCase(),
+              webSite: '',
+              twitter: '',
+              customProfile: '',
+              instagram: '',
+              type: 'user',
+              role: 'owner'
+            };
+        
+            let imgCreator = {
+              name: newImg.creator.toLowerCase(),
+              avatar: '',
+              email: '',
+              account: newImg.creator.toLowerCase(),
+              webSite: '',
+              twitter: '',
+              customProfile: '',
+              instagram: '',
+              type: 'user',
+              role: 'creator'
+            };
+        
+            await this._fillUser(imgOwner, newImg.owner, 'owner');
+        
+            if(newImg.creator != newImg.owner) {
+              await this._fillUser(imgCreator, newImg.creator, 'creator');
+            } else {
+              imgCreator = { ...imgOwner };
+              imgCreator.role = 'creator';
+            }
+        
+            newImg.users.push(imgOwner);
+            newImg.users.push(imgCreator);
+        
+            await ImageContext.create(newImg);
+
+            return {
+              nft: newNFT,
+              image: newImg 
+            }
+          }));
+
+          if(nftsAndImages && nftsAndImages.length) {
+            responseResult = Result.success<ICollection>(null, null)
+          }
+        }
       }
     } else {
       responseResult = Result.custom<ICollection>(false, "The data sent is not unique!", null, 409, 390);
@@ -181,31 +302,17 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
     return responseResult;
   }
 
-  private async _checkUniqueness(collectionInfo: ICollectionUpdateCreateSignData) {
+  private async _checkUniqueness(collectionInfo: ICollectionExternalNFTRequestSignData) {
     const foundCollections = await CollectionContext.find({
-      title: {
-        $ne: collectionInfo.title.toLowerCase()
-      }
+      owner: collectionInfo.address.toLowerCase()
     });
 
-    if (collectionInfo.title || collectionInfo.owner) {
-      const checkTitle = collectionInfo.title ? foundCollections.some(a =>
-        (a.title && a.title?.toLowerCase().trim() == collectionInfo.title?.toLowerCase().trim())
-      ) : false;
-
-      const checkOwner = collectionInfo.owner ? foundCollections.some(a =>
-        (a.owner && a.owner?.toLowerCase().trim() == collectionInfo.owner?.toLowerCase().trim())
-      ) : false;
-
-      return checkTitle || checkOwner;
-    }
-
-    return false;
+    return foundCollections.length > 0;
   }
 
   async createAsync(createdItem: ICollection): Promise<Result<ICollection>> {
     const input = await CollectionContext.create(createdItem);
-    return Result.success<ICollection>(null, input);
+    return Result.success<ICollection>(null, input as ICollection);
   }
 
   async updateAsync(id: string, updatedItem: Partial<ICollection>): Promise<Result<ICollection>> {

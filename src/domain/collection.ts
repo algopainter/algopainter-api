@@ -2,19 +2,19 @@ import { model, Schema, Model, Document } from 'mongoose';
 import v8n from "v8n";
 
 export interface CollectionDocument extends Document {
-  blockchainId: number,
+  blockchainId?: number,
   title: string;
   namelc: string;
-  description: string;
+  description?: string;
   show: boolean;
   isCustom: boolean;
   owner: string;
-  avatar: string | null | undefined;
+  avatar?: string | null;
   account: string;
-  website: string;
-  approvedBy: string;
-  metrics: ICollectionMetrics | null | undefined;
-  api: ICollectionNFTCreationAPI | null | undefined;
+  website?: string;
+  approvedBy?: string;
+  metrics?: ICollectionMetrics | null;
+  api?: ICollectionNFTCreationAPI | null;
 }
 
 export interface ICollectionMetrics {
@@ -63,6 +63,7 @@ export const CollectionSchema: Schema = new Schema({
   namelc: { type: String, required: true },
   description: { type: String, required: true },
   show: { type: Boolean, required: false },
+  isCustom: { type: Boolean, required: false },
   owner: { type: String, required: true, index: true },
   avatar: { type: String, required: false },
   account: { type: String, required: true, index: true },

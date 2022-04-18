@@ -30,6 +30,14 @@ class Application {
     this.router = express.Router();
 
     this.initializeMiddlewares();
+
+    connect(Settings.mongoURL(), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+      poolSize: 100
+    });
   }
 
   private initializeMiddlewares() {
@@ -39,21 +47,6 @@ class Application {
       exposedHeaders: [ 'x-total-items' ]
     }));
     this.app.use(async (req, res, next) => {
-      await connect(Settings.mongoURL(), {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true,
-        poolSize: 100
-      });
-
-      res.on('finish', async () => {
-        await disconnect()
-      });
-      res.on('close', async () => {
-        await disconnect()
-      });
-
       // const signService = new SignService();
       // const result = await signService.validatePreRequest(req.body);
       // if (result === null || result === true)

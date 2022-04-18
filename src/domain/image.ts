@@ -66,7 +66,7 @@ export const ImageSchema: Schema = new Schema({
   collectionOwner: { type: String, required: true },
   onSale: { type: Boolean, default: false },
   tags: { type: [String], required: true },
-  createAt: { type: Date, required: true },
+  createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
   nft: { type: Object, required: true },
   pirs: { type: Object },

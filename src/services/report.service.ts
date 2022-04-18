@@ -17,7 +17,7 @@ export default class ReportService extends BaseService {
       owner: artist.toLowerCase()
     }, {
       blockchainId: 1
-    })).map(a => a.blockchainId.toString());
+    })).map(a => a.blockchainId?.toString() as string);
 
     const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
     
@@ -67,7 +67,7 @@ export default class ReportService extends BaseService {
     const minus90Days = new Date(new Date().getTime() - (90 * 86400 * 1000));
     
     const nfts = await ImageContext.find({
-      collectionId: { $in: artistCollections.map(a => a.blockchainId.toString()) }
+      collectionId: { $in: artistCollections.map(a => a.blockchainId?.toString() as string) }
     }, {
       nft: 1,
       collectionId: 1,
@@ -95,7 +95,7 @@ export default class ReportService extends BaseService {
             index: a.index,
             amount: a.check?.net ? `${a.check?.net.toString()} ${a.minimumBid?.tokenSymbol}` : '',
             collection: artistCollections.find(
-              z => z.blockchainId.toString() == nfts.find(
+              z => z.blockchainId?.toString() as string == nfts.find(
                 s => s.nft.index == a.item.index)?.collectionId)?.title,
             creator: a.check?.creator ? (a.check.creator.toString() + ' ' + a.minimumBid?.tokenSymbol) : '',
             nft: a.item.index + ' ' + a.item.title,
