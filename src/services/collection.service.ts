@@ -233,7 +233,7 @@ export default class CollectionService extends BaseCRUDService<ICollection> {
               updatedAt: new Date(),
               nft: {
                 _id: createdNFT._id.valueOf(),
-                index: newNFT.supplyIndex,
+                index: parseInt(newNFT.supplyIndex),
                 previewImage: newNFT.image,
                 image: newNFT.image,
                 rawImage: newNFT.image,
